@@ -7,3 +7,9 @@ repo_dir: "data/context/langchain/repo"
 context_dir: "data/context/langchain"
 tasks_dir: "data/tasks/langchain"
 baselines_dir: "data/human_baselines/langchain"
+github:
+  - langchain-ai/langchain
+reddit_keywords:
+  - langchain
+hn_keywords:
+  - langchain

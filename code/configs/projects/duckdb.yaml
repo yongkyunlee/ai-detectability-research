@@ -7,3 +7,9 @@ repo_dir: "data/context/duckdb/repo"
 context_dir: "data/context/duckdb"
 tasks_dir: "data/tasks/duckdb"
 baselines_dir: "data/human_baselines/duckdb"
+github:
+  - duckdb/duckdb
+reddit_keywords:
+  - duckdb
+hn_keywords:
+  - duckdb

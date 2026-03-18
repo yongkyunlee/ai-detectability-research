@@ -18,6 +18,7 @@ dependencies = [
     "statsmodels",
     "jupyter",
     "pytest",
+    "httpx",
 ]
 
 [tool.hatch.build.targets.wheel]

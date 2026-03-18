@@ -7,3 +7,9 @@ repo_dir: "data/context/crewai/repo"
 context_dir: "data/context/crewai"
 tasks_dir: "data/tasks/crewai"
 baselines_dir: "data/human_baselines/crewai"
+github:
+  - crewAIInc/crewAI
+reddit_keywords:
+  - crewai
+hn_keywords:
+  - crewai

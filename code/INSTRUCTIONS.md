@@ -61,16 +61,37 @@ The cloned repos provide README, docs, and source code context. Task YAMLs refer
 
 | Directory | Content | How to collect |
 |---|---|---|
-| `data/context/{project}/issues/` | GitHub issue excerpts (title + body + top comments) | Search GitHub issues for topic-related threads |
-| `data/context/{project}/community/` | Reddit/HN thread excerpts | Search Reddit/HN for topic discussions |
-| `data/context/{project}/releases/` | Relevant changelog entries | Copy from project release notes |
+| `data/context/{project}/issues/` | GitHub issue excerpts (title + body + top comments) | `fetch_github.py` |
+| `data/context/{project}/community/` | Reddit/HN thread excerpts | `fetch_reddit.py` + `fetch_hn.py` |
+| `data/context/{project}/releases/` | Relevant changelog entries | `fetch_github.py` |
+
+Run the fetch scripts for each project (fetches the past week of data):
+
+```bash
+cd code/
+
+# GitHub issues & releases (requires GITHUB_TOKEN env var)
+uv run python scripts/fetch_github.py --project crewai --since 2026-03-11
+uv run python scripts/fetch_github.py --project duckdb --since 2026-03-11
+uv run python scripts/fetch_github.py --project langchain --since 2026-03-11
+
+# Reddit posts
+uv run python scripts/fetch_reddit.py --project crewai --since 2026-03-11 --fetch-comments
+uv run python scripts/fetch_reddit.py --project duckdb --since 2026-03-11 --fetch-comments
+uv run python scripts/fetch_reddit.py --project langchain --since 2026-03-11 --fetch-comments
+
+# Hacker News threads
+uv run python scripts/fetch_hn.py --project crewai --since 2026-03-11
+uv run python scripts/fetch_hn.py --project duckdb --since 2026-03-11
+uv run python scripts/fetch_hn.py --project langchain --since 2026-03-11
+```
 
 **Preprocessing rules (for issues, community, and releases):**
-- Strip bullet formatting, marketing copy, and canned opening/closing phrases
-- Keep factual content: version numbers, commands, config details, error messages, trade-offs
+- Scripts automatically strip HTML tags, marketing copy, and canned phrases
+- Kept: factual content — version numbers, commands, config details, error messages, trade-offs
 - Context is used for factual grounding only, not for borrowing phrasing
 
-Save each file as plain markdown.
+Each file is saved as plain markdown.
 
 ---
 

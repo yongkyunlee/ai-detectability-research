@@ -1,0 +1,23 @@
+task_id: duckdb_003
+project: duckdb
+topic: "DuckDB extension system and community extensions"
+word_target: "300-500"
+gold_facts:
+  - field: install_command
+    value: "INSTALL"
+    match_type: literal
+  - field: load_command
+    value: "LOAD"
+    match_type: literal
+  - field: core_extensions
+    value: "httpfs"
+    match_type: literal
+  - field: community_repo
+    value: "community"
+    match_type: semantic
+context_sources:
+  code_only:
+    - data/context/duckdb/code/extensions.md
+  additional:
+    - data/context/duckdb/issues/extension_issues.md
+    - data/context/duckdb/community/reddit_extensions.md

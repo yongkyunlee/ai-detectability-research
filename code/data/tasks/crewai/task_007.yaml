@@ -1,0 +1,23 @@
+task_id: crewai_007
+project: crewai
+topic: "CrewAI project structure and CLI commands"
+word_target: "300-500"
+gold_facts:
+  - field: create_command
+    value: "crewai create crew"
+    match_type: literal
+  - field: run_command
+    value: "crewai run"
+    match_type: literal
+  - field: config_dir
+    value: "config"
+    match_type: semantic
+  - field: main_file
+    value: "crew.py"
+    match_type: literal
+context_sources:
+  code_only:
+    - data/context/crewai/code/cli.md
+  additional:
+    - data/context/crewai/issues/cli_issues.md
+    - data/context/crewai/community/reddit_project_structure.md

@@ -1,0 +1,23 @@
+task_id: duckdb_005
+project: duckdb
+topic: "DuckDB integration with pandas and Arrow"
+word_target: "300-500"
+gold_facts:
+  - field: pandas_method
+    value: "df()"
+    match_type: regex
+  - field: arrow_method
+    value: "arrow"
+    match_type: literal
+  - field: zero_copy
+    value: "zero-copy"
+    match_type: semantic
+  - field: sql_on_df
+    value: "FROM df"
+    match_type: regex
+context_sources:
+  code_only:
+    - data/context/duckdb/code/python_integration.md
+  additional:
+    - data/context/duckdb/issues/pandas_issues.md
+    - data/context/duckdb/community/reddit_pandas_integration.md

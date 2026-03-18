@@ -1,0 +1,23 @@
+task_id: duckdb_007
+project: duckdb
+topic: "DuckDB window functions and analytical queries"
+word_target: "300-500"
+gold_facts:
+  - field: window_syntax
+    value: "OVER"
+    match_type: literal
+  - field: partition_by
+    value: "PARTITION BY"
+    match_type: literal
+  - field: ranking_function
+    value: "ROW_NUMBER"
+    match_type: literal
+  - field: frame_spec
+    value: "ROWS BETWEEN"
+    match_type: regex
+context_sources:
+  code_only:
+    - data/context/duckdb/code/window_functions.md
+  additional:
+    - data/context/duckdb/issues/window_function_issues.md
+    - data/context/duckdb/community/reddit_analytical_queries.md

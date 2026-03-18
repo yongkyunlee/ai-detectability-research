@@ -1,0 +1,23 @@
+task_id: crewai_004
+project: crewai
+topic: "Using tools in CrewAI agents"
+word_target: "300-500"
+gold_facts:
+  - field: tools_install
+    value: "crewai install"
+    match_type: regex
+  - field: tool_decorator
+    value: "@tool"
+    match_type: literal
+  - field: builtin_tools
+    value: "SerperDevTool"
+    match_type: literal
+  - field: tool_assignment
+    value: "tools"
+    match_type: semantic
+context_sources:
+  code_only:
+    - data/context/crewai/code/tools.md
+  additional:
+    - data/context/crewai/issues/tool_integration_issues.md
+    - data/context/crewai/community/reddit_tools.md

@@ -1,0 +1,32 @@
+detection:
+  gptzero:
+    endpoint: "https://api.gptzero.me/v2/predict/text"
+    env_key: "GPTZERO_API_KEY"
+    rate_limit_rpm: 60
+    min_text_length: 250
+  originality:
+    endpoint: "https://api.originality.ai/api/v1/scan/ai"
+    env_key: "ORIGINALITY_API_KEY"
+    rate_limit_rpm: 100
+    min_text_length: 250
+
+factual:
+  llm_judge:
+    model: "claude-sonnet-4-20250514"
+    temperature: 0
+    max_tokens: 256
+  overlap_threshold: 0.15  # Flag outputs with >15% n-gram overlap
+
+linguistic:
+  features:
+    - sent_len_std
+    - sent_len_mean
+    - vocab_diversity
+    - contraction_rate
+    - first_person_rate
+    - discourse_marker_rate
+    - list_density
+    - passive_ratio
+    - paragraph_len_std
+    - specificity_score
+  spacy_model: "en_core_web_sm"

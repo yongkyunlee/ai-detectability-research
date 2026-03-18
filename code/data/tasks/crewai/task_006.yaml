@@ -1,0 +1,23 @@
+task_id: crewai_006
+project: crewai
+topic: "Memory and context management in CrewAI"
+word_target: "300-500"
+gold_facts:
+  - field: memory_flag
+    value: "memory"
+    match_type: literal
+  - field: memory_types
+    value: "short-term, long-term, entity"
+    match_type: semantic
+  - field: storage
+    value: "embedder"
+    match_type: semantic
+  - field: crew_parameter
+    value: "memory=True"
+    match_type: literal
+context_sources:
+  code_only:
+    - data/context/crewai/code/memory.md
+  additional:
+    - data/context/crewai/issues/memory_issues.md
+    - data/context/crewai/community/reddit_memory.md

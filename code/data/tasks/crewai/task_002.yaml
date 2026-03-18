@@ -1,0 +1,23 @@
+task_id: crewai_002
+project: crewai
+topic: "Configuring agents in CrewAI with roles and goals"
+word_target: "300-500"
+gold_facts:
+  - field: config_file
+    value: "agents.yaml"
+    match_type: literal
+  - field: agent_attributes
+    value: "role, goal, backstory"
+    match_type: semantic
+  - field: llm_parameter
+    value: "llm"
+    match_type: literal
+  - field: delegation
+    value: "allow_delegation"
+    match_type: literal
+context_sources:
+  code_only:
+    - data/context/crewai/code/agents.md
+  additional:
+    - data/context/crewai/issues/agent_config_issues.md
+    - data/context/crewai/community/reddit_agent_setup.md

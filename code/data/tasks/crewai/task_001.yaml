@@ -1,0 +1,23 @@
+task_id: crewai_001
+project: crewai
+topic: "Getting started with CrewAI: installation and first project"
+word_target: "300-500"
+gold_facts:
+  - field: install_command
+    value: "pip install crewai"
+    match_type: literal
+  - field: python_requirement
+    value: "Python >=3.10"
+    match_type: regex
+  - field: project_init_command
+    value: "crewai create crew"
+    match_type: literal
+  - field: config_format
+    value: "YAML"
+    match_type: semantic
+context_sources:
+  code_only:
+    - data/context/crewai/code/installation.md
+  additional:
+    - data/context/crewai/issues/setup_issues.md
+    - data/context/crewai/community/reddit_getting_started.md

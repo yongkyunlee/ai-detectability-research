@@ -1,0 +1,51 @@
+conditions:
+  c1_code_only:
+    label: "code_only"
+    description: "Minimal prompt with code/docs only"
+    system_prompt: "Write a technical blog post about {topic} based on the following documentation. Target length: {word_target} words."
+    context_type: "code_only"
+
+  c2_context_rich:
+    label: "context_rich"
+    description: "Rich context with minimal prompt"
+    system_prompt: "Write a technical blog post about {topic} based on the following documentation. Target length: {word_target} words."
+    context_type: "full"
+    context_instructions: |
+      Use the following context for facts, terminology, and trade-offs only.
+      Do not copy phrasing from context sources.
+      Do not reuse contiguous spans longer than 8 words from any context source.
+      Do not claim personal experiences not supported by the provided sources.
+
+  c3_style_constrained:
+    label: "style_constrained"
+    description: "Rich context with style-constrained prompt"
+    context_type: "full"
+    # system_prompt loaded from style_rules.yaml
+    context_instructions: |
+      Use the following context for facts, terminology, and trade-offs only.
+      Do not copy phrasing from context sources.
+      Do not reuse contiguous spans longer than 8 words from any context source.
+      Do not claim personal experiences not supported by the provided sources.
+
+  c4_humanized:
+    label: "humanized"
+    description: "Post-hoc humanization of C2 output"
+    system_prompt: "You are an editor making AI-generated technical content sound natural."
+    user_prompt: |
+      Rewrite this to sound like a human engineer wrote it. Preserve all technical facts.
+      Do not add information not in the original. Do not remove technical details.
+      Target length: {word_target} words.
+
+      Original text:
+      {text}
+
+  c5_human_baseline:
+    label: "human_baseline"
+    description: "Real engineer-written blog posts"
+
+model:
+  name: "claude-sonnet-4-20250514"
+  temperature: 0.3
+  max_tokens: 1024
+
+runs_per_condition: 3

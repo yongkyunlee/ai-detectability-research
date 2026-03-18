@@ -1,0 +1,23 @@
+task_id: duckdb_006
+project: duckdb
+topic: "Using DuckDB with remote storage and httpfs"
+word_target: "300-500"
+gold_facts:
+  - field: httpfs_extension
+    value: "httpfs"
+    match_type: literal
+  - field: s3_config
+    value: "s3_region"
+    match_type: regex
+  - field: remote_read
+    value: "read_parquet('s3://"
+    match_type: regex
+  - field: install_httpfs
+    value: "INSTALL httpfs"
+    match_type: literal
+context_sources:
+  code_only:
+    - data/context/duckdb/code/remote_storage.md
+  additional:
+    - data/context/duckdb/issues/httpfs_issues.md
+    - data/context/duckdb/community/reddit_remote_storage.md

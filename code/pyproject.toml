@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-text-quality"
+version = "0.1.0"
+description = "Measuring AI detectability and factual accuracy across content generation strategies"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic",
+    "pyyaml",
+    "spacy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "scipy",
+    "statsmodels",
+    "jupyter",
+    "pytest",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_text_quality"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

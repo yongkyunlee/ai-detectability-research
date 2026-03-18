@@ -1,0 +1,8 @@
+project: duckdb
+name: "DuckDB"
+description: "In-process analytical database management system"
+repo_url: "https://github.com/duckdb/duckdb"
+docs_url: "https://duckdb.org/docs"
+context_dir: "data/context/duckdb"
+tasks_dir: "data/tasks/duckdb"
+baselines_dir: "data/human_baselines/duckdb"

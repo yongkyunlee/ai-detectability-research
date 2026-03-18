@@ -5,12 +5,6 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
-class GoldFact(BaseModel):
-    field: str
-    value: str
-    match_type: Literal["literal", "regex", "semantic"] = "literal"
-
-
 class ContextSources(BaseModel):
     code_only: list[str]
     additional: list[str] = Field(default_factory=list)
@@ -21,8 +15,23 @@ class Task(BaseModel):
     project: str
     topic: str
     word_target: str
-    gold_facts: list[GoldFact]
+    reference_docs: list[str] = Field(default_factory=list)
     context_sources: ContextSources
+
+
+class Claim(BaseModel):
+    """An atomic factual claim extracted from generated text."""
+    claim_id: int
+    text: str
+    source_sentence: str
+
+
+class ClaimVerdict(BaseModel):
+    """Verification result for a single claim."""
+    claim_id: int
+    claim_text: str
+    verdict: Literal["CORRECT", "INCORRECT", "UNVERIFIABLE"]
+    evidence: str = ""
 
 
 class GeneratedText(BaseModel):
@@ -31,22 +40,18 @@ class GeneratedText(BaseModel):
     run_id: str
     text: str
     model: str
+    word_target: str = ""
     timestamp: str
     token_usage: dict[str, int]  # input_tokens, output_tokens
     overlap_score: float = 0.0
-
-
-class SlotVerdict(BaseModel):
-    field: str
-    expected: str
-    verdict: Literal["CORRECT", "INCORRECT", "MISSING"]
-    evidence: str = ""
 
 
 class DetectionResult(BaseModel):
     task_id: str
     condition: str
     run_id: str
+    model: str = ""
+    word_target: str = ""
     gptzero_human_prob: float
     gptzero_mixed_prob: float = 0.0
     gptzero_generated_prob: float = 0.0
@@ -60,16 +65,22 @@ class FactCheckResult(BaseModel):
     task_id: str
     condition: str
     run_id: str
-    slot_results: list[SlotVerdict]
-    hybrid_slot_accuracy: float
-    strict_slot_accuracy: float
-    llm_judge_agreement: float = 0.0
+    model: str = ""
+    word_target: str = ""
+    claims: list[ClaimVerdict]
+    total_claims: int
+    correct_claims: int
+    incorrect_claims: int
+    unverifiable_claims: int
+    factual_precision: float  # correct / (correct + incorrect)
 
 
 class LinguisticFeatures(BaseModel):
     task_id: str
     condition: str
     run_id: str
+    model: str = ""
+    word_target: str = ""
     sent_len_std: float
     sent_len_mean: float
     vocab_diversity: float

@@ -1,0 +1,9 @@
+project: langchain
+name: "LangChain"
+description: "Framework for building applications with large language models"
+repo_url: "https://github.com/langchain-ai/langchain"
+docs_url: "https://python.langchain.com/docs"
+repo_dir: "data/context/langchain/repo"
+context_dir: "data/context/langchain"
+tasks_dir: "data/tasks/langchain"
+baselines_dir: "data/human_baselines/langchain"

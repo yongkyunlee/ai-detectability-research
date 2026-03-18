@@ -1,0 +1,12 @@
+task_id: langchain_002
+project: langchain
+topic: Building RAG pipelines with LangChain retrievers and vector stores
+word_target: 300-500
+reference_docs:
+- data/context/langchain/repo/README.md
+context_sources:
+  code_only:
+  - data/context/langchain/repo/README.md
+  additional:
+  - data/context/langchain/issues/rag_issues.md
+  - data/context/langchain/community/reddit_rag.md

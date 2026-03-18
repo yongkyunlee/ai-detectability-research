@@ -1,23 +1,11 @@
 task_id: crewai_008
 project: crewai
-topic: "Multi-agent collaboration patterns in CrewAI"
-word_target: "300-500"
-gold_facts:
-  - field: process_sequential
-    value: "sequential"
-    match_type: literal
-  - field: process_hierarchical
-    value: "hierarchical"
-    match_type: literal
-  - field: manager_llm
-    value: "manager_llm"
-    match_type: literal
-  - field: delegation
-    value: "allow_delegation"
-    match_type: literal
+topic: Multi-agent collaboration patterns in CrewAI
+word_target: 300-500
+reference_docs: &id001
+- data/context/crewai/repo/README.md
 context_sources:
-  code_only:
-    - data/context/crewai/code/collaboration.md
+  code_only: *id001
   additional:
-    - data/context/crewai/issues/collaboration_issues.md
-    - data/context/crewai/community/reddit_multi_agent.md
+  - data/context/crewai/issues/collaboration_issues.md
+  - data/context/crewai/community/reddit_multi_agent.md

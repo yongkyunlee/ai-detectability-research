@@ -1,6 +1,6 @@
 # Context Enrichment and Style Intervention for Reducing AI Detectability in Technical Content
 
-**Yong Kyun Lee**
+**Yongkyun Lee**
 Mini Research Project — March 2025
 
 ---
@@ -9,7 +9,7 @@ Mini Research Project — March 2025
 
 **Problem:** AI-generated technical content is easily detected and dismissed as "AI slop" — 73% of readers say they can spot it, and detection tools report >99% accuracy on raw AI output.
 
-**Method:** 5-condition ablation study isolating the effect of context enrichment, style constraints, and post-hoc humanization on AI detectability and factual accuracy across 15 technical writing tasks.
+**Method:** 5-condition ablation study across 3 models (Claude Opus 4.6, GPT 5.4, Gemini 3.1) and 3 content lengths, measuring AI detectability and factual accuracy on 22 technical writing tasks.
 
 **Key Results:**
 - Style constraints (C3) reduced AI detection by **[X]%** over baseline while preserving **[Y]%** factual accuracy
@@ -97,11 +97,17 @@ Each condition adds one intervention on top of the previous:
 
 **Why C4 rewrites C2, not C3:** Isolates the rewrite effect from style constraints — avoids confounding two interventions.
 
-### Task Set
-- **15 tasks** across 2 open-source projects (CrewAI, DuckDB)
-- Each task: write a 300–500 word technical blog section
-- Each task has a **gold fact table** (3–7 required facts: version numbers, commands, file names)
-- **3 runs per condition** → 180 generated texts + 15 human baselines = **195 total documents**
+### Task Set & Experimental Axes
+- **22 tasks** across 3 open-source projects (CrewAI, DuckDB, LangChain)
+- **3 models via CLI:** Claude Code (Opus 4.6), Codex CLI (GPT 5.4), Gemini CLI (3.1)
+- **3 content lengths:** Short (150–250), Medium (300–500), Long (700–1000 words)
+- **3 runs per condition** → ~750 documents total
+
+| Sub-experiment | Models | Lengths | Conditions | Texts |
+|---|---|---|---|---|
+| Core ablation | Claude Code | Medium | C1–C4 | 264 |
+| Model comparison | All 3 CLIs | Medium | C1, C3 | 396 |
+| Length variation | Claude Code | All 3 | C1, C3 | 396 |
 
 ---
 
@@ -138,13 +144,15 @@ Each condition adds one intervention on top of the previous:
 | **Originality.ai** (secondary) | `100 - ai_score` | Higher = less detectable |
 | Cross-check | Cohen's kappa between detectors | Agreement measure |
 
-### Axis 2: Factual Accuracy
+### Axis 2: Factual Accuracy (Claim-Based Verification)
 
-| Method | How It Works |
+| Step | How It Works |
 |---|---|
-| **Hybrid slot accuracy** (primary) | Per gold fact: `literal`/`regex` → automatic match; `semantic` → LLM judge |
-| **Strict slot accuracy** (secondary) | Literal/regex matches only |
-| **LLM judge audit** | Full rubric-based check for CORRECT / INCORRECT / MISSING per slot |
+| **1. Claim extraction** | LLM extracts atomic factual claims from generated text |
+| **2. Claim verification** | Separate LLM checks each claim against reference docs → CORRECT / INCORRECT / UNVERIFIABLE |
+| **Factual precision** (primary) | `correct / (correct + incorrect)` — measures correctness, not coverage |
+
+**Why not gold fact tables?** Gold facts from docs may not be what a blog post naturally covers. This avoids penalizing natural writing that omits some details.
 
 ### Axis 3: Linguistic Features (Interpretability)
 
@@ -184,7 +192,7 @@ C5 (human) │██████████████████████
            └──────────────────────────────────────────────────┘
 ```
 
-### Statistical Tests (Paired Wilcoxon, n=15 tasks)
+### Statistical Tests (Paired Wilcoxon, n=22 tasks)
 
 | Comparison | Hypothesis | Effect Size | p-value |
 |---|---|---|---|
@@ -222,11 +230,11 @@ C5 (human) │██████████████████████
 | Metric | C1 | C2 | C3 | C4 | C5 |
 |---|---|---|---|---|---|
 | GPTZero human_prob | [X.XX] | [X.XX] | [X.XX] | [X.XX] | [X.XX] |
-| Hybrid slot accuracy | [X.XX] | [X.XX] | [X.XX] | [X.XX] | — |
+| Factual precision | [X.XX] | [X.XX] | [X.XX] | [X.XX] | — |
 | Style distance from human | [X.XX] | [X.XX] | [X.XX] | [X.XX] | 0.00 |
 
-- **H3 result:** C4 achieves [lowest/near-lowest] detectability but factual accuracy drops by [X]% — humanization introduces paraphrasing errors
-- **H4 result:** C3 closes **[W]%** of the C1→C5 gap on detector scores with only **[V]%** factual accuracy loss
+- **H3 result:** C4 achieves [lowest/near-lowest] detectability but factual precision drops by [X]% — humanization introduces paraphrasing errors
+- **H4 result:** C3 closes **[W]%** of the C1→C5 gap on detector scores with only **[V]%** factual precision loss
 - **Takeaway:** Context + style rules offer the best accuracy-preserving path to reduced detectability
 
 ---
@@ -264,6 +272,56 @@ specificity_score  [lo]  [mid] [mid] [mid] [hi]
 
 ---
 
+## Results: Model Comparison
+
+### AI Detectability by Model (C1 Baseline)
+
+```
+           Mean human_prob (higher = less detectable)
+           ┌──────────────────────────────────────────────────┐
+Claude     │████████████░░░░░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+GPT 5.4    │██████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+Gemini 3.1 │████████████████░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+           └──────────────────────────────────────────────────┘
+```
+
+### With Style Constraints (C3)
+
+```
+           Mean human_prob (higher = less detectable)
+           ┌──────────────────────────────────────────────────┐
+Claude     │████████████████████░░░░░░░░░░░░░░░░░░│ [0.XX]
+GPT 5.4    │██████████████████░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+Gemini 3.1 │██████████████████████░░░░░░░░░░░░░░░░│ [0.XX]
+           └──────────────────────────────────────────────────┘
+```
+
+### Key Finding (H6)
+- [TBD: Which model is most/least detectable by default?]
+- [TBD: Do style constraints help equally across all models?]
+
+---
+
+## Results: Content Length vs. AI Detectability
+
+### Detectability by Content Length (C1 Baseline)
+
+```
+           Mean human_prob (higher = less detectable)
+           ┌──────────────────────────────────────────────────┐
+Short      │████████████████████░░░░░░░░░░░░░░░░░░│ [0.XX]
+Medium     │████████████░░░░░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+Long       │████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+           └──────────────────────────────────────────────────┘
+```
+
+### Key Finding (H7)
+- [TBD: Does longer content expose more AI patterns?]
+- [TBD: Is there a "sweet spot" length for evading detection?]
+- [TBD: Correlation between word count and detectability score]
+
+---
+
 ## Code & Implementation
 
 ### Repository Structure
@@ -275,7 +333,7 @@ ai-detectability-research/
 │   ├── style_rules.yaml       # Anti-patterns, persona (C3)
 │   └── validators.yaml        # API config, thresholds
 ├── data/
-│   ├── tasks/                 # 15 task definitions + gold facts
+│   ├── tasks/                 # 15 task definitions + reference docs
 │   ├── context/               # Rich context per project
 │   ├── human_baselines/       # C5 real engineer posts
 │   ├── generated/             # 180 AI-generated outputs
@@ -283,7 +341,7 @@ ai-detectability-research/
 ├── src/ai_text_quality/
 │   ├── generate.py            # Prompt building + LLM calls
 │   ├── detect.py              # GPTZero + Originality.ai wrappers
-│   ├── factcheck.py           # Gold-fact slot matching + LLM judge
+│   ├── factcheck.py           # Claim extraction + verification
 │   └── linguistic.py          # 10-feature extraction (spaCy)
 └── notebooks/
     ├── 01_task_design.ipynb
@@ -294,10 +352,11 @@ ai-detectability-research/
 ```
 
 ### Key Tech Stack
-- **Generation:** Claude Sonnet 4 via Anthropic API (temp=0.3, 3 runs/condition)
-- **Detection:** GPTZero API + Originality.ai API
+- **Generation:** Claude Code + Codex CLI + Gemini CLI (3 runs/condition, no API keys)
+- **Fact checking:** Claim extraction + verification via LLM-as-judge (cross-model)
+- **Detection:** GPTZero + Originality.ai
 - **Linguistic analysis:** spaCy (`en_core_web_sm`)
-- **Statistics:** SciPy (Wilcoxon), statsmodels (regression)
+- **Statistics:** SciPy (Wilcoxon, Kruskal-Wallis), statsmodels (regression)
 
 ### GitHub Repository (Code)
 **[github.com/yongkyunlee/ai-detectability-research](https://github.com/yongkyunlee/ai-detectability-research)**
@@ -328,11 +387,12 @@ Pre-recorded walkthrough of the generation and evaluation pipeline:
 **[YouTube link: placeholder]**
 
 Demo covers:
-1. Task definition and gold fact setup
-2. Running generation across all 5 conditions
-3. Detector API calls and score comparison
-4. Linguistic feature extraction
-5. Side-by-side output comparison
+1. Task definition and reference doc setup
+2. Running generation across conditions, models, and lengths
+3. Claim extraction and fact-checking pipeline
+4. Detector score comparison (GPTZero + Originality.ai)
+5. Model comparison and length variation analysis
+6. Side-by-side output comparison
 
 ### References
 

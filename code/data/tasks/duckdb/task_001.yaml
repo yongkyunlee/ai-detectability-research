@@ -1,23 +1,11 @@
 task_id: duckdb_001
 project: duckdb
-topic: "Getting started with DuckDB Python client"
-word_target: "300-500"
-gold_facts:
-  - field: install_command
-    value: "pip install duckdb"
-    match_type: literal
-  - field: import_statement
-    value: "import duckdb"
-    match_type: literal
-  - field: connect_method
-    value: "duckdb.connect"
-    match_type: literal
-  - field: in_memory
-    value: ":memory:"
-    match_type: regex
+topic: Getting started with DuckDB Python client
+word_target: 300-500
+reference_docs: &id001
+- data/context/duckdb/repo/README.md
 context_sources:
-  code_only:
-    - data/context/duckdb/code/python_client.md
+  code_only: *id001
   additional:
-    - data/context/duckdb/issues/python_setup_issues.md
-    - data/context/duckdb/community/reddit_python_setup.md
+  - data/context/duckdb/issues/python_setup_issues.md
+  - data/context/duckdb/community/reddit_python_setup.md

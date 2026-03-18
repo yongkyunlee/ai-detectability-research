@@ -31,9 +31,11 @@ Which content generation strategy most effectively reduces AI detectability, use
 |----|-----------|------------|
 | H1 | Context enrichment reduces detectability | C2 (context-rich) scores lower on AI detectors than C1 (code-only), because richer input leads to more specific, less generic output |
 | H2 | Style constraints reduce detectability further | C3 (style-constrained) scores lower than C2, because explicit anti-pattern rules suppress the most salient AI tells |
-| H3 | Post-hoc humanization reduces detectability but degrades facts | C4 (humanized) scores lowest on detectors but has worse factual accuracy than C2/C3, because rewriting introduces paraphrasing errors |
+| H3 | Post-hoc humanization reduces detectability but degrades facts | C4 (humanized) scores lowest on detectors but has worse factual precision than C2/C3, because rewriting introduces paraphrasing errors |
 | H4 | The combination of context + style closes a substantial portion of the gap to matched human baselines | C3 outperforms C1 and approaches C5 (human baseline) on detector scores without a large factuality penalty |
 | H5 | Linguistic features explain detector-proxy scores | A small set of interpretable features (sentence length variance, contraction rate, discourse markers) predicts detector scores and helps explain condition differences |
+| H6 | Model choice affects detectability | Different models (Claude Code, GPT 5.4, Gemini 3.1) produce text with different detectability levels, suggesting AI-ness is partially model-specific |
+| H7 | Longer content is more detectable | Longer generated texts exhibit more AI patterns (uniform structure, formulaic transitions), making them easier for detectors to flag |
 
 ---
 
@@ -90,17 +92,15 @@ To keep C2/C3 focused on richer context rather than borrowed phrasing, all non-c
 
 ### 3.4 Task Set
 
-Each task asks the LLM to write a 300-500 word technical blog section about a specific topic for one open-source project. Topics are chosen so that gold facts can be extracted from existing documentation.
+Each task asks the LLM to write a technical blog section about a specific topic for one open-source project. Reference documentation is provided for factual verification (see Section 4.2).
 
-**Target: 15 tasks across 2-3 open-source projects.**
+**Target: 22 tasks across 3 open-source projects.**
 
-| Source project | Example topics | Gold fact source |
-|---|---|---|
-| CrewAI | Installation & setup, Knowledge configuration, Agent tool integration, Project structure, Enterprise deployment | Existing `data/raw/crewai/docs/` + release notes |
-| DuckDB | Python client setup, Query performance, Extension system, CSV/Parquet import, Version migration | Existing `data/raw/duckdb/docs/` + release notes |
-| (Optional 3rd) | TBD | Public docs |
-
-Each task has an accompanying **gold fact table**: a list of required factual slots (version numbers, command syntax, file names, feature names) that a correct response must include.
+| Source project | # Tasks | Example topics | Reference docs |
+|---|---|---|---|
+| CrewAI | 8 | Installation & setup, Knowledge configuration, Agent tool integration, Project structure, Enterprise deployment | Official docs + release notes |
+| DuckDB | 7 | Python client setup, Query performance, Extension system, CSV/Parquet import, Version migration | Official docs + release notes |
+| LangChain | 7 | Quickstart, RAG pipelines, Agents & tools, Prompt templates, Memory, Streaming, LCEL | Official docs + release notes |
 
 Example task:
 
@@ -108,35 +108,56 @@ Example task:
 task_id: crewai_001
 project: crewai
 topic: "Getting started with CrewAI: installation and first project"
-word_target: 300-500
-gold_facts:
-  - field: install_command
-    value: "pip install crewai"
-  - field: python_requirement
-    value: "Python 3.10 or newer"
-  - field: project_init_command
-    value: "crewai create crew my_project"
-  - field: config_file
-    value: "agents.yaml"
+word_target: "300-500"
+reference_docs:
+  - data/context/crewai/code/installation.md
 context_sources:
   code_only:
-    - data/raw/crewai/docs/installation.md
+    - data/context/crewai/code/installation.md
   additional:
     - data/context/crewai/issues/setup_issues.md
     - data/context/crewai/community/reddit_getting_started.md
-    - data/context/crewai/competitor/langchain_quickstart_snippet.md
 ```
 
 ### 3.5 LLM Configuration
 
+#### Generation Models (Model Comparison Axis)
+
+| CLI Tool | Model | Key | Rationale |
+|---|---|---|---|
+| Claude Code | Claude Code 4.6 | `claude` | Anthropic's flagship model |
+| Codex CLI | GPT 5.4 | `codex` | OpenAI's flagship model |
+| Gemini CLI | Gemini 3.1 | `gemini` | Google's flagship model |
+
+All generation happens via CLI tools (no API keys needed). Comparing across models tests whether AI detectability is model-specific or a general property of LLM-generated text.
+
+#### Content Length Axis
+
+| Length | Word target | Rationale |
+|---|---|---|
+| Short | 150–250 words | Tests whether brevity increases or decreases detectability |
+| Medium | 300–500 words | Standard blog section length (baseline) |
+| Long | 700–1000 words | Tests whether longer content exhibits more AI patterns |
+
+#### Other Parameters
+
 | Parameter | Value | Rationale |
 |---|---|---|
-| Model | Claude Sonnet 4 (`claude-sonnet-4-20250514`) | Balances quality and cost for repeated generations |
 | Temperature | 0.3 | Low enough to reduce run-to-run noise while still allowing stylistic variation |
-| Max tokens | 1024 | Sufficient for 500 words + formatting |
+| Max tokens | 2048 | Sufficient for 1000 words + formatting |
 | Runs per condition | 3 per task-condition (`run_01`-`run_03`) | Reduces single-sample noise and supports more stable comparisons |
 
-**Cost estimate:** 135 base generations (15 tasks x 3 runs x C1-C3) + 45 humanization calls (C4) = ~180 API calls, plus detector scans. At ~2K input tokens and ~800 output tokens per call, total generation cost is approximately $15-25 depending on final context length.
+#### Experimental Matrix
+
+The full factorial (3 CLI tools × 3 lengths × 4 conditions × 22 tasks × 3 runs = 1,620) is large. The recommended design:
+
+| Sub-experiment | Models | Lengths | Conditions | Tasks | Runs | Total texts |
+|---|---|---|---|---|---|---|
+| **Core ablation** | Claude Code | Medium | C1–C4 | 22 | 3 | 264 |
+| **Model comparison** | All 3 | Medium | C1, C3 | 22 | 3 | 396 |
+| **Length variation** | Claude Code | All 3 | C1, C3 | 22 | 3 | 396 |
+
+Plus 22 human baselines (C5). Total: ~1,056 texts + 22 baselines = **~1,078 documents**.
 
 ### 3.6 Human Baseline Collection (C5)
 
@@ -165,17 +186,22 @@ Selection criteria: written by a named human author, published on a credible pla
 **Secondary metric:** `(100 - ai_score)` from Originality.ai, normalized to same direction.
 **Agreement metric:** Cohen's kappa between the two detectors' binary classifications (AI vs human at 50% threshold).
 
-### 4.2 Factual Accuracy (Accuracy Axis)
+### 4.2 Factual Accuracy (Accuracy Axis) — Claim-Based Verification
 
-| Validator | Implementation | Output |
+Instead of pre-defined gold fact tables, factual accuracy is measured by extracting and verifying claims from the generated text (FActScore-style). This measures **precision** ("are the claims made correct?") rather than recall ("did it mention required facts?").
+
+| Step | Implementation | Output |
 |---|---|---|
-| **Hybrid slot accuracy** | For each gold fact, use the task-defined `match_type`: `literal`/`regex` slots are checked automatically, and `semantic` slots are judged with a rubric-based LLM check | `slots_hit / slots_total` per document |
-| **Strict slot accuracy** | Literal/regex-only subset scored with exact or regex matching | Strict hit rate on machine-checkable slots |
-| **Factual error detection** | LLM-as-judge: send (generated text, gold fact table) to Claude with rubric asking for CORRECT / INCORRECT / MISSING per slot | Per-slot verdict + overall accuracy |
+| **1. Claim extraction** | LLM extracts all atomic factual claims from the generated text (version numbers, commands, config details, behavioral descriptions, compatibility) | List of claims with source sentences |
+| **2. Claim verification** | A separate LLM call checks each claim against the task's reference documentation | Per-claim verdict: CORRECT / INCORRECT / UNVERIFIABLE |
+| **3. Scoring** | Compute precision over verifiable claims | `factual_precision = correct / (correct + incorrect)` |
 
-**Primary metric:** Hybrid slot accuracy using per-slot `match_type`.
-**Secondary metric:** Strict slot accuracy on machine-checkable slots.
-**Audit metric:** LLM-judge agreement rate between hybrid scoring and the full rubric-based factual check.
+**Judge models:** Use a different model as judge than the one that generated the text to avoid self-bias. E.g., if text was generated by GPT 5.4, use Claude Code 4.6 as judge.
+
+**Primary metric:** Factual precision (correct / (correct + incorrect)).
+**Secondary metrics:** Total claims count (measures information density), incorrect claim count (raw error count), unverifiable rate.
+
+**Why this replaces gold fact tables:** Gold facts extracted from docs may not be naturally covered by a blog post, biasing the metric toward exhaustive/comprehensive (AI-like) text and against naturally-written text that omits some details. Claim-based verification measures correctness of what was actually written.
 
 ### 4.3 Linguistic Features (Interpretability Axis)
 
@@ -202,9 +228,9 @@ Computed per document. These explain *why* a condition is more or less detectabl
 |---|---|---|---|
 | GPTZero human_prob | Detectability proxy | Higher = better | Primary |
 | Originality.ai human score | Detectability proxy | Higher = better | Secondary |
-| Hybrid slot accuracy | Factual | Higher = better | Primary |
-| Strict slot accuracy | Factual | Higher = better | Secondary |
-| LLM judge agreement | Factual | Higher = better | Audit |
+| Factual precision | Factual | Higher = better | Primary |
+| Total claims count | Factual (density) | Descriptive | Secondary |
+| Incorrect claim count | Factual (errors) | Lower = better | Secondary |
 | Style distance from human | Interpretability | Lower = better | Primary |
 | Per-feature analysis | Interpretability | Varies | Exploratory |
 
@@ -224,7 +250,7 @@ ai-text-quality/
 │   ├── style_rules.yaml            # Anti-patterns, persona templates (used by C3)
 │   └── validators.yaml             # API keys placeholder, thresholds, feature list
 ├── data/
-│   ├── tasks/                      # Task definitions with gold facts
+│   ├── tasks/                      # Task definitions with reference docs
 │   │   ├── crewai/
 │   │   │   ├── task_001.yaml
 │   │   │   ├── task_002.yaml
@@ -255,7 +281,7 @@ ai-text-quality/
 │   │   └── c4_humanized/
 │   └── results/                    # Validator outputs and aggregated metrics
 │       ├── detection/              # GPTZero + Originality.ai raw responses
-│       ├── factual/                # Slot checks + LLM judge verdicts
+│       ├── factual/                # Claim extraction + verification results
 │       ├── linguistic/             # Feature vectors per document
 │       └── summary/                # Aggregated tables, figures
 ├── src/
@@ -266,7 +292,7 @@ ai-text-quality/
 │       ├── paths.py                # Path constants and helpers
 │       ├── generate.py             # Build prompts per condition, call LLM API
 │       ├── detect.py               # GPTZero + Originality.ai API wrappers
-│       ├── factcheck.py            # Hybrid slot scoring + LLM judge
+│       ├── factcheck.py            # Claim extraction + verification (FActScore-style)
 │       ├── linguistic.py           # Compute 10 linguistic features per document
 │       └── io_utils.py             # JSONL / YAML / markdown read/write helpers
 ├── notebooks/
@@ -275,12 +301,6 @@ ai-text-quality/
 │   ├── 03_validate.ipynb           # Run all validators, inspect per-document results
 │   ├── 04_analysis.ipynb           # Aggregate metrics, statistical tests, figures
 │   └── 05_examples.ipynb           # Cherry-picked examples for slides (side-by-side)
-└── tests/
-    ├── conftest.py
-    ├── test_generate.py
-    ├── test_detect.py
-    ├── test_factcheck.py
-    └── test_linguistic.py
 ```
 
 ---
@@ -293,19 +313,20 @@ ai-text-quality/
 
 #### 1.1 Repository Setup
 - Initialize repo with `pyproject.toml`, directory structure, `.gitignore`
-- Dependencies: `pydantic`, `pyyaml`, `anthropic`, `requests`, `spacy`, `pandas`, `matplotlib`, `seaborn`, `scipy`, `statsmodels`, `jupyter`, `pytest`
+- Dependencies: `pydantic`, `pyyaml`, `spacy`, `pandas`, `matplotlib`, `seaborn`, `scipy`, `statsmodels`, `jupyter`
 - Pydantic models in `models.py`:
-  - `Task` (task_id, project, topic, word_target, gold_facts, context_sources)
-  - `GoldFact` (field, value, match_type: literal | regex | semantic)
-  - `GeneratedText` (task_id, condition, run_id, text, model, timestamp, token_usage, overlap_score)
-  - `DetectionResult` (task_id, condition, run_id, gptzero_human_prob, gptzero_mixed_prob, gptzero_generated_prob, gptzero_sentences, originality_score, originality_paragraphs)
-  - `FactCheckResult` (task_id, condition, run_id, slot_results: list[SlotVerdict], hybrid_slot_accuracy, strict_slot_accuracy, llm_judge_agreement)
-  - `LinguisticFeatures` (task_id, condition, run_id, sent_len_std, sent_len_mean, vocab_diversity, contraction_rate, first_person_rate, discourse_marker_rate, list_density, passive_ratio, paragraph_len_std, specificity_score)
+  - `Task` (task_id, project, topic, word_target, reference_docs, context_sources)
+  - `Claim` (claim_id, text, source_sentence)
+  - `ClaimVerdict` (claim_id, claim_text, verdict: CORRECT | INCORRECT | UNVERIFIABLE, evidence)
+  - `GeneratedText` (task_id, condition, run_id, text, model, timestamp, token_usage, overlap_score, word_target)
+  - `DetectionResult` (task_id, condition, run_id, model, word_target, gptzero_human_prob, gptzero_mixed_prob, gptzero_generated_prob, gptzero_sentences, originality_score, originality_paragraphs)
+  - `FactCheckResult` (task_id, condition, run_id, model, word_target, claims: list[ClaimVerdict], total_claims, correct_claims, incorrect_claims, unverifiable_claims, factual_precision)
+  - `LinguisticFeatures` (task_id, condition, run_id, model, word_target, sent_len_std, sent_len_mean, vocab_diversity, contraction_rate, first_person_rate, discourse_marker_rate, list_density, passive_ratio, paragraph_len_std, specificity_score)
 
 #### 1.2 Task Design (Notebook 01)
-- Define 15 tasks across CrewAI and DuckDB
-- For each task: write the topic, specify gold facts, list context source paths
-- Validate: each task has 3-7 gold facts, context files exist, no overlap between tasks
+- Define 22 tasks across CrewAI, DuckDB, and LangChain
+- For each task: write the topic, list reference docs for fact verification, list context source paths
+- Validate: each task has at least one reference doc, context files exist, no overlap between tasks
 
 #### 1.3 Context Collection
 - **Code/docs:** Copy relevant sections from existing `data/raw/` in gensearch-eval, or fetch from public repos
@@ -323,20 +344,23 @@ ai-text-quality/
 
 ### Phase 2: Generation Pipeline
 
-**Goal:** Generate all 180 AI texts (15 tasks x 4 conditions x 3 runs) plus collect 15 human baselines.
+**Goal:** Generate AI texts across all conditions, models, and lengths, plus collect 15 human baselines.
 
 #### 2.1 Implement `generate.py`
-- `build_prompt(task: Task, condition: str, style_rules: dict) -> tuple[str, str]` — returns (system_prompt, user_message)
-- `generate_text(task: Task, condition: str, config: dict) -> GeneratedText` — calls Anthropic API
-- `generate_humanized(text: str, config: dict) -> GeneratedText` — C4 rewrite call
-- Embed hard instructions for C2-C4: use context for factual grounding only, do not copy wording from context sources, and do not claim unsupported personal experience
+- `build_prompt(task, condition, style_rules, word_target)` — returns (system_prompt, user_message)
+- `generate_text(task, condition, run_id, style_rules, model_key, word_target)` — interactive generation (user pastes into target model UI)
+- `generate_humanized(source_text, run_id, model_key, word_target)` — C4 rewrite call
+- `generate_all(tasks, style_rules, runs, model_keys, word_targets)` — batch generation across all axes
+- Embed hard instructions for C2-C4: use context for factual grounding only, do not copy wording from context sources
 - Compute and save overlap metrics against the task's context bundle after each generation
 
 #### 2.2 Run Generation (Notebook 02)
-- Loop over tasks x runs x conditions C1-C3, save outputs to `data/generated/{condition}/{task_id}_{run_id}.md`
-- Run C4 humanization on each C2 run, save to `data/generated/c4_humanized/`
-- Display sample outputs inline for quick inspection
-- Save generation metadata (model, tokens, timestamp, overlap score) as JSONL sidecar
+- **Core ablation:** Loop over tasks × runs × conditions C1-C4 with Claude Code at medium length
+- **Model comparison:** Loop over tasks × runs × {C1, C3} × {Claude Code, GPT 5.4, Gemini 3.1} at medium length
+- **Length variation:** Loop over tasks × runs × {C1, C3} × {short, medium, long} with Claude Code
+- For each text, the prompt is displayed for the user to paste into the appropriate model's UI
+- Save outputs to `data/generated/{condition}/{task_id}_{model}_{length}_{run_id}.md`
+- Save generation metadata (model, word_target, tokens, timestamp, overlap score) as JSONL sidecar
 
 ### Phase 3: Validation Pipeline
 
@@ -361,11 +385,14 @@ Originality.ai:
 - Input: `{"content": text}`
 - Output: `score.ai` (0-1), `score.original` (0-1), per-paragraph breakdown
 
-#### 3.2 Implement `factcheck.py`
-- `check_slots(text: str, gold_facts: list[GoldFact]) -> list[SlotVerdict]` — regex/string matching per slot
-- `judge_facts_llm(text: str, gold_facts: list[GoldFact]) -> list[SlotVerdict]` — LLM-as-judge for semantic matches
-- `score_hybrid_slots(text: str, gold_facts: list[GoldFact]) -> FactCheckResult` — uses `match_type` to combine strict checks with semantic checks
-- All methods return per-slot CORRECT / INCORRECT / MISSING verdicts
+#### 3.2 Implement `factcheck.py` (Claim-Based Verification)
+- `build_extract_prompt(text) -> (system, user)` — generates prompt for LLM to extract atomic factual claims
+- `parse_extracted_claims(raw_response) -> list[Claim]` — parses claim extraction output
+- `build_verify_prompt(claims, reference_text) -> (system, user)` — generates prompt for LLM to verify claims against docs
+- `parse_verification_response(raw_response, claims) -> list[ClaimVerdict]` — parses verification output
+- `compute_factual_precision(verdicts) -> float` — correct / (correct + incorrect)
+- `score_document(text, task_id, condition, run_id, reference_text, model, word_target) -> FactCheckResult`
+- Use a different LLM as judge than the generator to avoid self-bias
 
 #### 3.3 Implement `linguistic.py`
 - `extract_features(text: str) -> LinguisticFeatures` — computes all 10 features
@@ -374,9 +401,9 @@ Originality.ai:
 - Discourse marker detection via curated keyword list
 
 #### 3.4 Run Validation (Notebook 03)
-- Run detection on all 195 texts (rate-limit aware: GPTZero allows ~60 req/min, Originality.ai ~100 req/min)
-- Run fact checking on all 180 generated texts (human baselines may not match task gold facts exactly)
-- Run linguistic feature extraction on all 195 texts
+- Run detection on all texts (~750 total) via GPTZero and Originality.ai web UIs
+- Run claim-based fact checking on all generated texts (extract claims, verify against reference docs)
+- Run linguistic feature extraction on all texts
 - Save all results to `data/results/` as JSONL
 - Display per-document results inline
 
@@ -389,31 +416,39 @@ Originality.ai:
 **Aggregate tables:**
 - Mean and std of GPTZero `human_prob` by condition
 - Mean and std of Originality.ai human score by condition
-- Mean hybrid slot accuracy by condition
-- Mean strict slot accuracy by condition
+- Mean factual precision by condition
+- Mean total claims count by condition (information density)
 - Mean linguistic feature values by condition (10-feature table)
 - Style distance from C5 by condition
+- **Model comparison:** Mean detectability by model (across conditions)
+- **Length variation:** Mean detectability by word target (across conditions)
 
 **Statistical tests:**
 - Average replicate-level scores to task-condition means, then run paired Wilcoxon signed-rank tests between adjacent conditions (C1 vs C2, C2 vs C3, C2 vs C4)
 - With 15 paired tasks per comparison, power is still limited, so report effect sizes and confidence intervals alongside p-values
 - Bonferroni correction for multiple comparisons
 - For H5, fit regression with task fixed effects or cluster-robust standard errors by task rather than treating all document rows as independent
+- **Model comparison:** Kruskal-Wallis test across models, pairwise comparisons
+- **Length variation:** Spearman correlation between word count and detectability score
 
 **Figures:**
 1. **Bar chart:** Mean GPTZero human_prob by condition (with error bars), C5 as reference line
 2. **Bar chart:** Mean Originality.ai human score by condition
-3. **Scatter plot:** Detectability proxy (GPTZero human_prob) vs factual accuracy (hybrid slot accuracy) per document, colored by condition — the Pareto frontier
+3. **Scatter plot:** Detectability vs factual precision per document, colored by condition — the Pareto frontier
 4. **Radar chart:** Mean linguistic features by condition (normalized), showing which features each intervention changes
 5. **Heatmap:** Feature correlation with detector scores (which features predict detectability?)
-6. **Table:** Per-task breakdown showing where conditions diverge most
+6. **Bar chart:** Detectability by model (Claude Code vs GPT 5.4 vs Gemini 3.1) for C1 and C3
+7. **Line plot:** Detectability by content length (short/medium/long) for C1 and C3
+8. **Table:** Per-task breakdown showing where conditions diverge most
 
 **Hypothesis testing:**
 - H1: paired test C2 > C1 on human_prob
 - H2: paired test C3 > C2 on human_prob
-- H3: paired test C4 > C2 on human_prob AND C4 <= C2 on hybrid slot accuracy
+- H3: paired test C4 > C2 on human_prob AND C4 <= C2 on factual precision
 - H4: report the fraction of the C1-to-C5 gap recovered by C3 on detector scores as a descriptive effect size, not a hard pass/fail threshold
 - H5: regression of human_prob ~ 10 features with task controls, report R² and top-3 coefficients
+- H6 (new): model comparison — are some models inherently less detectable?
+- H7 (new): length effect — does content length correlate with detectability?
 
 #### 4.2 Examples (Notebook 05)
 - Side-by-side display of C1 through C5 for 2-3 selected tasks
@@ -427,16 +462,18 @@ Originality.ai:
 
 | Slide | Content | Duration |
 |---|---|---|
-| 1. tl;dr | Problem: AI text is detectable and rejected. Method: 5-condition ablation. Key finding: [TBD]. | 30s |
+| 1. tl;dr | Problem: AI text is detectable and rejected. Method: 5-condition ablation + model/length axes. Key finding: [TBD]. | 30s |
 | 2. Motivation | AI slop stats (73% spot it, 9x growth in complaints), industry impact on developer content | 1m |
-| 3. Literature Review | Detection methods (GPTZero, Originality.ai), paraphrasing attacks (Sadasivan et al.), detector biases (Liang et al.), ALCE citation metrics | 1.5m |
-| 4. Research Question & Design | RQ, 5 conditions table, task set description | 1.5m |
-| 5. Methodology | Validator stack (detection + factual + linguistic), metrics, dataset size | 1m |
-| 6. Results: Detectability | Bar charts of detector scores by condition, statistical test results | 1.5m |
-| 7. Results: Trade-off | Pareto scatter (detectability vs accuracy), key finding on whether humanization breaks facts | 1m |
-| 8. Results: Feature Analysis | Radar chart, regression results, which features matter most | 1m |
-| 9. Code & Demo | Repo structure, notebook walkthrough link, live example of C1 vs C3 output | 1m |
-| 10. YouTube Demo Link | Link to pre-recorded notebook walkthrough | — |
+| 3. Literature Review | Detection methods, paraphrasing attacks, detector biases, citation metrics | 1.5m |
+| 4. Research Question & Design | RQ, 5 conditions table, 3 CLI tools, 3 lengths, task set | 1.5m |
+| 5. Methodology | Detection + claim-based fact checking + linguistic features, metrics | 1m |
+| 6. Results: Detectability | Bar charts of detector scores by condition, statistical tests | 1m |
+| 7. Results: Trade-off | Pareto scatter (detectability vs factual precision) | 1m |
+| 8. Results: Model Comparison | Detectability by model for C1 and C3 | 0.5m |
+| 9. Results: Length Effect | Detectability by content length | 0.5m |
+| 10. Results: Features | Radar chart, regression, which features matter most | 1m |
+| 11. Code & Demo | Repo structure, example C1 vs C3 | 0.5m |
+| 12. YouTube Demo Link | Link to pre-recorded notebook walkthrough | — |
 
 ---
 
@@ -458,11 +495,11 @@ Originality.ai:
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Small sample size (15 tasks) limits statistical power | Cannot detect small effect sizes | Use 3 runs per condition, aggregate to task-level comparisons, and report effect sizes and confidence intervals, not just p-values. Frame as exploratory. |
+| Small sample size (22 tasks) limits statistical power | Cannot detect small effect sizes | Use 3 runs per condition, aggregate to task-level comparisons, and report effect sizes and confidence intervals, not just p-values. Frame as exploratory. |
 | Detector APIs may change behavior between runs | Non-reproducible results | Pin API versions, save raw API responses, run all detection in a single batch session |
 | GPTZero/Originality.ai may not expose per-sentence data for short texts | Lose granularity | Ensure texts are >250 words (both APIs recommend this minimum) |
 | Human baselines may not match task scope exactly | C5 comparison is imprecise | Select baselines carefully, match topic/audience/genre where possible, document scope differences, and treat C5 gap-closing as descriptive rather than absolute |
-| Single LLM (Claude Sonnet) limits generalizability | Findings may not transfer to GPT-4, Gemini | Note in limitations; suggest multi-model extension as future work |
+| LLM-as-judge for fact checking may be unreliable | Inconsistent claim extraction or verification across runs | Use structured prompts, run judge multiple times for key samples, report inter-run agreement |
 | Style rules in C3 could overfit known detector patterns | Trivially high scores that don't generalize | Use two independent detectors; include linguistic features as an interpretability check beyond detector gaming |
 | Rich context may leak phrasing from community or competitor sources | Artificially improved detector scores through borrowed prose | Treat context as factual input only, strip boilerplate before prompting, and exclude/regenerate outputs with high n-gram overlap |
 | Detector scores are only a proxy for practitioner judgment | Conclusions may overstate real reader perception | State the proxy limitation explicitly throughout and frame results as detector-facing evidence, not direct human preference evidence |
@@ -473,8 +510,7 @@ Originality.ai:
 
 | Dependency | Purpose | Install |
 |---|---|---|
-| `anthropic` | Text generation (Claude API) | `pip install anthropic` |
-| `requests` | API calls to GPTZero and Originality.ai | `pip install requests` |
+| *(none for generation)* | Text generation via CLI tools (Claude Code, Codex CLI, Gemini CLI) | N/A — interactive copy-paste |
 | `pydantic` | Data models | `pip install pydantic` |
 | `pyyaml` | Config loading | `pip install pyyaml` |
 | `spacy` + `en_core_web_sm` | Linguistic feature extraction | `pip install spacy && python -m spacy download en_core_web_sm` |
@@ -483,12 +519,9 @@ Originality.ai:
 | `scipy` | Statistical tests (Wilcoxon) | `pip install scipy` |
 | `statsmodels` | Regression with task controls / robust SEs | `pip install statsmodels` |
 | `jupyter` | Notebook execution | `pip install jupyter` |
-| `pytest` | Testing | `pip install pytest` |
 
 **Environment variables needed:**
-- `ANTHROPIC_API_KEY` — for generation and LLM judge
-- `GPTZERO_API_KEY` — for GPTZero detection API
-- `ORIGINALITY_API_KEY` — for Originality.ai detection API
+- None required — all interactions happen via CLI tools (Claude Code, Codex CLI, Gemini CLI) and web UIs (GPTZero, Originality.ai)
 
 ---
 
@@ -498,18 +531,20 @@ Originality.ai:
 Stage 1: Scaffolding
          ├── Repository setup, pyproject.toml, directory structure
          ├── Pydantic models, config loading, path helpers
-         ├── Task definitions (15 tasks with gold facts)
+         ├── Task definitions (22 tasks with reference docs)
          └── Context collection (issues, community, competitor snippets)
 
 Stage 2: Generation + Human Baselines
-         ├── Implement generate.py
-         ├── Notebook 02: generate all C1-C4 outputs (180 texts across 3 runs)
+         ├── Implement generate.py (multi-model, multi-length support)
+         ├── Core ablation: C1-C4 × 22 tasks × 3 runs with Claude Code (medium)
+         ├── Model comparison: C1,C3 × 22 tasks × 3 runs × 3 CLI tools (medium)
+         ├── Length variation: C1,C3 × 22 tasks × 3 runs × 3 lengths (Claude Code)
          ├── Collect 15 human baselines
          └── Quick manual inspection of outputs
 
 Stage 3: Validation
          ├── Implement detect.py (GPTZero + Originality.ai wrappers)
-         ├── Implement factcheck.py (hybrid slot matching + LLM judge)
+         ├── Implement factcheck.py (claim extraction + verification)
          ├── Implement linguistic.py (10 features)
          ├── Notebook 03: run all validators, save results
          └── Tests for each validator module
@@ -517,7 +552,7 @@ Stage 3: Validation
 Stage 4: Analysis + Presentation
          ├── Notebook 04: aggregate metrics, statistical tests, figures
          ├── Notebook 05: example comparisons for slides
-         ├── Build slide deck (10 slides)
+         ├── Build slide deck (10+ slides)
          ├── Record YouTube demo (notebook walkthrough)
          └── Final PDF
 ```

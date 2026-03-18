@@ -6,11 +6,13 @@
 
 - Python 3.10+
 - Access to:
-  - **Claude Code** (or another LLM chat interface) for text generation and LLM-judge fact checking
+  - **Claude Code** CLI for text generation (Claude Opus 4.6)
+  - **Codex CLI** for text generation (GPT 5.4)
+  - **Gemini CLI** for text generation (Gemini 3.1)
   - **GPTZero** web UI (https://gptzero.me) for AI detection
   - **Originality.ai** web UI (https://originality.ai) for AI detection
 
-No API keys are required. All LLM and detection interactions happen via copy-paste through their respective UIs.
+No API keys are required. All LLM generation, fact-checking, and detection interactions happen via copy-paste through CLI tools and web UIs.
 
 ---
 
@@ -19,25 +21,20 @@ No API keys are required. All LLM and detection interactions happen via copy-pas
 ```bash
 cd code/
 
-# Create and activate a virtual environment
-python -m venv .venv
+# Create a virtual environment and install the package in editable mode
+uv venv
 source .venv/bin/activate
-
-# Install the package in editable mode
-pip install -e .
+uv pip install -e .
 
 # Download the spaCy model for linguistic analysis
-python -m spacy download en_core_web_sm
+uv run python -m spacy download en_core_web_sm
 ```
 
 Verify the installation:
 
 ```bash
-python -c "from ai_text_quality import Task, GeneratedText; print('OK')"
-python -m pytest tests/ -v
+uv run python -c "from ai_text_quality import Task, GeneratedText; print('OK')"
 ```
-
-All 50 tests should pass.
 
 ---
 
@@ -45,15 +42,30 @@ All 50 tests should pass.
 
 Populate the context files referenced by each task YAML in `data/tasks/`. Each task specifies which files it expects under `context_sources`.
 
+Projects: **CrewAI**, **DuckDB**, **LangChain**
+
+### 1a. Clone project repositories
+
+Clone each project's repo into `data/context/{project}/repo/`:
+
+```bash
+cd code/
+git clone https://github.com/crewAIInc/crewAI data/context/crewai/repo
+git clone https://github.com/duckdb/duckdb data/context/duckdb/repo
+git clone https://github.com/langchain-ai/langchain data/context/langchain/repo
+```
+
+The cloned repos provide README, docs, and source code context. Task YAMLs reference specific files within each repo (e.g., `data/context/crewai/repo/README.md`). After cloning, review the repo structure and update task YAML `code_only` paths to point to the most relevant files for each topic.
+
+### 1b. Collect additional context
+
 | Directory | Content | How to collect |
 |---|---|---|
-| `data/context/{project}/code/` | README, doc pages, source file excerpts | Copy from official project docs or repo |
 | `data/context/{project}/issues/` | GitHub issue excerpts (title + body + top comments) | Search GitHub issues for topic-related threads |
 | `data/context/{project}/community/` | Reddit/HN thread excerpts | Search Reddit/HN for topic discussions |
 | `data/context/{project}/releases/` | Relevant changelog entries | Copy from project release notes |
-| `data/context/{project}/competitor/` | Competitor docs covering the same concept | Short snippets from similar projects |
 
-**Preprocessing rules:**
+**Preprocessing rules (for issues, community, and releases):**
 - Strip bullet formatting, marketing copy, and canned opening/closing phrases
 - Keep factual content: version numbers, commands, config details, error messages, trade-offs
 - Context is used for factual grounding only, not for borrowing phrasing
@@ -62,15 +74,23 @@ Save each file as plain markdown.
 
 ---
 
-## Step 2: Collect Human Baselines (C5)
+## Step 2: Choose Topics and Collect Human Baselines (C5)
 
-For each of the 15 task topics, find a real engineer-written blog post or documentation section covering the same subject.
+For each project, find 7-8 real engineer-written blog posts or documentation sections on distinct technical topics. These blog posts define the experiment topics — each one becomes a task.
+
+### 2a. Find engineer-written blog posts
 
 **Selection criteria:**
 - Written by a named human author
 - Published on a credible platform (official blog, Dev.to, Medium, engineering blog)
-- Covers the same technical scope as the task
+- Covers a specific, well-scoped technical topic (e.g., setup guide, feature walkthrough, performance comparison)
 - Trimmed to 300-500 words if longer
+
+Aim for topic diversity across each project (e.g., getting started, core features, advanced usage, performance, integrations).
+
+### 2b. Create task YAMLs from discovered topics
+
+For each blog post found in 2a, create a corresponding task YAML in `data/tasks/{project}/` using the blog post's topic. See existing task files for the format.
 
 Save each baseline as a markdown file in `data/human_baselines/{project}/` with YAML frontmatter:
 
@@ -89,27 +109,20 @@ The actual blog post content goes here...
 
 ## Steps 3-8: Run the Experiment Notebook
 
-All experiment steps (generation, detection, fact checking, linguistic analysis, statistical analysis, and figure generation) are run from a single Jupyter notebook:
+All experiment steps are run from a single Jupyter notebook:
 
 ```bash
 cd code/
-jupyter notebook notebooks/experiment.ipynb
+uv run jupyter notebook notebooks/experiment.ipynb
 ```
 
-The notebook contains cells for each step — run them top-to-bottom. See the markdown headers in the notebook for details on each step.
-
----
-
-## Running Tests
-
-```bash
-cd code/
-python -m pytest tests/ -v
-
-# Or a specific module
-python -m pytest tests/test_linguistic.py -v
-python -m pytest tests/test_factcheck.py -v
-```
+The notebook covers:
+1. **Generation** — Prompts displayed for each CLI tool (Claude Code / Codex / Gemini), paste back responses
+2. **Detection** — Paste texts into GPTZero and Originality.ai, enter scores
+3. **Fact checking** — Claim extraction + verification via LLM (use a different model as judge)
+4. **Linguistic analysis** — Automatic (spaCy)
+5. **Statistical analysis** — Hypothesis tests, model comparison, length analysis
+6. **Figures** — Bar charts, Pareto scatter, radar, heatmap, model/length plots
 
 ---
 
@@ -118,7 +131,8 @@ python -m pytest tests/test_factcheck.py -v
 | What | Where |
 |---|---|
 | Task definitions | `data/tasks/{project}/task_*.yaml` |
-| Context materials | `data/context/{project}/{category}/` |
+| Cloned repos | `data/context/{project}/repo/` |
+| Additional context | `data/context/{project}/{issues,community,releases}/` |
 | Human baselines | `data/human_baselines/{project}/` |
 | Generated outputs | `data/generated/c{1-4}_*/` |
 | Detection results | `data/results/detection/detection_results.jsonl` |
@@ -135,7 +149,7 @@ python -m pytest tests/test_factcheck.py -v
 **"spaCy model 'en_core_web_sm' is not installed"**
 
 ```bash
-python -m spacy download en_core_web_sm
+uv run python -m spacy download en_core_web_sm
 ```
 
 **High overlap scores (>0.15)**

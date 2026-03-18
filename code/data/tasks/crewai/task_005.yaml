@@ -1,23 +1,11 @@
 task_id: crewai_005
 project: crewai
-topic: "CrewAI knowledge system and RAG integration"
-word_target: "300-500"
-gold_facts:
-  - field: knowledge_sources
-    value: "StringKnowledgeSource"
-    match_type: literal
-  - field: embedding_config
-    value: "embedder"
-    match_type: semantic
-  - field: chunk_size
-    value: "chunk_size"
-    match_type: literal
-  - field: knowledge_attribute
-    value: "knowledge_sources"
-    match_type: literal
+topic: CrewAI knowledge system and RAG integration
+word_target: 300-500
+reference_docs: &id001
+- data/context/crewai/repo/README.md
 context_sources:
-  code_only:
-    - data/context/crewai/code/knowledge.md
+  code_only: *id001
   additional:
-    - data/context/crewai/issues/knowledge_issues.md
-    - data/context/crewai/community/reddit_knowledge.md
+  - data/context/crewai/issues/knowledge_issues.md
+  - data/context/crewai/community/reddit_knowledge.md

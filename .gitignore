@@ -2,3 +2,6 @@ firebase-debug.log
 
 **/__pycache__
 .DS_Store
+
+# Cloned project repos used as context
+code/data/context/*/repo/

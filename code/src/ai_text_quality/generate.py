@@ -6,9 +6,11 @@ Generates technical blog posts under four experimental conditions:
   C3 (style_constrained)- Persona + anti-pattern rules with rich context
   C4 (humanized)        - LLM rewrite of C2 output to sound human
 
-Instead of calling the Anthropic API directly, prompts are printed to the
-console so the user can paste them into Claude Code (or another LLM
-interface) and paste back the response.
+Supports multi-model generation (Claude Code, Codex CLI, Gemini CLI) and
+content length variation (short/medium/long).
+
+Prompts are printed to the console so the user can paste them into the
+appropriate CLI tool and paste back the response.
 """
 
 from __future__ import annotations
@@ -23,9 +25,32 @@ from ai_text_quality.models import GeneratedText, Task
 
 logger = logging.getLogger(__name__)
 
-MODEL = "claude-sonnet-4-20250514"
+# ---------------------------------------------------------------------------
+# Model and length configuration
+# ---------------------------------------------------------------------------
+
+MODELS = {
+    "claude": "claude-opus-4-6 (Claude Code)",
+    "codex": "codex-cli (Codex CLI)",
+    "gemini": "gemini-3.1 (Gemini CLI)",
+}
+DEFAULT_MODEL = "claude"
+
+MODEL_DISPLAY_NAMES = {
+    "claude": "Claude Code (Opus 4.6)",
+    "codex": "Codex CLI (GPT 5.4)",
+    "gemini": "Gemini CLI (Gemini 3.1)",
+}
+
+WORD_TARGETS = {
+    "short": "150-250",
+    "medium": "300-500",
+    "long": "700-1000",
+}
+DEFAULT_WORD_TARGET = "medium"
+
 TEMPERATURE = 0.3
-MAX_TOKENS = 1024
+MAX_TOKENS = 2048
 
 
 # ---------------------------------------------------------------------------
@@ -50,6 +75,7 @@ def build_prompt(
     task: Task,
     condition: str,
     style_rules: dict | None = None,
+    word_target: str | None = None,
 ) -> tuple[str, str]:
     """Return ``(system_prompt, user_message)`` for the given condition.
 
@@ -65,17 +91,20 @@ def build_prompt(
         Required when *condition* is ``"style_constrained"``.  Expected keys:
         ``persona``, ``sentence_structure``, ``anti_patterns``,
         ``content_rules``.
+    word_target:
+        Override the task's default word target. If None, uses task.word_target.
 
     Returns
     -------
     tuple[str, str]
         ``(system_prompt, user_message)``
     """
+    effective_word_target = word_target or task.word_target
     base_system = (
         f"Write a technical blog post about {task.topic} "
         "based on the following documentation."
     )
-    word_instruction = f"\n\nTarget length: approximately {task.word_target} words."
+    word_instruction = f"\n\nTarget length: approximately {effective_word_target} words."
 
     # -- C1: code_only -------------------------------------------------------
     if condition == "code_only":
@@ -175,19 +204,19 @@ def compute_overlap(
 def _print_prompt_and_collect_response(
     system_prompt: str,
     user_message: str,
+    model_key: str = DEFAULT_MODEL,
 ) -> str:
-    """Print a prompt for the user to paste into Claude Code, then read back the response.
-
-    The user should copy the displayed prompt, paste it into Claude Code
-    (or another LLM), and then paste the generated response back here.
-    """
+    """Print a prompt for the user to paste into a CLI tool, then read back the response."""
+    display_name = MODEL_DISPLAY_NAMES.get(model_key, model_key)
     separator = "=" * 70
     print(f"\n{separator}")
-    print("SYSTEM PROMPT (paste this as system/context instructions):")
+    print(f"TARGET: {display_name}")
+    print(f"{separator}")
+    print("SYSTEM PROMPT:")
     print(f"{separator}")
     print(system_prompt)
     print(f"\n{separator}")
-    print("USER MESSAGE (paste this as the user message):")
+    print("USER MESSAGE:")
     print(f"{separator}")
     print(user_message)
     print(f"\n{separator}")
@@ -220,16 +249,27 @@ def generate_text(
     condition: str,
     run_id: str,
     style_rules: dict | None = None,
+    model_key: str = DEFAULT_MODEL,
+    word_target: str | None = None,
 ) -> GeneratedText:
     """Generate text for a single task under a given condition.
 
-    Prints the prompt for the user to paste into Claude Code, then reads
-    back the pasted response.
+    Prints the prompt for the user to paste into the target CLI tool,
+    then reads back the pasted response.
     """
-    system_prompt, user_message = build_prompt(task, condition, style_rules)
+    effective_word_target = word_target or task.word_target
+    system_prompt, user_message = build_prompt(
+        task, condition, style_rules, word_target=word_target,
+    )
 
-    print(f"\n>>> Generating: task={task.task_id} condition={condition} run={run_id}")
-    generated = _print_prompt_and_collect_response(system_prompt, user_message)
+    display_name = MODEL_DISPLAY_NAMES.get(model_key, model_key)
+    print(
+        f"\n>>> Generating: task={task.task_id} condition={condition} "
+        f"run={run_id} model={display_name} length={effective_word_target}"
+    )
+    generated = _print_prompt_and_collect_response(
+        system_prompt, user_message, model_key=model_key,
+    )
 
     context_texts = _gather_all_context_texts(task)
     overlap = compute_overlap(generated, context_texts)
@@ -239,7 +279,8 @@ def generate_text(
         condition=condition,
         run_id=run_id,
         text=generated,
-        model=MODEL,
+        model=MODELS.get(model_key, model_key),
+        word_target=effective_word_target,
         timestamp=datetime.now(timezone.utc).isoformat(),
         token_usage={"input_tokens": 0, "output_tokens": 0},
         overlap_score=overlap,
@@ -249,11 +290,14 @@ def generate_text(
 def generate_humanized(
     source_text: GeneratedText,
     run_id: str,
+    model_key: str = DEFAULT_MODEL,
+    word_target: str | None = None,
 ) -> GeneratedText:
     """C4: Rewrite *source_text* (typically C2 output) to sound human.
 
-    Prints the rewrite prompt for the user to paste into Claude Code.
+    Prints the rewrite prompt for the user to paste into the target CLI tool.
     """
+    effective_word_target = word_target or source_text.word_target
     system_prompt = (
         "You are an editor making AI-generated technical content sound natural."
     )
@@ -264,15 +308,22 @@ def generate_humanized(
         f"{source_text.text}"
     )
 
-    print(f"\n>>> Humanizing: task={source_text.task_id} run={run_id}")
-    generated = _print_prompt_and_collect_response(system_prompt, user_message)
+    display_name = MODEL_DISPLAY_NAMES.get(model_key, model_key)
+    print(
+        f"\n>>> Humanizing: task={source_text.task_id} run={run_id} "
+        f"model={display_name}"
+    )
+    generated = _print_prompt_and_collect_response(
+        system_prompt, user_message, model_key=model_key,
+    )
 
     return GeneratedText(
         task_id=source_text.task_id,
         condition="humanized",
         run_id=run_id,
         text=generated,
-        model=MODEL,
+        model=MODELS.get(model_key, model_key),
+        word_target=effective_word_target,
         timestamp=datetime.now(timezone.utc).isoformat(),
         token_usage={"input_tokens": 0, "output_tokens": 0},
         overlap_score=source_text.overlap_score,
@@ -287,61 +338,90 @@ def generate_all(
     tasks: list[Task],
     style_rules: dict,
     runs: int = 3,
+    model_keys: list[str] | None = None,
+    word_targets: list[str | None] | None = None,
 ) -> list[GeneratedText]:
-    """Generate all conditions for all tasks across multiple runs.
+    """Generate all conditions for all tasks across multiple runs, models, and lengths.
 
-    For each task and each run:
-      1. Generate C1 (``code_only``)
-      2. Generate C2 (``context_rich``)
-      3. Generate C3 (``style_constrained``)
-      4. Generate C4 (``humanized``) from the C2 output
+    Parameters
+    ----------
+    tasks:
+        List of task definitions.
+    style_rules:
+        Style rules for C3 condition.
+    runs:
+        Number of runs per task-condition-model-length combination.
+    model_keys:
+        List of model keys to generate with. Defaults to [DEFAULT_MODEL].
+    word_targets:
+        List of word targets. None entries use the task default. Defaults to [None].
 
     Returns the full list of :class:`GeneratedText` objects.
     """
+    if model_keys is None:
+        model_keys = [DEFAULT_MODEL]
+    if word_targets is None:
+        word_targets = [None]
+
     results: list[GeneratedText] = []
 
-    for task in tasks:
-        for run_idx in range(1, runs + 1):
-            run_id = f"run_{run_idx:02d}"
-            logger.info(
-                "Generating task=%s run=%s", task.task_id, run_id,
-            )
-
-            try:
-                c1 = generate_text(task, "code_only", run_id)
-                results.append(c1)
-            except Exception:
-                logger.exception(
-                    "Failed C1 for task=%s run=%s", task.task_id, run_id,
-                )
-
-            c2: GeneratedText | None = None
-            try:
-                c2 = generate_text(task, "context_rich", run_id)
-                results.append(c2)
-            except Exception:
-                logger.exception(
-                    "Failed C2 for task=%s run=%s", task.task_id, run_id,
-                )
-
-            try:
-                c3 = generate_text(
-                    task, "style_constrained", run_id, style_rules=style_rules,
-                )
-                results.append(c3)
-            except Exception:
-                logger.exception(
-                    "Failed C3 for task=%s run=%s", task.task_id, run_id,
-                )
-
-            if c2 is not None:
-                try:
-                    c4 = generate_humanized(c2, run_id)
-                    results.append(c4)
-                except Exception:
-                    logger.exception(
-                        "Failed C4 for task=%s run=%s", task.task_id, run_id,
+    for model_key in model_keys:
+        for wt in word_targets:
+            for task in tasks:
+                for run_idx in range(1, runs + 1):
+                    run_id = f"run_{run_idx:02d}"
+                    logger.info(
+                        "Generating task=%s run=%s model=%s length=%s",
+                        task.task_id, run_id, model_key, wt or task.word_target,
                     )
+
+                    try:
+                        c1 = generate_text(
+                            task, "code_only", run_id,
+                            model_key=model_key, word_target=wt,
+                        )
+                        results.append(c1)
+                    except Exception:
+                        logger.exception(
+                            "Failed C1 for task=%s run=%s", task.task_id, run_id,
+                        )
+
+                    c2: GeneratedText | None = None
+                    try:
+                        c2 = generate_text(
+                            task, "context_rich", run_id,
+                            model_key=model_key, word_target=wt,
+                        )
+                        results.append(c2)
+                    except Exception:
+                        logger.exception(
+                            "Failed C2 for task=%s run=%s", task.task_id, run_id,
+                        )
+
+                    try:
+                        c3 = generate_text(
+                            task, "style_constrained", run_id,
+                            style_rules=style_rules,
+                            model_key=model_key, word_target=wt,
+                        )
+                        results.append(c3)
+                    except Exception:
+                        logger.exception(
+                            "Failed C3 for task=%s run=%s", task.task_id, run_id,
+                        )
+
+                    if c2 is not None:
+                        try:
+                            c4 = generate_humanized(
+                                c2, run_id,
+                                model_key=model_key, word_target=wt,
+                            )
+                            results.append(c4)
+                        except Exception:
+                            logger.exception(
+                                "Failed C4 for task=%s run=%s",
+                                task.task_id, run_id,
+                            )
 
     logger.info("Generation complete: %d texts produced", len(results))
     return results

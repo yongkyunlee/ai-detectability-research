@@ -1,23 +1,11 @@
 task_id: duckdb_002
 project: duckdb
-topic: "Importing CSV and Parquet files in DuckDB"
-word_target: "300-500"
-gold_facts:
-  - field: csv_read
-    value: "read_csv"
-    match_type: literal
-  - field: parquet_read
-    value: "read_parquet"
-    match_type: literal
-  - field: auto_detect
-    value: "auto_detect"
-    match_type: semantic
-  - field: copy_statement
-    value: "COPY"
-    match_type: literal
+topic: Importing CSV and Parquet files in DuckDB
+word_target: 300-500
+reference_docs: &id001
+- data/context/duckdb/repo/README.md
 context_sources:
-  code_only:
-    - data/context/duckdb/code/import_data.md
+  code_only: *id001
   additional:
-    - data/context/duckdb/issues/csv_import_issues.md
-    - data/context/duckdb/community/reddit_data_import.md
+  - data/context/duckdb/issues/csv_import_issues.md
+  - data/context/duckdb/community/reddit_data_import.md

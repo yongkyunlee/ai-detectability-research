@@ -1,23 +1,11 @@
 task_id: duckdb_004
 project: duckdb
-topic: "Query performance optimization in DuckDB"
-word_target: "300-500"
-gold_facts:
-  - field: explain_command
-    value: "EXPLAIN ANALYZE"
-    match_type: literal
-  - field: columnar_storage
-    value: "columnar"
-    match_type: literal
-  - field: parallel_execution
-    value: "parallel"
-    match_type: semantic
-  - field: indexing
-    value: "ART index"
-    match_type: semantic
+topic: Query performance optimization in DuckDB
+word_target: 300-500
+reference_docs: &id001
+- data/context/duckdb/repo/README.md
 context_sources:
-  code_only:
-    - data/context/duckdb/code/performance.md
+  code_only: *id001
   additional:
-    - data/context/duckdb/issues/performance_issues.md
-    - data/context/duckdb/community/reddit_performance.md
+  - data/context/duckdb/issues/performance_issues.md
+  - data/context/duckdb/community/reddit_performance.md

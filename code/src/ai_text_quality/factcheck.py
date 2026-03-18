@@ -1,203 +1,229 @@
-"""Factual accuracy checking against gold-standard slot values.
+"""Factual accuracy checking via claim extraction and verification.
 
-Supports literal, regex, and semantic (LLM-judge) matching strategies,
-plus a hybrid pipeline that routes each fact to the appropriate checker.
+Instead of matching against a pre-defined gold fact table, this module:
+1. Extracts atomic factual claims from generated text (via LLM)
+2. Verifies each claim against reference documentation (via LLM)
+3. Computes factual precision = correct / (correct + incorrect)
 
-For semantic checks, instead of calling the Anthropic API directly, the
-prompt is printed so the user can paste it into Claude Code and paste
-back the response.
+All LLM interactions are interactive: prompts are printed for the user
+to paste into a CLI tool (Claude Code, Codex CLI, or Gemini CLI).
 """
 
 from __future__ import annotations
 
-import re
 import sys
 
-from ai_text_quality.models import FactCheckResult, GoldFact, SlotVerdict
+from ai_text_quality.models import Claim, ClaimVerdict, FactCheckResult
 
 
 # ---------------------------------------------------------------------------
-# Strict (deterministic) slot checks
+# Step 1: Claim extraction
 # ---------------------------------------------------------------------------
 
-def check_slot_literal(text: str, gold_fact: GoldFact) -> SlotVerdict:
-    """Check if *gold_fact.value* appears literally in *text* (case-insensitive).
-
-    Returns a CORRECT verdict with the matching snippet as evidence when found,
-    or a MISSING verdict otherwise.
-    """
-    idx = text.lower().find(gold_fact.value.lower())
-    if idx != -1:
-        # Pull a window of context around the match for evidence
-        start = max(0, idx - 30)
-        end = min(len(text), idx + len(gold_fact.value) + 30)
-        snippet = text[start:end]
-        return SlotVerdict(
-            field=gold_fact.field,
-            expected=gold_fact.value,
-            verdict="CORRECT",
-            evidence=snippet,
-        )
-    return SlotVerdict(
-        field=gold_fact.field,
-        expected=gold_fact.value,
-        verdict="MISSING",
-        evidence="",
-    )
-
-
-def check_slot_regex(text: str, gold_fact: GoldFact) -> SlotVerdict:
-    """Check if *gold_fact.value* (treated as a regex) matches anywhere in *text*.
-
-    Returns CORRECT with the first match as evidence, or MISSING.
-    """
-    try:
-        match = re.search(gold_fact.value, text, re.IGNORECASE)
-    except re.error:
-        # If the pattern is invalid fall back to a literal search
-        return check_slot_literal(text, gold_fact)
-
-    if match:
-        return SlotVerdict(
-            field=gold_fact.field,
-            expected=gold_fact.value,
-            verdict="CORRECT",
-            evidence=match.group(),
-        )
-    return SlotVerdict(
-        field=gold_fact.field,
-        expected=gold_fact.value,
-        verdict="MISSING",
-        evidence="",
-    )
-
-
-def check_slot_strict(text: str, gold_fact: GoldFact) -> SlotVerdict:
-    """Route to the appropriate deterministic checker based on *match_type*.
-
-    Handles ``literal`` and ``regex`` types.  For ``semantic`` (which requires
-    an LLM), returns MISSING so the caller knows no deterministic answer was
-    available.
-    """
-    if gold_fact.match_type == "literal":
-        return check_slot_literal(text, gold_fact)
-    if gold_fact.match_type == "regex":
-        return check_slot_regex(text, gold_fact)
-    # semantic -- cannot handle without LLM
-    return SlotVerdict(
-        field=gold_fact.field,
-        expected=gold_fact.value,
-        verdict="MISSING",
-        evidence="no deterministic check available for semantic match_type",
-    )
-
-
-# ---------------------------------------------------------------------------
-# LLM-judge slot check (interactive)
-# ---------------------------------------------------------------------------
-
-_JUDGE_SYSTEM_PROMPT = (
-    "You are a fact-checking judge. Given a text and an expected fact, "
-    "determine if the text contains this fact."
+_EXTRACT_SYSTEM = (
+    "You are a fact-checking assistant. Extract all atomic factual claims "
+    "from the given text. A factual claim is a statement that can be verified "
+    "as true or false against documentation — e.g., version numbers, commands, "
+    "file names, configuration details, behavioral descriptions, compatibility "
+    "statements. Exclude opinions, subjective assessments, and hedged statements."
 )
 
+_EXTRACT_USER_TEMPLATE = """Text to analyze:
+\"\"\"
+{text}
+\"\"\"
 
-def judge_slot_llm(text: str, gold_fact: GoldFact) -> SlotVerdict:
-    """Use Claude as a judge for semantic fact-checking.
+Extract every atomic factual claim. Output one claim per line in this exact format:
+CLAIM_ID|SOURCE_SENTENCE|CLAIM_TEXT
 
-    Prints the prompt for the user to paste into Claude Code, then reads
-    back the verdict response.
-    """
-    user_message = (
-        f"Text:\n\"\"\"\n{text}\n\"\"\"\n\n"
-        f"Expected fact field: {gold_fact.field}\n"
-        f"Expected value: {gold_fact.value}\n\n"
-        "Does the text contain this fact? Respond with exactly one of: "
-        "CORRECT, INCORRECT, or MISSING, followed by a pipe character (|) "
-        "and a brief explanation.\n"
-        "Format: VERDICT|explanation"
-    )
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- SOURCE_SENTENCE is the sentence from the text that contains this claim
+- CLAIM_TEXT is the atomic factual claim, stated clearly
 
+Example output:
+1|First, install it with pip install crewai.|The install command for CrewAI is "pip install crewai"
+2|You'll need Python 3.10 or newer.|CrewAI requires Python 3.10 or newer
+"""
+
+
+def build_extract_prompt(text: str) -> tuple[str, str]:
+    """Return (system_prompt, user_message) for claim extraction."""
+    return _EXTRACT_SYSTEM, _EXTRACT_USER_TEMPLATE.format(text=text)
+
+
+def parse_extracted_claims(raw_response: str) -> list[Claim]:
+    """Parse the LLM response into a list of Claims."""
+    claims: list[Claim] = []
+    for line in raw_response.strip().splitlines():
+        line = line.strip()
+        if not line or "|" not in line:
+            continue
+        parts = line.split("|", 2)
+        if len(parts) < 3:
+            continue
+        try:
+            claim_id = int(parts[0].strip())
+        except ValueError:
+            continue
+        claims.append(Claim(
+            claim_id=claim_id,
+            source_sentence=parts[1].strip(),
+            text=parts[2].strip(),
+        ))
+    return claims
+
+
+def extract_claims_interactive(text: str) -> list[Claim]:
+    """Print the extraction prompt and read back the LLM response."""
+    system, user = build_extract_prompt(text)
     separator = "=" * 70
     print(f"\n{separator}")
-    print("LLM-JUDGE FACT CHECK")
+    print("CLAIM EXTRACTION")
+    print("Paste the following into Claude Code, Codex CLI, or Gemini CLI:")
     print(f"{separator}")
-    print(f"SYSTEM PROMPT: {_JUDGE_SYSTEM_PROMPT}")
-    print(f"\nUSER MESSAGE:")
+    print(f"SYSTEM: {system}")
+    print(f"\nUSER MESSAGE:\n{user}")
     print(f"{separator}")
-    print(user_message)
-    print(f"{separator}")
-    print("Paste the LLM response below (single line, e.g. CORRECT|The text mentions...):")
+    print("Paste the LLM response below, then enter END_OF_RESPONSE on a new line:")
     print(separator)
 
-    raw = ""
+    lines: list[str] = []
     for line in sys.stdin:
-        raw = line.strip()
-        if raw:
+        if line.strip() == "END_OF_RESPONSE":
             break
+        lines.append(line)
 
-    # Parse VERDICT|explanation
-    verdict: str = "MISSING"
-    evidence: str = raw
+    return parse_extracted_claims("".join(lines))
 
-    if "|" in raw:
-        parts = raw.split("|", 1)
-        token = parts[0].strip().upper()
-        if token in {"CORRECT", "INCORRECT", "MISSING"}:
-            verdict = token
-            evidence = parts[1].strip()
-    else:
-        # Fallback: check if the response starts with a known verdict
-        upper = raw.upper()
-        for v in ("CORRECT", "INCORRECT", "MISSING"):
-            if upper.startswith(v):
-                verdict = v
-                evidence = raw[len(v):].strip().lstrip(":|-.").strip()
-                break
 
-    return SlotVerdict(
-        field=gold_fact.field,
-        expected=gold_fact.value,
-        verdict=verdict,  # type: ignore[arg-type]
-        evidence=evidence,
+# ---------------------------------------------------------------------------
+# Step 2: Claim verification
+# ---------------------------------------------------------------------------
+
+_VERIFY_SYSTEM = (
+    "You are a fact-checking judge. Given a factual claim and reference "
+    "documentation, determine if the claim is correct, incorrect, or "
+    "unverifiable based solely on the provided documentation."
+)
+
+_VERIFY_USER_TEMPLATE = """Reference documentation:
+\"\"\"
+{reference_text}
+\"\"\"
+
+Claims to verify (one per line):
+{claims_block}
+
+For each claim, respond with exactly one line in this format:
+CLAIM_ID|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID matches the input claim ID
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Rules:
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information to verify
+"""
+
+
+def build_verify_prompt(
+    claims: list[Claim],
+    reference_text: str,
+) -> tuple[str, str]:
+    """Return (system_prompt, user_message) for claim verification."""
+    claims_block = "\n".join(
+        f"{c.claim_id}|{c.text}" for c in claims
     )
+    user = _VERIFY_USER_TEMPLATE.format(
+        reference_text=reference_text,
+        claims_block=claims_block,
+    )
+    return _VERIFY_SYSTEM, user
 
 
-# ---------------------------------------------------------------------------
-# Hybrid (match-type-routed) pipeline
-# ---------------------------------------------------------------------------
+def parse_verification_response(
+    raw_response: str,
+    claims: list[Claim],
+) -> list[ClaimVerdict]:
+    """Parse the LLM verification response into ClaimVerdicts."""
+    claim_map = {c.claim_id: c.text for c in claims}
+    verdicts: list[ClaimVerdict] = []
 
-def check_slots_hybrid(text: str, gold_facts: list[GoldFact]) -> list[SlotVerdict]:
-    """Check each gold fact using the strategy dictated by its *match_type*.
+    for line in raw_response.strip().splitlines():
+        line = line.strip()
+        if not line or "|" not in line:
+            continue
+        parts = line.split("|", 2)
+        if len(parts) < 2:
+            continue
+        try:
+            claim_id = int(parts[0].strip())
+        except ValueError:
+            continue
 
-    - ``literal`` -> :func:`check_slot_literal`
-    - ``regex``   -> :func:`check_slot_regex`
-    - ``semantic``-> :func:`judge_slot_llm`
-    """
-    verdicts: list[SlotVerdict] = []
-    for fact in gold_facts:
-        if fact.match_type == "literal":
-            verdicts.append(check_slot_literal(text, fact))
-        elif fact.match_type == "regex":
-            verdicts.append(check_slot_regex(text, fact))
-        else:  # semantic
-            verdicts.append(judge_slot_llm(text, fact))
+        verdict_str = parts[1].strip().upper()
+        if verdict_str not in {"CORRECT", "INCORRECT", "UNVERIFIABLE"}:
+            verdict_str = "UNVERIFIABLE"
+
+        evidence = parts[2].strip() if len(parts) >= 3 else ""
+        claim_text = claim_map.get(claim_id, "")
+
+        verdicts.append(ClaimVerdict(
+            claim_id=claim_id,
+            claim_text=claim_text,
+            verdict=verdict_str,
+            evidence=evidence,
+        ))
+
     return verdicts
 
 
+def verify_claims_interactive(
+    claims: list[Claim],
+    reference_text: str,
+) -> list[ClaimVerdict]:
+    """Print the verification prompt and read back the LLM response."""
+    system, user = build_verify_prompt(claims, reference_text)
+    separator = "=" * 70
+    print(f"\n{separator}")
+    print("CLAIM VERIFICATION")
+    print("Paste the following into Claude Code, Codex CLI, or Gemini CLI:")
+    print(f"(Use a DIFFERENT model than the one that generated the text)")
+    print(f"{separator}")
+    print(f"SYSTEM: {system}")
+    print(f"\nUSER MESSAGE:\n{user}")
+    print(f"{separator}")
+    print("Paste the LLM response below, then enter END_OF_RESPONSE on a new line:")
+    print(separator)
+
+    lines: list[str] = []
+    for line in sys.stdin:
+        if line.strip() == "END_OF_RESPONSE":
+            break
+        lines.append(line)
+
+    return parse_verification_response("".join(lines), claims)
+
+
 # ---------------------------------------------------------------------------
-# Accuracy helpers
+# Scoring
 # ---------------------------------------------------------------------------
 
-def compute_accuracy(verdicts: list[SlotVerdict]) -> float:
-    """Fraction of verdicts that are CORRECT.
+def compute_factual_precision(verdicts: list[ClaimVerdict]) -> float:
+    """Compute factual precision: correct / (correct + incorrect).
 
-    Returns 0.0 when *verdicts* is empty.
+    Returns 0.0 if no claims are verifiable (all UNVERIFIABLE or empty).
     """
-    if not verdicts:
-        return 0.0
     correct = sum(1 for v in verdicts if v.verdict == "CORRECT")
-    return correct / len(verdicts)
+    incorrect = sum(1 for v in verdicts if v.verdict == "INCORRECT")
+    total_verifiable = correct + incorrect
+    if total_verifiable == 0:
+        return 0.0
+    return correct / total_verifiable
 
 
 # ---------------------------------------------------------------------------
@@ -209,52 +235,49 @@ def score_document(
     task_id: str,
     condition: str,
     run_id: str,
-    gold_facts: list[GoldFact],
+    reference_text: str,
+    model: str = "",
+    word_target: str = "",
 ) -> FactCheckResult:
-    """Run the complete fact-checking pipeline on one document.
+    """Run the full claim-extraction + verification pipeline on one document.
 
-    1. Hybrid checks (routes by *match_type*).
-    2. Strict-only checks (literal + regex; semantic facts get MISSING).
-    3. Computes both accuracy metrics.
-    4. Returns a :class:`FactCheckResult`.
+    1. Extract claims from the generated text (interactive)
+    2. Verify claims against reference documentation (interactive)
+    3. Compute factual precision and return results
     """
-    hybrid_verdicts = check_slots_hybrid(text, gold_facts)
-    strict_verdicts = [check_slot_strict(text, fact) for fact in gold_facts]
+    claims = extract_claims_interactive(text)
 
-    hybrid_acc = compute_accuracy(hybrid_verdicts)
-    strict_acc = compute_accuracy(strict_verdicts)
+    if not claims:
+        return FactCheckResult(
+            task_id=task_id,
+            condition=condition,
+            run_id=run_id,
+            model=model,
+            word_target=word_target,
+            claims=[],
+            total_claims=0,
+            correct_claims=0,
+            incorrect_claims=0,
+            unverifiable_claims=0,
+            factual_precision=0.0,
+        )
+
+    verdicts = verify_claims_interactive(claims, reference_text)
+
+    correct = sum(1 for v in verdicts if v.verdict == "CORRECT")
+    incorrect = sum(1 for v in verdicts if v.verdict == "INCORRECT")
+    unverifiable = sum(1 for v in verdicts if v.verdict == "UNVERIFIABLE")
 
     return FactCheckResult(
         task_id=task_id,
         condition=condition,
         run_id=run_id,
-        slot_results=hybrid_verdicts,
-        hybrid_slot_accuracy=hybrid_acc,
-        strict_slot_accuracy=strict_acc,
+        model=model,
+        word_target=word_target,
+        claims=verdicts,
+        total_claims=len(verdicts),
+        correct_claims=correct,
+        incorrect_claims=incorrect,
+        unverifiable_claims=unverifiable,
+        factual_precision=compute_factual_precision(verdicts),
     )
-
-
-# ---------------------------------------------------------------------------
-# LLM-judge agreement audit
-# ---------------------------------------------------------------------------
-
-def compute_llm_judge_agreement(
-    text: str, gold_facts: list[GoldFact]
-) -> float:
-    """Run the LLM judge on *all* facts and compare with hybrid scoring.
-
-    Returns the agreement rate (0--1) between the LLM-judge verdicts and the
-    hybrid verdicts.  This serves as an audit / calibration metric.
-    """
-    if not gold_facts:
-        return 0.0
-
-    hybrid_verdicts = check_slots_hybrid(text, gold_facts)
-    llm_verdicts = [judge_slot_llm(text, fact) for fact in gold_facts]
-
-    agreements = sum(
-        1
-        for hv, lv in zip(hybrid_verdicts, llm_verdicts)
-        if hv.verdict == lv.verdict
-    )
-    return agreements / len(gold_facts)

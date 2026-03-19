@@ -34,15 +34,14 @@ def create_detection_template(
     """Write a CSV template for manual AI-detection scoring.
 
     Each row identifies a text and has empty score columns for the user to
-    fill in after pasting the text into GPTZero / Originality.ai.
+    fill in after pasting the text into GPTZero.
 
     Columns
     -------
     task_id, condition, run_id, model, word_target,
-    gptzero_generated_prob, originality_ai_score
+    gptzero_ai_prob, gptzero_mixed_prob, gptzero_human_prob
 
-    Both score columns should be filled with values between 0 and 1.
-    Human probabilities are derived automatically (1 - score).
+    GPTZero columns should be filled with percentage values (0-100).
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -52,8 +51,9 @@ def create_detection_template(
         "run_id",
         "model",
         "word_target",
-        "gptzero_generated_prob",
-        "originality_ai_score",
+        "gptzero_ai_prob",
+        "gptzero_mixed_prob",
+        "gptzero_human_prob",
     ]
 
     with open(output_path, "w", newline="", encoding="utf-8") as f:
@@ -66,8 +66,9 @@ def create_detection_template(
                 "run_id": gen.run_id,
                 "model": gen.model,
                 "word_target": gen.word_target,
-                "gptzero_generated_prob": "",
-                "originality_ai_score": "",
+                "gptzero_ai_prob": "",
+                "gptzero_mixed_prob": "",
+                "gptzero_human_prob": "",
             })
 
     print(f"Wrote detection template with {len(texts)} rows → {output_path}")
@@ -77,7 +78,9 @@ def create_detection_template(
 def load_detection_from_csv(csv_path: Path) -> list[DetectionResult]:
     """Read a filled-in detection CSV and return DetectionResult objects.
 
-    Rows where both score columns are still empty are skipped.
+    Reads GPTZero percentage columns (gptzero_ai_prob, gptzero_mixed_prob,
+    gptzero_human_prob) with values 0-100 and converts to 0-1 probabilities.
+    Rows where gptzero_ai_prob is empty are skipped.
     """
     results: list[DetectionResult] = []
     skipped = 0
@@ -85,15 +88,18 @@ def load_detection_from_csv(csv_path: Path) -> list[DetectionResult]:
     with open(csv_path, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            gptzero_raw = row.get("gptzero_generated_prob", "").strip()
-            originality_raw = row.get("originality_ai_score", "").strip()
+            ai_raw = row.get("gptzero_ai_prob", "").strip()
 
-            if not gptzero_raw and not originality_raw:
+            if not ai_raw:
                 skipped += 1
                 continue
 
-            gptzero_gen = float(gptzero_raw) if gptzero_raw else 0.0
-            originality_ai = float(originality_raw) if originality_raw else 0.0
+            ai_pct = float(ai_raw)
+            mixed_raw = row.get("gptzero_mixed_prob", "").strip()
+            human_raw = row.get("gptzero_human_prob", "").strip()
+
+            mixed_pct = float(mixed_raw) if mixed_raw else 0.0
+            human_pct = float(human_raw) if human_raw else 0.0
 
             results.append(DetectionResult(
                 task_id=row["task_id"],
@@ -101,10 +107,9 @@ def load_detection_from_csv(csv_path: Path) -> list[DetectionResult]:
                 run_id=row["run_id"],
                 model=row.get("model", ""),
                 word_target=row.get("word_target", ""),
-                gptzero_human_prob=1.0 - gptzero_gen,
-                gptzero_generated_prob=gptzero_gen,
-                originality_ai_score=originality_ai,
-                originality_human_score=1.0 - originality_ai,
+                gptzero_generated_prob=ai_pct / 100.0,
+                gptzero_mixed_prob=mixed_pct / 100.0,
+                gptzero_human_prob=human_pct / 100.0,
             ))
 
     if skipped:

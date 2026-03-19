@@ -1,0 +1,1079 @@
+================================================================================
+  [1/24]  Task: crewai_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_001_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_001_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [2/24]  Task: crewai_001  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_001_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_001_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [3/24]  Task: crewai_004  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_004_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_004_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [4/24]  Task: crewai_004  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_004_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_004_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [5/24]  Task: crewai_006  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_006_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_006_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [6/24]  Task: crewai_006  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_006_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_006_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [7/24]  Task: crewai_008  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_008_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_008_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [8/24]  Task: crewai_008  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/crewai_008_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/crewai_008_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [9/24]  Task: duckdb_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_001_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_001_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [10/24]  Task: duckdb_001  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_001_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_001_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [11/24]  Task: duckdb_002  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_002_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_002_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [12/24]  Task: duckdb_002  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_002_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_002_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [13/24]  Task: duckdb_004  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_004_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_004_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [14/24]  Task: duckdb_004  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_004_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_004_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [15/24]  Task: duckdb_007  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_007_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_007_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [16/24]  Task: duckdb_007  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/duckdb_007_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/duckdb_007_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [17/24]  Task: langchain_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_001_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_001_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [18/24]  Task: langchain_001  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_001_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_001_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [19/24]  Task: langchain_002  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_002_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_002_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [20/24]  Task: langchain_002  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_002_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_002_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [21/24]  Task: langchain_003  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_003_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_003_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [22/24]  Task: langchain_003  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_003_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_003_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [23/24]  Task: langchain_007  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_007_claude_medium_run_01.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_007_claude_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [24/24]  Task: langchain_007  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+You are a senior engineer rewriting an AI-generated blog post so it reads like a human wrote it. Preserve every technical fact. Do not add information not in the original. Apply ALL of the following rules:
+
+## Banned words and phrases (never use these)
+- Transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently
+- Filler openers: 'In today's world', 'In today's digital age', 'In the realm of', 'When it comes to', 'It's important to note', 'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'
+- Overused adjectives: comprehensive, robust, seamless, cutting-edge, pivotal, crucial, vital, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, dynamic
+- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore
+- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, treasure trove, synergy, paradigm, cornerstone, catalyst, nexus
+- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently
+- Patterns: 'a myriad of', 'a plethora of', 'at its core', 'not only... but also', 'serves as a testament to'
+
+## Sentence and paragraph structure
+- Vary sentence length aggressively: mix very short sentences (3-7 words) with long complex ones (25+ words) in the SAME paragraph. Do not keep sentences in a uniform 15-20 word range.
+- Use occasional sentence fragments for emphasis.
+- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row.
+- Do NOT start consecutive sentences with the same word or part of speech.
+
+## Punctuation
+- NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence instead.
+- Use semicolons occasionally.
+
+## Voice and tone
+- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.
+- Use first person where appropriate ('I found', 'we ran into').
+- Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious').
+- Add occasional hedging that sounds genuinely uncertain ('I think', 'from what I can tell', 'not 100% sure on this').
+- Use casual register shifts: an informal aside, a colloquial synonym ('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').
+
+## Anti-patterns
+- Do NOT use numbered or bulleted lists unless the content absolutely requires it. Convert lists to prose.
+- Do NOT use the '[Topic] is a [category] that [description]' formula.
+- Do NOT add trailing importance claims ('highlighting the significance of...', 'reflecting the continued relevance of...').
+- Do NOT write a generic concluding paragraph that just restates the intro.
+- Do NOT repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or colloquial synonyms instead.
+
+Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/context_rich/langchain_007_claude_medium_run_02.md and rewrite it following every rule above.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/humanized/langchain_007_claude_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+

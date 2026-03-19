@@ -136,7 +136,7 @@ uv run jupyter notebook notebooks/experiment.ipynb
 ```
 
 The notebook covers:
-1. **Generation** — Prompts displayed for each CLI tool (Claude Code / Codex / Gemini); each prompt includes a save-to-file instruction so the CLI tool writes the output directly to `data/generated/{condition}/`. Press Enter after the CLI tool finishes. Conditions: C1 (context_rich), C2 (style_constrained), C3 (humanized). Models: Claude Code, Codex CLI, Gemini CLI. Lengths: short (150-250 words), long (700-1000 words). 2 runs per combination.
+1. **Generation** — Prompts displayed for each CLI tool (Claude Code / Codex / Gemini); each prompt includes a save-to-file instruction so the CLI tool writes the output directly to `data/generated/{condition}/`. Press Enter after the CLI tool finishes. Conditions: C1 (context_rich), C2 (style_constrained), C3 (humanized). Models: Claude Code, Codex CLI, Gemini CLI. Lengths: medium (800-1000 words), long (1500-2000 words). 2 runs per combination.
 2. **Detection** — Paste texts into GPTZero and Originality.ai, enter scores
 3. **Fact checking** — Claim extraction + verification via LLM (use a different model as judge)
 4. **Linguistic analysis** — Automatic (spaCy)

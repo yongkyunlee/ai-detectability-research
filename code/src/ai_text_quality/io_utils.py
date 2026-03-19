@@ -5,8 +5,12 @@ from pathlib import Path
 
 import yaml
 
+from collections import defaultdict
+
 from ai_text_quality.models import GeneratedText
-from ai_text_quality.paths import CONDITION_DIRS, GENERATED_DIR
+from ai_text_quality.paths import CONDITION_DIRS, GENERATED_DIR, PROMPTS_DIR
+
+PROMPTS_LOG = GENERATED_DIR / "prompts.jsonl"
 
 
 # ── Markdown ─────────────────────────────────────────────────────────
@@ -67,6 +71,65 @@ def _md_path(condition: str, task_id: str, run_id: str) -> Path:
 
 def _sidecar_path(condition: str) -> Path:
     return _condition_dir(condition) / "metadata.jsonl"
+
+
+def save_prompt(
+    task_id: str,
+    condition: str,
+    run_id: str,
+    model: str,
+    word_target: str,
+    prompt: str,
+) -> None:
+    """Append a prompt record to the shared prompts log."""
+    append_jsonl(PROMPTS_LOG, {
+        "task_id": task_id,
+        "condition": condition,
+        "run_id": run_id,
+        "model": model,
+        "word_target": word_target,
+        "prompt": prompt,
+    })
+
+
+LENGTH_LABELS = {"800-1000": "medium", "1500-2000": "long"}
+
+
+def write_grouped_prompts(records: list[dict]) -> list[Path]:
+    """Write prompt records to text files grouped by model + condition + length.
+
+    Each file is named ``prompts_{model_key}_{condition}_{length}.txt`` and
+    contains all prompts for that combination, separated by clear delimiters.
+    Returns the list of file paths written.
+    """
+    PROMPTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    groups: dict[tuple[str, str, str], list[dict]] = defaultdict(list)
+    for rec in records:
+        length = LENGTH_LABELS.get(rec.get("word_target", ""), rec.get("word_target", "unknown"))
+        key = (rec.get("model_key", "unknown"), rec["condition"], length)
+        groups[key].append(rec)
+
+    written: list[Path] = []
+    for (model_key, condition, length), recs in sorted(groups.items()):
+        path = PROMPTS_DIR / f"prompts_{model_key}_{condition}_{length}.txt"
+        lines: list[str] = []
+        for i, rec in enumerate(recs, 1):
+            lines.append("=" * 80)
+            lines.append(
+                f"  [{i}/{len(recs)}]  "
+                f"Task: {rec['task_id']}  |  Run: {rec['run_id']}  |  "
+                f"Words: {rec['word_target']}"
+            )
+            lines.append("=" * 80)
+            lines.append("")
+            lines.append(rec["prompt"])
+            lines.append("")
+            lines.append("")
+        path.write_text("\n".join(lines), encoding="utf-8")
+        written.append(path)
+
+    return written
 
 
 def save_generated_text(gen: GeneratedText) -> None:

@@ -108,7 +108,7 @@ Example task:
 task_id: crewai_001
 project: crewai
 topic: "Getting started with CrewAI: installation and first project"
-word_target: "300-500"
+word_target: "800-1000"
 reference_docs:
   - data/context/crewai/code/installation.md
 context_sources:
@@ -135,29 +135,28 @@ All generation happens via CLI tools (no API keys needed). Comparing across mode
 
 | Length | Word target | Rationale |
 |---|---|---|
-| Short | 150–250 words | Tests whether brevity increases or decreases detectability |
-| Medium | 300–500 words | Standard blog section length (baseline) |
-| Long | 700–1000 words | Tests whether longer content exhibits more AI patterns |
+| Medium | 800–1000 words | Standard blog section length (~4-5 min read, baseline) |
+| Long | 1500–2000 words | Tests whether longer content exhibits more AI patterns |
 
 #### Other Parameters
 
 | Parameter | Value | Rationale |
 |---|---|---|
 | Temperature | 0.3 | Low enough to reduce run-to-run noise while still allowing stylistic variation |
-| Max tokens | 2048 | Sufficient for 1000 words + formatting |
+| Max tokens | 4096 | Sufficient for 2000 words + formatting |
 | Runs per condition | 3 per task-condition (`run_01`-`run_03`) | Reduces single-sample noise and supports more stable comparisons |
 
 #### Experimental Matrix
 
-The full factorial (3 CLI tools × 3 lengths × 4 conditions × 22 tasks × 3 runs = 1,620) is large. The recommended design:
+The full factorial (3 CLI tools × 2 lengths × 4 conditions × 22 tasks × 3 runs = 1,584) is large. The recommended design:
 
 | Sub-experiment | Models | Lengths | Conditions | Tasks | Runs | Total texts |
 |---|---|---|---|---|---|---|
 | **Core ablation** | Claude Code | Medium | C1–C4 | 22 | 3 | 264 |
 | **Model comparison** | All 3 | Medium | C1, C3 | 22 | 3 | 396 |
-| **Length variation** | Claude Code | All 3 | C1, C3 | 22 | 3 | 396 |
+| **Length variation** | Claude Code | Both | C1, C3 | 22 | 3 | 264 |
 
-Plus 22 human baselines (C5). Total: ~1,056 texts + 22 baselines = **~1,078 documents**.
+Plus 22 human baselines (C5). Total: ~924 texts + 22 baselines = **~946 documents**.
 
 ### 3.6 Human Baseline Collection (C5)
 
@@ -167,7 +166,7 @@ For each task topic, find a real engineer-written blog post or documentation sec
 - Dev.to, Hashnode, Medium posts by practitioners
 - Engineering team blogs that reference the project
 
-Selection criteria: written by a named human author, published on a credible platform, covers the same technical scope as the task, and is matched as closely as possible on topic, audience, and genre. Trim to 300-500 words if longer, and record any remaining scope mismatch in metadata.
+Selection criteria: written by a named human author, published on a credible platform, covers the same technical scope as the task, and is matched as closely as possible on topic, audience, and genre. Trim to 800-1000 words if longer, and record any remaining scope mismatch in metadata.
 
 ---
 
@@ -339,7 +338,7 @@ ai-text-quality/
 
 #### 1.4 Human Baseline Collection
 - For each task topic, find 1 real blog post or tutorial section written by a human engineer
-- Trim to 300-500 words covering the same scope
+- Trim to 800-1000 words covering the same scope
 - Record source URL and author in metadata
 
 ### Phase 2: Generation Pipeline
@@ -357,7 +356,7 @@ ai-text-quality/
 #### 2.2 Run Generation (Notebook 02)
 - **Core ablation:** Loop over tasks × runs × conditions C1-C4 with Claude Code at medium length
 - **Model comparison:** Loop over tasks × runs × {C1, C3} × {Claude Code, GPT 5.4, Gemini 3.1} at medium length
-- **Length variation:** Loop over tasks × runs × {C1, C3} × {short, medium, long} with Claude Code
+- **Length variation:** Loop over tasks × runs × {C1, C3} × {medium, long} with Claude Code
 - For each text, the prompt is displayed for the user to paste into the appropriate model's UI
 - Save outputs to `data/generated/{condition}/{task_id}_{model}_{length}_{run_id}.md`
 - Save generation metadata (model, word_target, tokens, timestamp, overlap score) as JSONL sidecar
@@ -465,7 +464,7 @@ Originality.ai:
 | 1. tl;dr | Problem: AI text is detectable and rejected. Method: 5-condition ablation + model/length axes. Key finding: [TBD]. | 30s |
 | 2. Motivation | AI slop stats (73% spot it, 9x growth in complaints), industry impact on developer content | 1m |
 | 3. Literature Review | Detection methods, paraphrasing attacks, detector biases, citation metrics | 1.5m |
-| 4. Research Question & Design | RQ, 5 conditions table, 3 CLI tools, 3 lengths, task set | 1.5m |
+| 4. Research Question & Design | RQ, 5 conditions table, 3 CLI tools, 2 lengths, task set | 1.5m |
 | 5. Methodology | Detection + claim-based fact checking + linguistic features, metrics | 1m |
 | 6. Results: Detectability | Bar charts of detector scores by condition, statistical tests | 1m |
 | 7. Results: Trade-off | Pareto scatter (detectability vs factual precision) | 1m |
@@ -497,7 +496,7 @@ Originality.ai:
 |---|---|---|
 | Small sample size (22 tasks) limits statistical power | Cannot detect small effect sizes | Use 3 runs per condition, aggregate to task-level comparisons, and report effect sizes and confidence intervals, not just p-values. Frame as exploratory. |
 | Detector APIs may change behavior between runs | Non-reproducible results | Pin API versions, save raw API responses, run all detection in a single batch session |
-| GPTZero/Originality.ai may not expose per-sentence data for short texts | Lose granularity | Ensure texts are >250 words (both APIs recommend this minimum) |
+| GPTZero/Originality.ai may not expose per-sentence data for short texts | Lose granularity | All texts are 800+ words, well above API minimums |
 | Human baselines may not match task scope exactly | C5 comparison is imprecise | Select baselines carefully, match topic/audience/genre where possible, document scope differences, and treat C5 gap-closing as descriptive rather than absolute |
 | LLM-as-judge for fact checking may be unreliable | Inconsistent claim extraction or verification across runs | Use structured prompts, run judge multiple times for key samples, report inter-run agreement |
 | Style rules in C3 could overfit known detector patterns | Trivially high scores that don't generalize | Use two independent detectors; include linguistic features as an interpretability check beyond detector gaming |
@@ -538,7 +537,7 @@ Stage 2: Generation + Human Baselines
          ├── Implement generate.py (multi-model, multi-length support)
          ├── Core ablation: C1-C4 × 22 tasks × 3 runs with Claude Code (medium)
          ├── Model comparison: C1,C3 × 22 tasks × 3 runs × 3 CLI tools (medium)
-         ├── Length variation: C1,C3 × 22 tasks × 3 runs × 3 lengths (Claude Code)
+         ├── Length variation: C1,C3 × 22 tasks × 3 runs × 2 lengths (Claude Code)
          ├── Collect 15 human baselines
          └── Quick manual inspection of outputs
 

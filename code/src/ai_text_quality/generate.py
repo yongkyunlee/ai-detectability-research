@@ -5,20 +5,21 @@ Generates technical blog posts under three experimental conditions:
   C2 (style_constrained) - Persona + anti-pattern rules with rich context
   C3 (humanized)         - LLM rewrite of C1 output to sound human
 
-Supports multi-model generation (Claude Code, Codex CLI, Gemini CLI) and
-content length variation (short/long).
-
-Prompts are printed to the console so the user can paste them into the
-appropriate CLI tool and paste back the response.
+Workflow (non-interactive, notebook-friendly):
+  1. build_all_prompts()  → writes prompts.jsonl (C1 + C2)
+  2. User pastes each prompt into the appropriate CLI tool
+  3. build_humanize_prompts() → appends C3 prompts (needs C1 outputs on disk)
+  4. User pastes C3 prompts
+  5. load_all_generated() → reads output files, computes overlap, returns GeneratedText list
 """
 
 from __future__ import annotations
 
 import logging
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ai_text_quality.io_utils import save_prompt, write_grouped_prompts
 from ai_text_quality.models import GeneratedText, Task
 from ai_text_quality.paths import GENERATED_DIR, ROOT_DIR
 
@@ -42,13 +43,13 @@ MODEL_DISPLAY_NAMES = {
 }
 
 WORD_TARGETS = {
-    "short": "150-250",
-    "long": "700-1000",
+    "medium": "800-1000",
+    "long": "1500-2000",
 }
-DEFAULT_WORD_TARGET = "short"
+DEFAULT_WORD_TARGET = "medium"
 
 TEMPERATURE = 0.3
-MAX_TOKENS = 2048
+MAX_TOKENS = 4096
 
 
 # ---------------------------------------------------------------------------
@@ -83,14 +84,20 @@ def _read_context_dir(directory: str) -> list[str]:
     return contents
 
 
+LENGTH_LABELS = {"800-1000": "medium", "1500-2000": "long"}
+
+
 def _output_file_path(
     condition: str,
     task_id: str,
     run_id: str,
     model_key: str = DEFAULT_MODEL,
+    word_target: str | None = None,
 ) -> Path:
     """Return the absolute path where the CLI tool should save the output."""
-    return GENERATED_DIR / condition / f"{task_id}_{model_key}_{run_id}.md"
+    effective_wt = word_target or WORD_TARGETS[DEFAULT_WORD_TARGET]
+    length = LENGTH_LABELS.get(effective_wt, effective_wt)
+    return GENERATED_DIR / condition / f"{task_id}_{model_key}_{length}_{run_id}.md"
 
 
 def _save_instruction(save_path: Path) -> str:
@@ -117,14 +124,10 @@ def build_prompt(
         The task definition containing topic, context directory, etc.
     condition:
         One of ``"context_rich"`` or ``"style_constrained"``.
-        The ``"humanized"`` condition is handled by
-        :func:`generate_humanized` instead.
     style_rules:
-        Required when *condition* is ``"style_constrained"``.  Expected keys:
-        ``persona``, ``sentence_structure``, ``anti_patterns``,
-        ``content_rules``.
+        Required when *condition* is ``"style_constrained"``.
     word_target:
-        Word target range string (e.g. "150-250"). Required.
+        Word target range string (e.g. "800-1000").
     save_path:
         If provided, appends an instruction for the CLI tool to save the output
         directly to this file path.
@@ -189,6 +192,19 @@ def build_prompt(
     raise ValueError(f"Unknown condition: {condition!r}")
 
 
+def _build_humanize_prompt(source_text: str, save_path: Path) -> str:
+    """Return a C3 humanization prompt for the given source text."""
+    save_suffix = _save_instruction(save_path)
+    return (
+        "You are an editor making AI-generated technical content sound natural.\n\n"
+        "Rewrite this to sound like a human engineer wrote it. "
+        "Preserve all technical facts. "
+        "Do not add information not in the original.\n\n"
+        f"{source_text}"
+        f"{save_suffix}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # Overlap scoring
 # ---------------------------------------------------------------------------
@@ -224,182 +240,163 @@ def compute_overlap(
 
 
 # ---------------------------------------------------------------------------
-# Interactive prompt helpers
+# Step 1: Build C1 + C2 prompts
 # ---------------------------------------------------------------------------
 
-def _print_prompt_and_collect_response(
-    prompt: str,
-    model_key: str = DEFAULT_MODEL,
-    save_path: Path | None = None,
-) -> str:
-    """Print a prompt for the user to paste into a CLI tool, then collect the response.
-
-    If *save_path* is provided, the prompt already contains a save-to-file
-    instruction.  The user presses Enter after the CLI tool finishes, and the
-    response is read from the file.  Otherwise, falls back to the original
-    stdin paste workflow.
-    """
-    display_name = MODEL_DISPLAY_NAMES.get(model_key, model_key)
-    separator = "=" * 70
-    print(f"\n{separator}")
-    print(f"TARGET: {display_name}")
-    print(f"{separator}")
-    print("PROMPT:")
-    print(f"{separator}")
-    print(prompt)
-    print(f"\n{separator}")
-
-    if save_path is not None:
-        # Ensure parent directory exists
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        print(f"Output will be saved to: {save_path}")
-        print("Press Enter after the CLI tool finishes writing the file...")
-        input()
-        if not save_path.exists():
-            raise FileNotFoundError(
-                f"Expected output file not found: {save_path}"
-            )
-        return save_path.read_text(encoding="utf-8").strip()
-
-    # Fallback: manual paste
-    print("Paste the LLM response below, then enter END_OF_RESPONSE on a new line:")
-    print(separator)
-
-    lines: list[str] = []
-    for line in sys.stdin:
-        if line.strip() == "END_OF_RESPONSE":
-            break
-        lines.append(line)
-
-    return "".join(lines).strip()
-
-
-# ---------------------------------------------------------------------------
-# Generation helpers
-# ---------------------------------------------------------------------------
-
-def _gather_all_context_texts(task: Task) -> list[str]:
-    """Read all context files for overlap scoring."""
-    return _read_context_dir(task.context_dir)
-
-
-def generate_text(
-    task: Task,
-    condition: str,
-    run_id: str,
-    style_rules: dict | None = None,
-    model_key: str = DEFAULT_MODEL,
-    word_target: str | None = None,
-) -> GeneratedText:
-    """Generate text for a single task under a given condition.
-
-    Prints the prompt for the user to paste into the target CLI tool,
-    then reads back the response from the saved file.
-    """
-    effective_word_target = word_target or WORD_TARGETS[DEFAULT_WORD_TARGET]
-    save_path = _output_file_path(condition, task.task_id, run_id, model_key)
-    prompt = build_prompt(
-        task, condition, style_rules, word_target=word_target, save_path=save_path,
-    )
-
-    display_name = MODEL_DISPLAY_NAMES.get(model_key, model_key)
-    print(
-        f"\n>>> Generating: task={task.task_id} condition={condition} "
-        f"run={run_id} model={display_name} length={effective_word_target}"
-    )
-    generated = _print_prompt_and_collect_response(
-        prompt, model_key=model_key, save_path=save_path,
-    )
-
-    context_texts = _gather_all_context_texts(task)
-    overlap = compute_overlap(generated, context_texts)
-
-    return GeneratedText(
-        task_id=task.task_id,
-        condition=condition,
-        run_id=run_id,
-        text=generated,
-        model=MODELS.get(model_key, model_key),
-        word_target=effective_word_target,
-        timestamp=datetime.now(timezone.utc).isoformat(),
-        token_usage={"input_tokens": 0, "output_tokens": 0},
-        overlap_score=overlap,
-    )
-
-
-def generate_humanized(
-    source_text: GeneratedText,
-    run_id: str,
-    model_key: str = DEFAULT_MODEL,
-    word_target: str | None = None,
-) -> GeneratedText:
-    """C3: Rewrite *source_text* (typically C1 output) to sound human.
-
-    Prints the rewrite prompt for the user to paste into the target CLI tool.
-    """
-    effective_word_target = word_target or source_text.word_target or WORD_TARGETS[DEFAULT_WORD_TARGET]
-    save_path = _output_file_path(
-        "humanized", source_text.task_id, run_id, model_key,
-    )
-    save_suffix = _save_instruction(save_path)
-    prompt = (
-        "You are an editor making AI-generated technical content sound natural.\n\n"
-        "Rewrite this to sound like a human engineer wrote it. "
-        "Preserve all technical facts. "
-        "Do not add information not in the original.\n\n"
-        f"{source_text.text}"
-        f"{save_suffix}"
-    )
-
-    display_name = MODEL_DISPLAY_NAMES.get(model_key, model_key)
-    print(
-        f"\n>>> Humanizing: task={source_text.task_id} run={run_id} "
-        f"model={display_name}"
-    )
-    generated = _print_prompt_and_collect_response(
-        prompt, model_key=model_key, save_path=save_path,
-    )
-
-    return GeneratedText(
-        task_id=source_text.task_id,
-        condition="humanized",
-        run_id=run_id,
-        text=generated,
-        model=MODELS.get(model_key, model_key),
-        word_target=effective_word_target,
-        timestamp=datetime.now(timezone.utc).isoformat(),
-        token_usage={"input_tokens": 0, "output_tokens": 0},
-        overlap_score=source_text.overlap_score,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Batch generation
-# ---------------------------------------------------------------------------
-
-def generate_all(
+def build_all_prompts(
     tasks: list[Task],
     style_rules: dict,
     runs: int = 2,
     model_keys: list[str] | None = None,
     word_targets: list[str | None] | None = None,
+) -> list[dict]:
+    """Build all C1/C2 prompts and save them to prompts.jsonl.
+
+    Returns a list of prompt records (each dict has task_id, condition,
+    run_id, model, word_target, prompt, save_path).
+    """
+    if model_keys is None:
+        model_keys = [DEFAULT_MODEL]
+    if word_targets is None:
+        word_targets = [None]
+
+    records: list[dict] = []
+
+    for model_key in model_keys:
+        for wt in word_targets:
+            effective_wt = wt or WORD_TARGETS[DEFAULT_WORD_TARGET]
+            for task in tasks:
+                for run_idx in range(1, runs + 1):
+                    run_id = f"run_{run_idx:02d}"
+
+                    for condition in ("context_rich", "style_constrained"):
+                        save_path = _output_file_path(
+                            condition, task.task_id, run_id, model_key, wt,
+                        )
+                        save_path.parent.mkdir(parents=True, exist_ok=True)
+
+                        prompt = build_prompt(
+                            task,
+                            condition,
+                            style_rules=style_rules if condition == "style_constrained" else None,
+                            word_target=wt,
+                            save_path=save_path,
+                        )
+
+                        record = {
+                            "task_id": task.task_id,
+                            "condition": condition,
+                            "run_id": run_id,
+                            "model": MODELS.get(model_key, model_key),
+                            "model_key": model_key,
+                            "word_target": effective_wt,
+                            "prompt": prompt,
+                            "save_path": str(save_path),
+                        }
+                        records.append(record)
+                        save_prompt(
+                            task_id=task.task_id,
+                            condition=condition,
+                            run_id=run_id,
+                            model=MODELS.get(model_key, model_key),
+                            word_target=effective_wt,
+                            prompt=prompt,
+                        )
+
+    files = write_grouped_prompts(records)
+    print(f"Built {len(records)} C1/C2 prompts → {len(files)} files in data/generated/prompts/")
+    for f in files:
+        print(f"  {f.name}")
+    return records
+
+
+# ---------------------------------------------------------------------------
+# Step 2: Build C3 (humanize) prompts — requires C1 outputs on disk
+# ---------------------------------------------------------------------------
+
+def build_humanize_prompts(
+    tasks: list[Task],
+    runs: int = 2,
+    model_keys: list[str] | None = None,
+    word_targets: list[str | None] | None = None,
+) -> list[dict]:
+    """Build C3 humanization prompts from C1 output files on disk.
+
+    Call this after the user has generated all C1 outputs.
+    Returns a list of prompt records and appends them to prompts.jsonl.
+    """
+    if model_keys is None:
+        model_keys = [DEFAULT_MODEL]
+    if word_targets is None:
+        word_targets = [None]
+
+    records: list[dict] = []
+    missing: list[str] = []
+
+    for model_key in model_keys:
+        for wt in word_targets:
+            effective_wt = wt or WORD_TARGETS[DEFAULT_WORD_TARGET]
+            for task in tasks:
+                for run_idx in range(1, runs + 1):
+                    run_id = f"run_{run_idx:02d}"
+
+                    c1_path = _output_file_path(
+                        "context_rich", task.task_id, run_id, model_key, wt,
+                    )
+                    if not c1_path.exists():
+                        missing.append(str(c1_path))
+                        continue
+
+                    c1_text = c1_path.read_text(encoding="utf-8").strip()
+                    save_path = _output_file_path(
+                        "humanized", task.task_id, run_id, model_key, wt,
+                    )
+                    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+                    prompt = _build_humanize_prompt(c1_text, save_path)
+
+                    record = {
+                        "task_id": task.task_id,
+                        "condition": "humanized",
+                        "run_id": run_id,
+                        "model": MODELS.get(model_key, model_key),
+                        "model_key": model_key,
+                        "word_target": effective_wt,
+                        "prompt": prompt,
+                        "save_path": str(save_path),
+                    }
+                    records.append(record)
+                    save_prompt(
+                        task_id=task.task_id,
+                        condition="humanized",
+                        run_id=run_id,
+                        model=MODELS.get(model_key, model_key),
+                        word_target=effective_wt,
+                        prompt=prompt,
+                    )
+
+    if missing:
+        print(f"Warning: {len(missing)} C1 output files not found, skipped C3 for those")
+    files = write_grouped_prompts(records)
+    print(f"Built {len(records)} C3 prompts → {len(files)} files in data/generated/prompts/")
+    for f in files:
+        print(f"  {f.name}")
+    return records
+
+
+# ---------------------------------------------------------------------------
+# Step 3: Load generated outputs from disk
+# ---------------------------------------------------------------------------
+
+def load_all_generated(
+    tasks: list[Task],
+    runs: int = 2,
+    model_keys: list[str] | None = None,
+    word_targets: list[str | None] | None = None,
 ) -> list[GeneratedText]:
-    """Generate all conditions for all tasks across multiple runs, models, and lengths.
+    """Read all generated output files from disk and return GeneratedText objects.
 
-    Parameters
-    ----------
-    tasks:
-        List of task definitions.
-    style_rules:
-        Style rules for C2 condition.
-    runs:
-        Number of runs per task-condition-model-length combination.
-    model_keys:
-        List of model keys to generate with. Defaults to [DEFAULT_MODEL].
-    word_targets:
-        List of word targets. None entries use the task default. Defaults to [None].
-
-    Returns the full list of :class:`GeneratedText` objects.
+    Computes overlap scores against context sources.
     """
     if model_keys is None:
         model_keys = [DEFAULT_MODEL]
@@ -407,56 +404,40 @@ def generate_all(
         word_targets = [None]
 
     results: list[GeneratedText] = []
+    missing: list[str] = []
 
     for model_key in model_keys:
         for wt in word_targets:
+            effective_wt = wt or WORD_TARGETS[DEFAULT_WORD_TARGET]
             for task in tasks:
+                context_texts = _read_context_dir(task.context_dir)
                 for run_idx in range(1, runs + 1):
                     run_id = f"run_{run_idx:02d}"
-                    logger.info(
-                        "Generating task=%s run=%s model=%s length=%s",
-                        task.task_id, run_id, model_key, wt or WORD_TARGETS[DEFAULT_WORD_TARGET],
-                    )
 
-                    # C1: context_rich
-                    c1: GeneratedText | None = None
-                    try:
-                        c1 = generate_text(
-                            task, "context_rich", run_id,
-                            model_key=model_key, word_target=wt,
+                    for condition in ("context_rich", "style_constrained", "humanized"):
+                        save_path = _output_file_path(
+                            condition, task.task_id, run_id, model_key, wt,
                         )
-                        results.append(c1)
-                    except Exception:
-                        logger.exception(
-                            "Failed C1 for task=%s run=%s", task.task_id, run_id,
-                        )
+                        if not save_path.exists():
+                            missing.append(str(save_path))
+                            continue
 
-                    # C2: style_constrained
-                    try:
-                        c2 = generate_text(
-                            task, "style_constrained", run_id,
-                            style_rules=style_rules,
-                            model_key=model_key, word_target=wt,
-                        )
-                        results.append(c2)
-                    except Exception:
-                        logger.exception(
-                            "Failed C2 for task=%s run=%s", task.task_id, run_id,
-                        )
+                        text = save_path.read_text(encoding="utf-8").strip()
+                        overlap = compute_overlap(text, context_texts)
 
-                    # C3: humanized (rewrite of C1)
-                    if c1 is not None:
-                        try:
-                            c3 = generate_humanized(
-                                c1, run_id,
-                                model_key=model_key, word_target=wt,
-                            )
-                            results.append(c3)
-                        except Exception:
-                            logger.exception(
-                                "Failed C3 for task=%s run=%s",
-                                task.task_id, run_id,
-                            )
+                        results.append(GeneratedText(
+                            task_id=task.task_id,
+                            condition=condition,
+                            run_id=run_id,
+                            text=text,
+                            model=MODELS.get(model_key, model_key),
+                            word_target=effective_wt,
+                            timestamp=datetime.now(timezone.utc).isoformat(),
+                            token_usage={"input_tokens": 0, "output_tokens": 0},
+                            overlap_score=overlap,
+                        ))
 
-    logger.info("Generation complete: %d texts produced", len(results))
+    if missing:
+        print(f"Warning: {len(missing)} output files not found")
+    print(f"Loaded {len(results)} generated texts")
     return results

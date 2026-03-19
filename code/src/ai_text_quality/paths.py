@@ -14,6 +14,7 @@ TASKS_DIR = DATA_DIR / "tasks"
 CONTEXT_DIR = DATA_DIR / "context"
 HUMAN_BASELINES_DIR = DATA_DIR / "human_baselines"
 GENERATED_DIR = DATA_DIR / "generated"
+PROMPTS_DIR = DATA_DIR / "generated" / "prompts"
 RESULTS_DIR = DATA_DIR / "results"
 
 # ── Results sub-directories ──────────────────────────────────────────
@@ -72,6 +73,7 @@ def ensure_dirs() -> None:
         CONTEXT_DIR,
         HUMAN_BASELINES_DIR,
         GENERATED_DIR,
+        PROMPTS_DIR,
         C1_DIR,
         C2_DIR,
         C3_DIR,

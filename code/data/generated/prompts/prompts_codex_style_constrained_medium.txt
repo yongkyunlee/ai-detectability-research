@@ -1,0 +1,503 @@
+================================================================================
+  [1/24]  Task: crewai_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Getting started with CrewAI: installation and first project based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Getting started with CrewAI: installation and first project.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_001_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [2/24]  Task: crewai_001  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Getting started with CrewAI: installation and first project based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Getting started with CrewAI: installation and first project.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_001_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [3/24]  Task: crewai_004  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Using tools in CrewAI agents based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Using tools in CrewAI agents.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_004_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [4/24]  Task: crewai_004  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Using tools in CrewAI agents based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Using tools in CrewAI agents.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_004_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [5/24]  Task: crewai_006  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Memory and context management in CrewAI based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Memory and context management in CrewAI.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_006_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [6/24]  Task: crewai_006  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Memory and context management in CrewAI based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Memory and context management in CrewAI.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_006_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [7/24]  Task: crewai_008  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Multi-agent collaboration patterns in CrewAI based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Multi-agent collaboration patterns in CrewAI.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_008_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [8/24]  Task: crewai_008  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Multi-agent collaboration patterns in CrewAI based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai and write a blog post about Multi-agent collaboration patterns in CrewAI.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_008_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [9/24]  Task: duckdb_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Getting started with DuckDB Python client based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about Getting started with DuckDB Python client.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_001_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [10/24]  Task: duckdb_001  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Getting started with DuckDB Python client based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about Getting started with DuckDB Python client.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_001_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [11/24]  Task: duckdb_002  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Importing CSV and Parquet files in DuckDB based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about Importing CSV and Parquet files in DuckDB.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_002_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [12/24]  Task: duckdb_002  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Importing CSV and Parquet files in DuckDB based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about Importing CSV and Parquet files in DuckDB.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_002_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [13/24]  Task: duckdb_004  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Query performance optimization in DuckDB based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about Query performance optimization in DuckDB.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_004_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [14/24]  Task: duckdb_004  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Query performance optimization in DuckDB based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about Query performance optimization in DuckDB.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_004_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [15/24]  Task: duckdb_007  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about DuckDB window functions and analytical queries based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about DuckDB window functions and analytical queries.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_007_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [16/24]  Task: duckdb_007  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about DuckDB window functions and analytical queries based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb and write a blog post about DuckDB window functions and analytical queries.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_007_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [17/24]  Task: langchain_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Getting started with LangChain: installation and first chain based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about Getting started with LangChain: installation and first chain.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_001_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [18/24]  Task: langchain_001  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Getting started with LangChain: installation and first chain based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about Getting started with LangChain: installation and first chain.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_001_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [19/24]  Task: langchain_002  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Building RAG pipelines with LangChain retrievers and vector stores based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about Building RAG pipelines with LangChain retrievers and vector stores.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_002_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [20/24]  Task: langchain_002  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Building RAG pipelines with LangChain retrievers and vector stores based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about Building RAG pipelines with LangChain retrievers and vector stores.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_002_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [21/24]  Task: langchain_003  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Using LangChain agents and tools for autonomous task execution based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about Using LangChain agents and tools for autonomous task execution.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_003_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [22/24]  Task: langchain_003  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about Using LangChain agents and tools for autonomous task execution based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about Using LangChain agents and tools for autonomous task execution.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_003_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [23/24]  Task: langchain_007  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about LangChain Expression Language (LCEL) for composable chains based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about LangChain Expression Language (LCEL) for composable chains.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_007_codex_medium_run_01.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+
+
+================================================================================
+  [24/24]  Task: langchain_007  |  Run: run_02  |  Words: 800-1000
+================================================================================
+
+Write a technical blog post about LangChain Expression Language (LCEL) for composable chains based on the project documentation.
+
+Persona: You are a senior backend engineer writing for other engineers on your team's blog. Sound experienced and opinionated, but do not claim personal use or experiences that are not supported by the provided sources.
+Sentence structure rules: ['Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words).', "Use contractions naturally: don't, it's, we've, wouldn't.", "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."]
+Anti-patterns to avoid: Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'.; Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'.; Do not use bullet lists for more than one section. Prefer prose.; Do not hedge with 'arguably', 'it could be said', or 'one might argue'.
+Content rules: ['Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources.', 'Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples.', "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."]
+
+Read the source code, documentation, issues, and community discussions in /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain and write a blog post about LangChain Expression Language (LCEL) for composable chains.
+
+Use the context for facts, terminology, and trade-offs only. Do not copy phrasing from context sources.
+
+Target length: approximately 800-1000 words.
+
+Save the blog post to /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_007_codex_medium_run_02.md
+Write only the blog post content to the file — no additional commentary, no markdown fences wrapping the whole file, and no meta-text.
+

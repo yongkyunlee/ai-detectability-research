@@ -9,7 +9,7 @@ Mini Research Project — March 2025
 
 **Problem:** AI-generated technical content is easily detected and dismissed as "AI slop" — 73% of readers say they can spot it, and detection tools report >99% accuracy on raw AI output.
 
-**Method:** 5-condition ablation study across 3 models (Claude Opus 4.6, GPT 5.4, Gemini 3.1) and 3 content lengths, measuring AI detectability and factual accuracy on 22 technical writing tasks.
+**Method:** 5-condition ablation study across 3 models (Claude Opus 4.6, GPT 5.4, Gemini 3.1) and 2 content lengths, measuring AI detectability and factual accuracy on 22 technical writing tasks.
 
 **Key Results:**
 - Style constraints (C3) reduced AI detection by **[X]%** over baseline while preserving **[Y]%** factual accuracy
@@ -100,14 +100,14 @@ Each condition adds one intervention on top of the previous:
 ### Task Set & Experimental Axes
 - **22 tasks** across 3 open-source projects (CrewAI, DuckDB, LangChain)
 - **3 models via CLI:** Claude Code (Opus 4.6), Codex CLI (GPT 5.4), Gemini CLI (3.1)
-- **3 content lengths:** Short (150–250), Medium (300–500), Long (700–1000 words)
-- **3 runs per condition** → ~750 documents total
+- **2 content lengths:** Medium (800–1000), Long (1500–2000 words)
+- **3 runs per condition** → ~946 documents total
 
 | Sub-experiment | Models | Lengths | Conditions | Texts |
 |---|---|---|---|---|
 | Core ablation | Claude Code | Medium | C1–C4 | 264 |
 | Model comparison | All 3 CLIs | Medium | C1, C3 | 396 |
-| Length variation | Claude Code | All 3 | C1, C3 | 396 |
+| Length variation | Claude Code | Both | C1, C3 | 264 |
 
 ---
 
@@ -309,9 +309,8 @@ Gemini 3.1 │██████████████████████
 ```
            Mean human_prob (higher = less detectable)
            ┌──────────────────────────────────────────────────┐
-Short      │████████████████████░░░░░░░░░░░░░░░░░░│ [0.XX]
-Medium     │████████████░░░░░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
-Long       │████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+Medium     │████████████████░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
+Long       │████████████░░░░░░░░░░░░░░░░░░░░░░░░░░│ [0.XX]
            └──────────────────────────────────────────────────┘
 ```
 

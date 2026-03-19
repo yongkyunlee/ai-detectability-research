@@ -192,15 +192,62 @@ def build_prompt(
     raise ValueError(f"Unknown condition: {condition!r}")
 
 
-def _build_humanize_prompt(source_text: str, save_path: Path) -> str:
-    """Return a C3 humanization prompt for the given source text."""
+def _build_humanize_prompt(source_path: Path, save_path: Path) -> str:
+    """Return a C3 humanization prompt that references the source file."""
     save_suffix = _save_instruction(save_path)
     return (
-        "You are an editor making AI-generated technical content sound natural.\n\n"
-        "Rewrite this to sound like a human engineer wrote it. "
-        "Preserve all technical facts. "
-        "Do not add information not in the original.\n\n"
-        f"{source_text}"
+        "You are a senior engineer rewriting an AI-generated blog post so it reads "
+        "like a human wrote it. Preserve every technical fact. Do not add information "
+        "not in the original. Apply ALL of the following rules:\n\n"
+        "## Banned words and phrases (never use these)\n"
+        "- Transition words: Moreover, Furthermore, Additionally, In addition, "
+        "Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently\n"
+        "- Filler openers: 'In today's world', 'In today's digital age', "
+        "'In the realm of', 'When it comes to', 'It's important to note', "
+        "'It's worth noting', 'Let's dive in', 'In conclusion', 'To summarize'\n"
+        "- Overused adjectives: comprehensive, robust, seamless, cutting-edge, "
+        "pivotal, crucial, vital, innovative, groundbreaking, transformative, "
+        "holistic, nuanced, intricate, multifaceted, dynamic\n"
+        "- Overused verbs: delve, embark, navigate, leverage, utilize, optimize, "
+        "streamline, foster, cultivate, harness, unleash, unlock, elevate, "
+        "empower, facilitate, underscore\n"
+        "- Overused nouns/metaphors: tapestry, landscape, realm, journey, beacon, "
+        "treasure trove, synergy, paradigm, cornerstone, catalyst, nexus\n"
+        "- Intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, "
+        "fundamentally, inherently\n"
+        "- Patterns: 'a myriad of', 'a plethora of', 'at its core', "
+        "'not only... but also', 'serves as a testament to'\n\n"
+        "## Sentence and paragraph structure\n"
+        "- Vary sentence length aggressively: mix very short sentences (3-7 words) "
+        "with long complex ones (25+ words) in the SAME paragraph. Do not keep "
+        "sentences in a uniform 15-20 word range.\n"
+        "- Use occasional sentence fragments for emphasis.\n"
+        "- Vary paragraph length: use a mix of 1-sentence and 5-8 sentence paragraphs. "
+        "Never write more than two paragraphs of similar length in a row.\n"
+        "- Do NOT start consecutive sentences with the same word or part of speech.\n\n"
+        "## Punctuation\n"
+        "- NEVER use em dashes (\u2014 or --). Use commas, parentheses, colons, or "
+        "rewrite the sentence instead.\n"
+        "- Use semicolons occasionally.\n\n"
+        "## Voice and tone\n"
+        "- Use contractions naturally: don't, it's, we've, can't, wouldn't, I'm.\n"
+        "- Use first person where appropriate ('I found', 'we ran into').\n"
+        "- Include 1-2 mild opinions or subjective judgments "
+        "('honestly this surprised me', 'the docs don't make this obvious').\n"
+        "- Add occasional hedging that sounds genuinely uncertain "
+        "('I think', 'from what I can tell', 'not 100% sure on this').\n"
+        "- Use casual register shifts: an informal aside, a colloquial synonym "
+        "('use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate').\n\n"
+        "## Anti-patterns\n"
+        "- Do NOT use numbered or bulleted lists unless the content absolutely requires it. "
+        "Convert lists to prose.\n"
+        "- Do NOT use the '[Topic] is a [category] that [description]' formula.\n"
+        "- Do NOT add trailing importance claims ('highlighting the significance of...', "
+        "'reflecting the continued relevance of...').\n"
+        "- Do NOT write a generic concluding paragraph that just restates the intro.\n"
+        "- Do NOT repeat the same key term more than twice in 3 consecutive sentences. "
+        "Use pronouns or colloquial synonyms instead.\n\n"
+        f"Read the blog post from {source_path} and rewrite it following every rule above."
         f"{save_suffix}"
     )
 
@@ -347,13 +394,12 @@ def build_humanize_prompts(
                         missing.append(str(c1_path))
                         continue
 
-                    c1_text = c1_path.read_text(encoding="utf-8").strip()
                     save_path = _output_file_path(
                         "humanized", task.task_id, run_id, model_key, wt,
                     )
                     save_path.parent.mkdir(parents=True, exist_ok=True)
 
-                    prompt = _build_humanize_prompt(c1_text, save_path)
+                    prompt = _build_humanize_prompt(c1_path, save_path)
 
                     record = {
                         "task_id": task.task_id,
@@ -394,10 +440,7 @@ def load_all_generated(
     model_keys: list[str] | None = None,
     word_targets: list[str | None] | None = None,
 ) -> list[GeneratedText]:
-    """Read all generated output files from disk and return GeneratedText objects.
-
-    Computes overlap scores against context sources.
-    """
+    """Read all generated output files from disk and return GeneratedText objects."""
     if model_keys is None:
         model_keys = [DEFAULT_MODEL]
     if word_targets is None:
@@ -410,7 +453,6 @@ def load_all_generated(
         for wt in word_targets:
             effective_wt = wt or WORD_TARGETS[DEFAULT_WORD_TARGET]
             for task in tasks:
-                context_texts = _read_context_dir(task.context_dir)
                 for run_idx in range(1, runs + 1):
                     run_id = f"run_{run_idx:02d}"
 
@@ -423,7 +465,6 @@ def load_all_generated(
                             continue
 
                         text = save_path.read_text(encoding="utf-8").strip()
-                        overlap = compute_overlap(text, context_texts)
 
                         results.append(GeneratedText(
                             task_id=task.task_id,
@@ -434,7 +475,6 @@ def load_all_generated(
                             word_target=effective_wt,
                             timestamp=datetime.now(timezone.utc).isoformat(),
                             token_usage={"input_tokens": 0, "output_tokens": 0},
-                            overlap_score=overlap,
                         ))
 
     if missing:

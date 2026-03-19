@@ -23,18 +23,6 @@ FACTUAL_DIR = RESULTS_DIR / "factual"
 LINGUISTIC_DIR = RESULTS_DIR / "linguistic"
 SUMMARY_DIR = RESULTS_DIR / "summary"
 
-# ── Condition directories ────────────────────────────────────────────
-C1_DIR = GENERATED_DIR / "c1_context_rich"
-C2_DIR = GENERATED_DIR / "c2_style_constrained"
-C3_DIR = GENERATED_DIR / "c3_humanized"
-
-# ── Condition label → directory mapping ──────────────────────────────
-CONDITION_DIRS: dict[str, Path] = {
-    "context_rich": C1_DIR,
-    "style_constrained": C2_DIR,
-    "humanized": C3_DIR,
-}
-
 
 # ── Helpers ──────────────────────────────────────────────────────────
 def get_task_path(project: str, task_id: str) -> Path:
@@ -46,7 +34,7 @@ def get_context_path(project: str, category: str) -> Path:
 
 
 def get_output_path(condition: str, task_id: str, run_id: str) -> Path:
-    return CONDITION_DIRS.get(condition, GENERATED_DIR / condition) / f"{task_id}_{run_id}.md"
+    return GENERATED_DIR / condition / f"{task_id}_{run_id}.md"
 
 
 def get_result_path(result_type: str, filename: str) -> Path:
@@ -74,9 +62,9 @@ def ensure_dirs() -> None:
         HUMAN_BASELINES_DIR,
         GENERATED_DIR,
         PROMPTS_DIR,
-        C1_DIR,
-        C2_DIR,
-        C3_DIR,
+        GENERATED_DIR / "context_rich",
+        GENERATED_DIR / "style_constrained",
+        GENERATED_DIR / "humanized",
         RESULTS_DIR,
         DETECTION_DIR,
         FACTUAL_DIR,

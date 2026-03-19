@@ -1,17 +1,22 @@
-"""AI-detection via manual UI interaction with GPTZero and Originality.ai.
+"""AI-detection scoring for GPTZero and Originality.ai.
 
-Instead of calling APIs directly, this module prints the text for the user
-to paste into the GPTZero and Originality.ai web UIs, then prompts the user
-to enter the scores reported by each tool.
+Provides a non-interactive workflow:
+
+1. :func:`create_detection_template` writes a CSV with one row per text.
+   The user fills in ``gptzero_generated_prob`` and ``originality_ai_score``
+   columns after running each text through the respective web UIs.
+
+2. :func:`load_detection_from_csv` reads the filled-in CSV and returns
+   :class:`DetectionResult` objects ready for analysis.
 
 Parsing helpers remain for backwards compatibility with any stored results.
-:func:`run_detection` orchestrates the interactive workflow over a batch of
-:class:`GeneratedText` items.
 """
 
 from __future__ import annotations
 
+import csv
 import logging
+from pathlib import Path
 
 from ai_text_quality.models import DetectionResult, GeneratedText
 
@@ -19,89 +24,93 @@ logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Interactive detection helpers
+# Non-interactive template workflow
 # ---------------------------------------------------------------------------
 
-def _prompt_gptzero_scores(
-    text: str,
-    task_id: str,
-    condition: str,
-    run_id: str,
-) -> DetectionResult:
-    """Print text for the user to paste into GPTZero UI, then collect scores.
+def create_detection_template(
+    texts: list[GeneratedText],
+    output_path: Path,
+) -> Path:
+    """Write a CSV template for manual AI-detection scoring.
 
-    The user should:
-    1. Go to https://gptzero.me
-    2. Paste the text shown below
-    3. Enter the reported scores back here
+    Each row identifies a text and has empty score columns for the user to
+    fill in after pasting the text into GPTZero / Originality.ai.
+
+    Columns
+    -------
+    task_id, condition, run_id, model, word_target,
+    gptzero_generated_prob, originality_ai_score
+
+    Both score columns should be filled with values between 0 and 1.
+    Human probabilities are derived automatically (1 - score).
     """
-    separator = "=" * 70
-    print(f"\n{separator}")
-    print(f"GPTZero - task={task_id} condition={condition} run={run_id}")
-    print(f"{separator}")
-    print("Paste the following text into https://gptzero.me :")
-    print(f"{separator}")
-    print(text)
-    print(f"{separator}")
-    print()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    generated_prob = _read_float("GPTZero AI-generated probability (0-1): ")
-    human_prob = 1.0 - generated_prob
+    fieldnames = [
+        "task_id",
+        "condition",
+        "run_id",
+        "model",
+        "word_target",
+        "gptzero_generated_prob",
+        "originality_ai_score",
+    ]
 
-    return DetectionResult(
-        task_id=task_id,
-        condition=condition,
-        run_id=run_id,
-        gptzero_human_prob=human_prob,
-        gptzero_generated_prob=generated_prob,
-    )
+    with open(output_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        for gen in texts:
+            writer.writerow({
+                "task_id": gen.task_id,
+                "condition": gen.condition,
+                "run_id": gen.run_id,
+                "model": gen.model,
+                "word_target": gen.word_target,
+                "gptzero_generated_prob": "",
+                "originality_ai_score": "",
+            })
+
+    print(f"Wrote detection template with {len(texts)} rows → {output_path}")
+    return output_path
 
 
-def _prompt_originality_scores(
-    text: str,
-    detection_result: DetectionResult,
-) -> DetectionResult:
-    """Print text for the user to paste into Originality.ai UI, then collect scores.
+def load_detection_from_csv(csv_path: Path) -> list[DetectionResult]:
+    """Read a filled-in detection CSV and return DetectionResult objects.
 
-    The user should:
-    1. Go to https://originality.ai
-    2. Paste the text shown below
-    3. Enter the reported scores back here
+    Rows where both score columns are still empty are skipped.
     """
-    separator = "=" * 70
-    print(f"\n{separator}")
-    print(
-        f"Originality.ai - task={detection_result.task_id} "
-        f"condition={detection_result.condition} run={detection_result.run_id}"
-    )
-    print(f"{separator}")
-    print("Paste the following text into https://originality.ai :")
-    print(f"{separator}")
-    print(text)
-    print(f"{separator}")
-    print()
+    results: list[DetectionResult] = []
+    skipped = 0
 
-    ai_score = _read_float("Originality.ai AI score (0-1): ")
-    human_score = 1.0 - ai_score
+    with open(csv_path, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            gptzero_raw = row.get("gptzero_generated_prob", "").strip()
+            originality_raw = row.get("originality_ai_score", "").strip()
 
-    return detection_result.model_copy(
-        update={
-            "originality_ai_score": ai_score,
-            "originality_human_score": human_score,
-        },
-    )
+            if not gptzero_raw and not originality_raw:
+                skipped += 1
+                continue
 
+            gptzero_gen = float(gptzero_raw) if gptzero_raw else 0.0
+            originality_ai = float(originality_raw) if originality_raw else 0.0
 
-def _read_float(prompt: str) -> float:
-    """Read a float value from stdin with validation."""
-    while True:
-        try:
-            value = float(input(prompt))
-            if 0.0 <= value <= 1.0:
-                return value
-            print("  Value must be between 0 and 1. Try again.")
-        except ValueError:
-            print("  Invalid number. Try again.")
+            results.append(DetectionResult(
+                task_id=row["task_id"],
+                condition=row["condition"],
+                run_id=row["run_id"],
+                model=row.get("model", ""),
+                word_target=row.get("word_target", ""),
+                gptzero_human_prob=1.0 - gptzero_gen,
+                gptzero_generated_prob=gptzero_gen,
+                originality_ai_score=originality_ai,
+                originality_human_score=1.0 - originality_ai,
+            ))
+
+    if skipped:
+        print(f"Skipped {skipped} rows with no scores filled in")
+    print(f"Loaded {len(results)} detection results from {csv_path}")
+    return results
 
 
 # ---------------------------------------------------------------------------

@@ -17,17 +17,27 @@ system_prompt_template: |
   {content_rules}
 
 sentence_structure:
-  - "Vary sentence length. Mix short declarative sentences (5-8 words) with longer explanatory ones (20-30 words)."
-  - "Use contractions naturally: don't, it's, we've, wouldn't."
-  - "Start some sentences with 'I', 'We', 'So', 'But', or 'And'."
+  - "Vary sentence length aggressively within each paragraph. Mix very short sentences (3-7 words) with longer complex ones (25+ words). Never write more than two sentences in a row of similar length."
+  - "Use contractions naturally: don't, it's, we've, wouldn't, can't, I'm."
+  - "Start some sentences with 'I', 'We', 'So', 'But', or 'And'. Do NOT start consecutive sentences with the same word."
+  - "Use occasional sentence fragments for emphasis. One or two words. Like this."
+  - "Vary paragraph length: mix 1-sentence paragraphs with 5-8 sentence paragraphs. Never write more than two paragraphs of similar length in a row."
 
 anti_patterns:
-  - "Never start a paragraph with 'In the world of', 'In today's', 'It's worth noting', 'Let's dive in', or 'When it comes to'."
-  - "Never use 'Furthermore', 'Moreover', 'It should be noted', 'It's important to note', or 'In conclusion'."
+  - "Never use these transition words: Moreover, Furthermore, Additionally, In addition, Subsequently, Accordingly, Indeed, Notably, Importantly, Consequently."
+  - "Never use these openers: 'In the world of', 'In today's', 'In the realm of', 'When it comes to', 'It's worth noting', 'It's important to note', 'It should be noted', 'Let's dive in', 'In conclusion', 'To summarize'."
+  - "Never use these overused AI words: delve, embark, navigate, leverage, utilize, optimize, streamline, foster, cultivate, harness, unleash, unlock, elevate, empower, facilitate, underscore, comprehensive, robust, seamless, cutting-edge, pivotal, innovative, groundbreaking, transformative, holistic, nuanced, intricate, multifaceted, tapestry, landscape, realm, journey, beacon, paradigm, cornerstone, catalyst."
+  - "Never use these intensifiers: meticulously, seamlessly, notably, remarkably, undeniably, fundamentally, inherently."
+  - "NEVER use em dashes (— or --). Use commas, parentheses, colons, or rewrite the sentence."
   - "Do not use bullet lists for more than one section. Prefer prose."
-  - "Do not hedge with 'arguably', 'it could be said', or 'one might argue'."
+  - "Do not use the '[Topic] is a [category] that [description]' formula to introduce subjects."
+  - "Do not add trailing importance claims like 'highlighting the significance of...' or 'reflecting the continued relevance of...'."
+  - "Do not write a generic concluding paragraph that restates the intro."
+  - "Do not repeat the same key term more than twice in 3 consecutive sentences. Use pronouns or simpler synonyms."
 
 content_rules:
   - "Include at least one specific version number, date, benchmark figure, command, or filename when supported by the provided sources."
   - "Only mention an error message, stack trace, or config snippet if it appears in the provided sources. Do not invent examples."
   - "Include one grounded trade-off judgment based on the provided materials ('X is simpler, but Y gives you...')."
+  - "Include 1-2 mild opinions or subjective judgments ('honestly this surprised me', 'the docs don't make this obvious')."
+  - "Use casual synonyms over formal ones: 'use' not 'utilize', 'help' not 'facilitate', 'fix' not 'remediate', 'improve' not 'optimize'."

@@ -1,18 +1,18 @@
 # Getting Started with CrewAI: Installation and First Project
 
-CrewAI is a multi-agent orchestration framework. That's the short version. The longer version is that it gives you a structured way to define AI agents with distinct roles, hand them tasks, and let them collaborate — sequentially or through a managed hierarchy — to produce a combined output. We've been evaluating it for internal tooling, and I wanted to document the setup process while it's still fresh.
+CrewAI is a multi-agent orchestration framework. That's the short version. The longer version is that it gives you a structured way to define AI agents with distinct roles, hand them tasks, and let them collaborate - sequentially or through a managed hierarchy - to produce a combined output. We've been evaluating it for internal tooling, and I wanted to document the setup process while it's still fresh.
 
 ## What You're Actually Getting
 
 The framework is built around two core abstractions: Crews and Flows. Crews are teams of agents that collaborate on tasks. Flows are the event-driven scaffolding that manage state and control execution around those crews. For a first project, you don't need Flows at all. A single Crew with a sequential process will get you surprisingly far.
 
-Each agent gets three required attributes: a `role`, a `goal`, and a `backstory`. These shape how the underlying LLM behaves when processing that agent's tasks. It sounds a bit theatrical, but the role-playing approach does produce noticeably different outputs compared to a single prompt with everything jammed in. Agents can also carry tools — search APIs, file readers, custom functions — and they'll decide when to invoke them during task execution.
+Each agent gets three required attributes: a `role`, a `goal`, and a `backstory`. These shape how the underlying LLM behaves when processing that agent's tasks. It sounds a bit theatrical, but the role-playing approach does produce noticeably different outputs compared to a single prompt with everything jammed in. Agents can also carry tools - search APIs, file readers, custom functions - and they'll decide when to invoke them during task execution.
 
 The YAML-based configuration is simpler than wiring everything up in pure Python, but it gives you less flexibility for dynamic setups. For a getting-started project, YAML is the right call.
 
 ## Installation
 
-CrewAI requires Python >=3.10 and <3.14. It uses `uv` as its dependency manager, which is a deliberate choice — `uv` is fast and handles virtual environments without ceremony. If you don't have it installed:
+CrewAI requires Python >=3.10 and <3.14. It uses `uv` as its dependency manager, which is a deliberate choice - `uv` is fast and handles virtual environments without ceremony. If you don't have it installed:
 
 ```
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -67,7 +67,7 @@ research_task:
   agent: researcher
 ```
 
-In `crew.py`, the `@CrewBase` decorator connects everything. You define methods decorated with `@agent` and `@task` that return configured `Agent` and `Task` objects. The `@crew` method assembles them into a `Crew` with a chosen process — `Process.sequential` runs tasks in order, with each task's output feeding into the next as context.
+In `crew.py`, the `@CrewBase` decorator connects everything. You define methods decorated with `@agent` and `@task` that return configured `Agent` and `Task` objects. The `@crew` method assembles them into a `Crew` with a chosen process - `Process.sequential` runs tasks in order, with each task's output feeding into the next as context.
 
 So the wiring is: YAML defines what, Python defines how, and the decorator system glues them together.
 
@@ -91,7 +91,7 @@ The crew executes each task sequentially, and you'll see verbose output in the c
 
 ## Where It Gets Tricky
 
-I want to be honest about the trade-offs. CrewAI's YAML-plus-decorator approach is simpler to get started with than something like LangGraph's explicit node-and-edge graphs, but you give up visibility into exactly what prompts are being sent to the LLM. Community discussions consistently flag observability as a pain point — when an agent starts looping or hallucinating a tool call, it's hard to tell which layer is actually failing. Is it the prompt? The tool? The routing between agents? Token costs can also climb fast with multi-agent setups, since agents re-summarize context as they pass it between tasks.
+I want to be honest about the trade-offs. CrewAI's YAML-plus-decorator approach is simpler to get started with than something like LangGraph's explicit node-and-edge graphs, but you give up visibility into exactly what prompts are being sent to the LLM. Community discussions consistently flag observability as a pain point - when an agent starts looping or hallucinating a tool call, it's hard to tell which layer is actually failing. Is it the prompt? The tool? The routing between agents? Token costs can also climb fast with multi-agent setups, since agents re-summarize context as they pass it between tasks.
 
 For a first project, stick with `Process.sequential` and two or three agents. The hierarchical process mode, which requires a `manager_llm` or `manager_agent`, adds a delegation layer that's powerful but introduces another surface area for debugging. Get comfortable with the basics before you introduce a manager agent deciding which worker handles what.
 

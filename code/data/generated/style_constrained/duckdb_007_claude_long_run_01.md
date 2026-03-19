@@ -1,12 +1,12 @@
 # DuckDB Window Functions: What's Fast, What's Broken, and What You Need to Know
 
-Window functions are one of the best reasons to pick SQL over imperative code for analytical work. They let you compute rankings, running totals, and comparisons across rows without collapsing your result set into aggregates. DuckDB handles them well — most of the time. But the v1.5.0 release introduced an optimizer rewrite that has caused real production headaches, and there are a few semantic traps that catch even experienced SQL writers off guard.
+Window functions are one of the best reasons to pick SQL over imperative code for analytical work. They let you compute rankings, running totals, and comparisons across rows without collapsing your result set into aggregates. DuckDB handles them well - most of the time. But the v1.5.0 release introduced an optimizer rewrite that has caused real production headaches, and there are a few semantic traps that catch even experienced SQL writers off guard.
 
 Here's what we've learned running DuckDB window functions against real-world datasets.
 
 ## The Basics: Why Window Functions Matter
 
-If you've ever written a self-join to get the previous row's value, or grouped a query just to rank rows and then un-grouped it, you already know the pain window functions solve. DuckDB supports the full standard set: `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()`, `LAG()`, `LEAD()`, `FIRST_VALUE()`, `LAST_VALUE()`, `NTH_VALUE()`, and aggregate functions like `SUM()`, `COUNT()`, and `MIN()` used with `OVER` clauses. You get `ROWS BETWEEN`, `RANGE BETWEEN`, and interval-based frames for timestamp columns. DuckDB also supports the `QUALIFY` clause, which is a huge ergonomic win — it lets you filter directly on window function results without needing a subquery or CTE wrapper.
+If you've ever written a self-join to get the previous row's value, or grouped a query just to rank rows and then un-grouped it, you already know the pain window functions solve. DuckDB supports the full standard set: `ROW_NUMBER()`, `RANK()`, `DENSE_RANK()`, `LAG()`, `LEAD()`, `FIRST_VALUE()`, `LAST_VALUE()`, `NTH_VALUE()`, and aggregate functions like `SUM()`, `COUNT()`, and `MIN()` used with `OVER` clauses. You get `ROWS BETWEEN`, `RANGE BETWEEN`, and interval-based frames for timestamp columns. DuckDB also supports the `QUALIFY` clause, which is a huge ergonomic win - it lets you filter directly on window function results without needing a subquery or CTE wrapper.
 
 A quick example of the `QUALIFY` pattern that's become extremely common in deduplication workflows:
 
@@ -24,7 +24,7 @@ DuckDB v1.5.0 shipped a new optimizer rule called `top_n_window_elimination`. Th
 
 But the rewrite makes an assumption that doesn't hold for remote storage.
 
-One user reported that a `QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY max_date DESC) = 1` query on hive-partitioned Parquet files in S3 went from 81 HTTP GET requests in v1.4.4 to over 4,200 in v1.5.0. Wall-clock time nearly tripled — from 11.6 seconds to 31.5 seconds. The root cause: the rewritten plan scans the remote files twice. The first scan identifies winning rows using a lightweight column projection. The second scan fetches all columns for those rows. Each column chunk in each file triggers a separate HTTP range request.
+One user reported that a `QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY max_date DESC) = 1` query on hive-partitioned Parquet files in S3 went from 81 HTTP GET requests in v1.4.4 to over 4,200 in v1.5.0. Wall-clock time nearly tripled - from 11.6 seconds to 31.5 seconds. The root cause: the rewritten plan scans the remote files twice. The first scan identifies winning rows using a lightweight column projection. The second scan fetches all columns for those rows. Each column chunk in each file triggers a separate HTTP range request.
 
 For local SSDs, two scans is cheap. For S3, where every request carries TLS overhead, auth signing, and a network round-trip, it's catastrophic. With a 90-column schema across 39 Parquet files, those small range requests add up fast.
 
@@ -48,7 +48,7 @@ FROM scanned
 QUALIFY row_number() OVER (PARTITION BY id ORDER BY max_date DESC) = 1;
 ```
 
-The optimizer implementation in `src/optimizer/topn_window_elimination.cpp` triggers its rewrite based purely on the logical pattern — `ROW_NUMBER` with a filter — without considering whether the underlying scan targets remote storage or a wide schema. This is the kind of optimization that's simpler to implement as a universal rewrite, but accounting for storage characteristics would give you a plan that doesn't regress by 50x on remote reads.
+The optimizer implementation in `src/optimizer/topn_window_elimination.cpp` triggers its rewrite based purely on the logical pattern - `ROW_NUMBER` with a filter - without considering whether the underlying scan targets remote storage or a wide schema. This is the kind of optimization that's simpler to implement as a universal rewrite, but accounting for storage characteristics would give you a plan that doesn't regress by 50x on remote reads.
 
 ## Memory Pre-allocation and OOM
 
@@ -58,7 +58,7 @@ DuckDB's lead developer confirmed the fix: the `BinaryAggregateHeap` needs dynam
 
 ## The LAG/LEAD Frame Trap
 
-Here's something that trips up even people who've written SQL for years. `LAG()` and `LEAD()` don't respect window frame specifications. This is actually per the SQL standard, and PostgreSQL behaves the same way — but it's surprising if you haven't hit it before.
+Here's something that trips up even people who've written SQL for years. `LAG()` and `LEAD()` don't respect window frame specifications. This is actually per the SQL standard, and PostgreSQL behaves the same way - but it's surprising if you haven't hit it before.
 
 Consider this query:
 
@@ -91,11 +91,11 @@ WITH deduped AS (
 SELECT k FROM deduped WHERE rn = 1;
 ```
 
-This throws: `INTERNAL Error: Failed to bind column reference "k" [N.1]: inequal types (VARCHAR != TIMESTAMP)`. All four conditions must be present — `row_number()` specifically (not `rank()`), multi-column `PARTITION BY`, non-VARCHAR `ORDER BY`, and a filter on the window output. Remove any one condition and the error disappears.
+This throws: `INTERNAL Error: Failed to bind column reference "k" [N.1]: inequal types (VARCHAR != TIMESTAMP)`. All four conditions must be present - `row_number()` specifically (not `rank()`), multi-column `PARTITION BY`, non-VARCHAR `ORDER BY`, and a filter on the window output. Remove any one condition and the error disappears.
 
 ## Serialization Failures with PARTITION BY
 
-Also in v1.5.0, window aggregate functions with `PARTITION BY` fail on non-Parquet data sources — CSV files and pandas DataFrames both trigger the error. The error message reads: `NotImplementedException: Logical Operator Copy requires serializable operators: PandasScan function cannot be serialized`.
+Also in v1.5.0, window aggregate functions with `PARTITION BY` fail on non-Parquet data sources - CSV files and pandas DataFrames both trigger the error. The error message reads: `NotImplementedException: Logical Operator Copy requires serializable operators: PandasScan function cannot be serialized`.
 
 A community-discovered workaround is dead simple: add `ORDER BY NULL` to the window spec.
 
@@ -113,7 +113,7 @@ The underlying issue is that the optimizer tries to copy the logical operator tr
 
 A community benchmark comparing DuckDB against BigQuery and Athena on 20GB of financial time-series Parquet data tells a clear story about where window functions shine and where they struggle. On the XL configuration (32 threads, 64GB RAM), DuckDB local completed window function queries in a median of 947ms. BigQuery took 3,013ms. Athena took 5,389ms.
 
-But DuckDB reading from Cloudflare R2 hit 12,187ms for those same window queries — roughly 13x slower than local. Window functions require multiple passes over the data, and each pass means another round of network I/O. Aggregation queries, by contrast, only degraded from 382ms to 411ms over remote storage.
+But DuckDB reading from Cloudflare R2 hit 12,187ms for those same window queries - roughly 13x slower than local. Window functions require multiple passes over the data, and each pass means another round of network I/O. Aggregation queries, by contrast, only degraded from 382ms to 411ms over remote storage.
 
 So the trade-off is this: DuckDB local is dramatically faster for window functions than any cloud warehouse, but DuckDB over remote storage can be slower than BigQuery for window-heavy workloads. If your analytics pipeline relies heavily on ranking and partitioned aggregates, keep the data local. If you can't, consider materializing intermediate results before applying windows.
 
@@ -127,6 +127,6 @@ Second, use `QUALIFY` freely for simple deduplication, but be aware that DuckDB 
 
 Third, if you're querying remote Parquet files with wide schemas, the `top_n_window_elimination` optimizer can hurt. Either disable it or wrap your scan in a `MATERIALIZED` CTE. This forces DuckDB to scan the remote files once and operate on the cached result.
 
-And fourth, remember that `LAG` and `LEAD` are peer-blind — they don't see your frame specification. If you need frame-aware access to adjacent rows, use `FIRST_VALUE` or `LAST_VALUE` with an explicit frame, or use the `ORDER BY` clause directly inside the function call.
+And fourth, remember that `LAG` and `LEAD` are peer-blind - they don't see your frame specification. If you need frame-aware access to adjacent rows, use `FIRST_VALUE` or `LAST_VALUE` with an explicit frame, or use the `ORDER BY` clause directly inside the function call.
 
-DuckDB's window function implementation is architecturally solid — it uses segment trees for efficient range queries, supports streaming execution for simple cases like `LAG` without `PARTITION BY`, and handles distinct aggregates within windows. The v1.5.0 issues are optimizer-level problems, not fundamental engine limitations. They'll get fixed. But until they do, knowing the workarounds is the difference between a sub-second query and an OOM crash.
+DuckDB's window function implementation is architecturally solid - it uses segment trees for efficient range queries, supports streaming execution for simple cases like `LAG` without `PARTITION BY`, and handles distinct aggregates within windows. The v1.5.0 issues are optimizer-level problems, not fundamental engine limitations. They'll get fixed. But until they do, knowing the workarounds is the difference between a sub-second query and an OOM crash.

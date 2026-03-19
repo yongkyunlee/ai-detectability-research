@@ -25,10 +25,10 @@ DuckDB exposes a connection object that acts as the entry point to everything. Y
 ```python
 import duckdb
 
-# In-memory database — disappears when the process exits
+# In-memory database - disappears when the process exits
 conn = duckdb.connect()
 
-# Persistent database — state survives restarts
+# Persistent database - state survives restarts
 conn = duckdb.connect("my_analysis.duckdb")
 ```
 

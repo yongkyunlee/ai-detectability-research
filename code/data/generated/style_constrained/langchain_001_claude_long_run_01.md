@@ -6,7 +6,7 @@ I want to walk through what it actually takes to install LangChain today, initia
 
 ## The Package Landscape
 
-The first thing that trips people up is the packaging. LangChain isn't one package anymore. It's a family of them, organized in a monorepo. The core abstractions live in `langchain-core` (currently at version 1.2.20). The main `langchain` package (version 1.2.12) sits on top and provides the high-level utilities most developers interact with. And then there's a constellation of integration packages — `langchain-openai`, `langchain-anthropic`, `langchain-ollama`, and so on — that connect you to specific model providers.
+The first thing that trips people up is the packaging. LangChain isn't one package anymore. It's a family of them, organized in a monorepo. The core abstractions live in `langchain-core` (currently at version 1.2.20). The main `langchain` package (version 1.2.12) sits on top and provides the high-level utilities most developers interact with. And then there's a constellation of integration packages - `langchain-openai`, `langchain-anthropic`, `langchain-ollama`, and so on - that connect you to specific model providers.
 
 This matters because you don't install one thing and get everything. You install the base, then you install the provider packages you need. The upside is that you don't drag in dependencies for providers you'll never use. The downside is that your first `pip install` might not be your last.
 
@@ -53,7 +53,7 @@ model = init_chat_model("openai:gpt-5.4")
 result = model.invoke("Hello, world!")
 ```
 
-That colon syntax — `"openai:gpt-5.4"` — is the provider prefix format. The part before the colon names the provider, the part after names the model. You can also skip the prefix if your model name is unambiguous. LangChain will try to infer the provider: anything starting with `gpt-`, `o1`, or `o3` routes to OpenAI; `claude` routes to Anthropic; `gemini` routes to Google Vertex AI; `mistral` routes to Mistral; and so on. But I'd recommend being explicit. Inference is convenient until it guesses wrong, and with model names getting increasingly creative, explicit is safer.
+That colon syntax - `"openai:gpt-5.4"` - is the provider prefix format. The part before the colon names the provider, the part after names the model. You can also skip the prefix if your model name is unambiguous. LangChain will try to infer the provider: anything starting with `gpt-`, `o1`, or `o3` routes to OpenAI; `claude` routes to Anthropic; `gemini` routes to Google Vertex AI; `mistral` routes to Mistral; and so on. But I'd recommend being explicit. Inference is convenient until it guesses wrong, and with model names getting increasingly creative, explicit is safer.
 
 You can also pass common model parameters directly:
 
@@ -117,7 +117,7 @@ chain = prompt | model
 result = chain.invoke({"topic": "Python", "question": "What are generators?"})
 ```
 
-The `prompt` Runnable takes a dictionary and produces a formatted prompt. The `model` Runnable takes that prompt and produces an `AIMessage`. Piping them together gives you a single Runnable that takes a dictionary and returns a model response. You can add more steps — output parsers, additional transformations — using the same pattern.
+The `prompt` Runnable takes a dictionary and produces a formatted prompt. The `model` Runnable takes that prompt and produces an `AIMessage`. Piping them together gives you a single Runnable that takes a dictionary and returns a model response. You can add more steps - output parsers, additional transformations - using the same pattern.
 
 And because every step in the chain implements the same Runnable interface, your whole chain also supports `stream`, `batch`, and their async counterparts. You don't have to think about streaming plumbing at each step.
 
@@ -141,11 +141,11 @@ configurable_model.invoke(
 )
 ```
 
-This is useful for A/B testing models or letting users choose their preferred provider. But a word of caution: setting `configurable_fields="any"` opens up all parameters — including `api_key` and `base_url` — to runtime configuration. The source code explicitly warns that this could redirect model requests to a different service. Enumerate the configurable fields explicitly if you're accepting untrusted input.
+This is useful for A/B testing models or letting users choose their preferred provider. But a word of caution: setting `configurable_fields="any"` opens up all parameters - including `api_key` and `base_url` - to runtime configuration. The source code explicitly warns that this could redirect model requests to a different service. Enumerate the configurable fields explicitly if you're accepting untrusted input.
 
 ## The Trade-Off You Should Know About
 
-LangChain makes it fast to prototype. The unified interface, the provider abstraction, the composable Runnables — all of this gets you to a working demo quickly. But the community discussions around LangChain are candid about the trade-off: the abstraction layer that speeds up prototyping can make production debugging harder. When something goes wrong three layers deep in a chain, the stack trace walks through framework internals that aren't always transparent.
+LangChain makes it fast to prototype. The unified interface, the provider abstraction, the composable Runnables - all of this gets you to a working demo quickly. But the community discussions around LangChain are candid about the trade-off: the abstraction layer that speeds up prototyping can make production debugging harder. When something goes wrong three layers deep in a chain, the stack trace walks through framework internals that aren't always transparent.
 
 The `init_chat_model` approach is simpler than building raw API calls by hand, but it gives you less visibility into what's happening at the HTTP level. For prototyping and standard use cases, this trade-off makes sense. For production systems where you need fine-grained control over retries, timeouts, and error handling at the transport layer, you might find yourself reaching through the abstraction or supplementing with tools like LangSmith for observability.
 
@@ -153,6 +153,6 @@ That said, the framework is more modular now than it used to be. You don't have 
 
 ## What Comes Next
 
-Once you have a model and a basic chain running, the natural next steps are adding tools (so the model can take actions), adding memory (so conversations persist), and adding retrieval (so the model can reference your data). Each of these builds on the same Runnable primitives. And if your agent workflows get complex enough to need explicit state management and control flow, LangGraph — LangChain's orchestration framework — is designed for that.
+Once you have a model and a basic chain running, the natural next steps are adding tools (so the model can take actions), adding memory (so conversations persist), and adding retrieval (so the model can reference your data). Each of these builds on the same Runnable primitives. And if your agent workflows get complex enough to need explicit state management and control flow, LangGraph - LangChain's orchestration framework - is designed for that.
 
 But start here. Install the package, pick a provider, call `init_chat_model`, and invoke it. The abstraction holds up well for that first step, and you'll have a clear picture of whether LangChain's composition model fits how your team builds.

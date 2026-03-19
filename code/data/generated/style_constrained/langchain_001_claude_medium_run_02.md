@@ -36,7 +36,7 @@ result = model.invoke("Explain Python generators in two sentences.")
 print(result.content)
 ```
 
-That `openai:` prefix tells LangChain which provider package to load. You can also skip the prefix if the model name is unambiguous — names starting with `gpt-` resolve to OpenAI, `claude` resolves to Anthropic, `gemini` resolves to Google, and so on. I'd recommend always using the explicit prefix. It makes your code readable and avoids surprises when new model names collide across providers.
+That `openai:` prefix tells LangChain which provider package to load. You can also skip the prefix if the model name is unambiguous - names starting with `gpt-` resolve to OpenAI, `claude` resolves to Anthropic, `gemini` resolves to Google, and so on. I'd recommend always using the explicit prefix. It makes your code readable and avoids surprises when new model names collide across providers.
 
 We can swap models without changing anything else:
 
@@ -45,7 +45,7 @@ claude = init_chat_model("anthropic:claude-sonnet-4-5-20250929", temperature=0)
 response = claude.invoke("Explain Python generators in two sentences.")
 ```
 
-This is where LangChain earns its keep. The interface is identical regardless of the backend. Every model supports `.invoke()`, `.stream()`, `.batch()`, and their async counterparts. That consistency isn't free — there's abstraction overhead — but for teams that need to evaluate multiple providers, it removes a lot of boilerplate.
+This is where LangChain earns its keep. The interface is identical regardless of the backend. Every model supports `.invoke()`, `.stream()`, `.batch()`, and their async counterparts. That consistency isn't free - there's abstraction overhead - but for teams that need to evaluate multiple providers, it removes a lot of boilerplate.
 
 ## Building Your First Chain
 
@@ -76,9 +76,9 @@ You can extend this pattern. Add an output parser to extract structured data. Ad
 
 ## The Runnable Protocol
 
-This is the architectural insight that makes LangChain either powerful or over-engineered, depending on who you ask. Every component — prompts, models, parsers, retrievers — implements the same `Runnable` interface. That means `.invoke()`, `.ainvoke()`, `.stream()`, `.astream()`, `.batch()`, and `.abatch()` all work everywhere.
+This is the architectural insight that makes LangChain either powerful or over-engineered, depending on who you ask. Every component - prompts, models, parsers, retrievers - implements the same `Runnable` interface. That means `.invoke()`, `.ainvoke()`, `.stream()`, `.astream()`, `.batch()`, and `.abatch()` all work everywhere.
 
-Community sentiment on this is split. Some engineers find the abstraction layers make debugging difficult — one Hacker News commenter described it as "abstraction soup." Others, particularly those with complex multi-model requirements, find that the consistency pays for itself. The honest assessment: if you're wrapping a single API call, LangChain adds unnecessary indirection. If you're building workflows that span multiple models, tools, and data sources, the uniform interface saves real time.
+Community sentiment on this is split. Some engineers find the abstraction layers make debugging difficult - one Hacker News commenter described it as "abstraction soup." Others, particularly those with complex multi-model requirements, find that the consistency pays for itself. The honest assessment: if you're wrapping a single API call, LangChain adds unnecessary indirection. If you're building workflows that span multiple models, tools, and data sources, the uniform interface saves real time.
 
 ## Configurable Models
 
@@ -100,7 +100,7 @@ configurable_model.invoke(
 )
 ```
 
-This is handy for A/B testing models or building user-facing apps where the model choice varies per request. Be cautious with `configurable_fields="any"`, though — the docs explicitly warn that it exposes parameters like `api_key` and `base_url` to runtime configuration, which could redirect model requests if you're accepting untrusted input.
+This is handy for A/B testing models or building user-facing apps where the model choice varies per request. Be cautious with `configurable_fields="any"`, though - the docs explicitly warn that it exposes parameters like `api_key` and `base_url` to runtime configuration, which could redirect model requests if you're accepting untrusted input.
 
 ## What Comes Next
 

@@ -1,6 +1,6 @@
 # Getting Started with the DuckDB Python Client
 
-DuckDB just hit version 1.5.0. If you haven't tried it from Python yet, now's a good time. The Python client gives you an embedded analytical database that runs inside your process — no server, no daemon, no configuration files. Just `pip install duckdb` and you're running SQL.
+DuckDB just hit version 1.5.0. If you haven't tried it from Python yet, now's a good time. The Python client gives you an embedded analytical database that runs inside your process - no server, no daemon, no configuration files. Just `pip install duckdb` and you're running SQL.
 
 I want to walk through what the client actually looks like in practice, where it shines, and where you'll want to be careful.
 
@@ -15,7 +15,7 @@ conn = duckdb.connect()  # in-memory
 conn = duckdb.connect("my_analysis.duckdb")  # persistent
 ```
 
-From there, it's standard SQL execution. The API follows PEP 249 loosely — you can create a cursor with `conn.cursor()` if you want, but it's fully redundant. The connection object itself handles everything.
+From there, it's standard SQL execution. The API follows PEP 249 loosely - you can create a cursor with `conn.cursor()` if you want, but it's fully redundant. The connection object itself handles everything.
 
 ```python
 conn.execute("CREATE TABLE test_table (i INTEGER, j STRING)")
@@ -23,7 +23,7 @@ conn.execute("INSERT INTO test_table VALUES (?, ?)", [2, 'two'])
 conn.executemany("INSERT INTO test_table VALUES (?, ?)", [[3, 'three'], [4, 'four']])
 ```
 
-Parameterized queries work as you'd expect. So does `executemany()` for bulk inserts. Nothing surprising here — and that's the point.
+Parameterized queries work as you'd expect. So does `executemany()` for bulk inserts. Nothing surprising here - and that's the point.
 
 ## Fetching Results
 
@@ -40,7 +40,7 @@ The `fetchdf()` call is the one most people reach for. It hands you a pandas Dat
 
 ## Querying Pandas DataFrames with SQL
 
-Here's the feature that hooks people. You can point DuckDB at an existing pandas DataFrame and query it with SQL — no loading, no import, no ETL step.
+Here's the feature that hooks people. You can point DuckDB at an existing pandas DataFrame and query it with SQL - no loading, no import, no ETL step.
 
 ```python
 import pandas as pd
@@ -65,7 +65,7 @@ rel.filter('i > 1').project('i + 1, j').order('j').limit(2)
 
 Each call returns a new relation object. Nothing executes until you call `.execute()`, `.fetchdf()`, or `.df()`. You can chain operations, inspect column names and types, and compose queries without concatenating SQL strings.
 
-There's also `duckdb.from_csv_auto()` for reading CSV files directly into a relation, which skips the pandas-loading-into-memory step entirely. For large CSV or Parquet validation pipelines — the kind where pandas chokes on memory — this matters a lot.
+There's also `duckdb.from_csv_auto()` for reading CSV files directly into a relation, which skips the pandas-loading-into-memory step entirely. For large CSV or Parquet validation pipelines - the kind where pandas chokes on memory - this matters a lot.
 
 ## Reading Files Directly
 
@@ -88,7 +88,7 @@ For read-heavy, single-writer workloads, DuckDB is solid. For high-concurrency r
 
 ## Disk Space: An Open Gotcha
 
-One thing to watch with persistent databases: dropping a table or deleting rows doesn't immediately shrink the `.duckdb` file. DuckDB uses free lists internally — dropped blocks get marked for reuse rather than reclaimed. `VACUUM` doesn't currently resolve this, and `CHECKPOINT` won't help either. This is a known open issue (GitHub issue #14124, open since September 2024). The problem compounds when ART indexes are involved — one user reported a 1,500-row table with a UNIQUE constraint whose database file grew to 1.2 GB over 24 hours of updates.
+One thing to watch with persistent databases: dropping a table or deleting rows doesn't immediately shrink the `.duckdb` file. DuckDB uses free lists internally - dropped blocks get marked for reuse rather than reclaimed. `VACUUM` doesn't currently resolve this, and `CHECKPOINT` won't help either. This is a known open issue (GitHub issue #14124, open since September 2024). The problem compounds when ART indexes are involved - one user reported a 1,500-row table with a UNIQUE constraint whose database file grew to 1.2 GB over 24 hours of updates.
 
 The practical workaround is exporting the database and reimporting it into a fresh file. That's ugly, but it works. If you're using DuckDB as a persistent store with frequent deletes and updates, understand this trade-off going in. DuckDB is simpler than running a Postgres instance for local analytics, but Postgres gives you proper VACUUM and space reclamation out of the box.
 
@@ -98,4 +98,4 @@ DuckDB's Python client is best suited for analytical workloads on a single machi
 
 Don't treat it as a general-purpose application database. Don't expect high-concurrency write throughput. And if you're persisting data with frequent mutations, keep the disk space behavior in mind.
 
-But for the analytical path — reading files, transforming data, running aggregations — the Python client is about as frictionless as it gets. Install it, connect, write SQL. That's the whole setup.
+But for the analytical path - reading files, transforming data, running aggregations - the Python client is about as frictionless as it gets. Install it, connect, write SQL. That's the whole setup.

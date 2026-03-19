@@ -12,7 +12,7 @@
   - **GPTZero** web UI (https://gptzero.me) for AI detection
   - **Originality.ai** web UI (https://originality.ai) for AI detection
 
-No API keys are required. All LLM generation, fact-checking, and detection interactions happen via copy-paste through CLI tools and web UIs.
+No API keys are required. LLM generation happens via CLI tools (prompts include a save-to-file instruction so outputs are written directly to `data/generated/`). Detection interactions happen via web UIs.
 
 ---
 
@@ -40,7 +40,7 @@ uv run python -c "from ai_text_quality import Task, GeneratedText; print('OK')"
 
 ## Step 1: Prepare Context Data
 
-Populate the context files referenced by each task YAML in `data/tasks/`. Each task specifies which files it expects under `context_sources`.
+Populate the context directories referenced by each task YAML in `data/tasks/`. Each task specifies a `context_dir` pointing to the root directory of context files for that project.
 
 Projects: **CrewAI**, **DuckDB**, **LangChain**
 
@@ -94,9 +94,9 @@ Each file is saved as plain markdown.
 
 ---
 
-## Step 2: Choose Topics and Collect Human Baselines (C5)
+## Step 2: Choose Topics and Collect Human Baselines
 
-For each project, find 7-8 real engineer-written blog posts or documentation sections on distinct technical topics. These blog posts define the experiment topics — each one becomes a task.
+For each project, find 4 real engineer-written blog posts or documentation sections on distinct technical topics. These blog posts define the experiment topics — each one becomes a task.
 
 ### 2a. Find engineer-written blog posts
 
@@ -104,9 +104,8 @@ For each project, find 7-8 real engineer-written blog posts or documentation sec
 - Written by a named human author
 - Published on a credible platform (official blog, Dev.to, Medium, engineering blog)
 - Covers a specific, well-scoped technical topic (e.g., setup guide, feature walkthrough, performance comparison)
-- Trimmed to 300-500 words if longer
 
-Aim for topic diversity across each project (e.g., getting started, core features, advanced usage, performance, integrations).
+Aim for topic diversity across each project (e.g., getting started, core features, advanced usage, performance).
 
 ### 2b. Create task YAMLs from discovered topics
 
@@ -137,7 +136,7 @@ uv run jupyter notebook notebooks/experiment.ipynb
 ```
 
 The notebook covers:
-1. **Generation** — Prompts displayed for each CLI tool (Claude Code / Codex / Gemini), paste back responses
+1. **Generation** — Prompts displayed for each CLI tool (Claude Code / Codex / Gemini); each prompt includes a save-to-file instruction so the CLI tool writes the output directly to `data/generated/{condition}/`. Press Enter after the CLI tool finishes. Conditions: C1 (context_rich), C2 (style_constrained), C3 (humanized). Models: Claude Code, Codex CLI, Gemini CLI. Lengths: short (150-250 words), long (700-1000 words). 2 runs per combination.
 2. **Detection** — Paste texts into GPTZero and Originality.ai, enter scores
 3. **Fact checking** — Claim extraction + verification via LLM (use a different model as judge)
 4. **Linguistic analysis** — Automatic (spaCy)
@@ -154,7 +153,7 @@ The notebook covers:
 | Cloned repos | `data/context/{project}/repo/` |
 | Additional context | `data/context/{project}/{issues,community}/` |
 | Human baselines | `data/human_baselines/{project}/` |
-| Generated outputs | `data/generated/c{1-4}_*/` |
+| Generated outputs | `data/generated/c{1-3}_*/` |
 | Detection results | `data/results/detection/detection_results.jsonl` |
 | Fact check results | `data/results/factual/factcheck_results.jsonl` |
 | Linguistic features | `data/results/linguistic/linguistic_features.jsonl` |

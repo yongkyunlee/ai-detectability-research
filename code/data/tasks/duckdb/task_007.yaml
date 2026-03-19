@@ -1,11 +1,4 @@
 task_id: duckdb_007
 project: duckdb
 topic: DuckDB window functions and analytical queries
-word_target: 300-500
-reference_docs: &id001
-- data/context/duckdb/repo/README.md
-context_sources:
-  code_only: *id001
-  additional:
-  - data/context/duckdb/issues/window_function_issues.md
-  - data/context/duckdb/community/reddit_analytical_queries.md
+context_dir: data/context/duckdb

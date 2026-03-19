@@ -1,7 +1,6 @@
 from ai_text_quality.models import (
     Claim,
     ClaimVerdict,
-    ContextSources,
     DetectionResult,
     FactCheckResult,
     GeneratedText,
@@ -12,7 +11,6 @@ from ai_text_quality.models import (
 __all__ = [
     "Claim",
     "ClaimVerdict",
-    "ContextSources",
     "DetectionResult",
     "FactCheckResult",
     "GeneratedText",

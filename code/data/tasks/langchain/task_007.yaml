@@ -1,12 +1,4 @@
 task_id: langchain_007
 project: langchain
 topic: LangChain Expression Language (LCEL) for composable chains
-word_target: 300-500
-reference_docs:
-- data/context/langchain/repo/README.md
-context_sources:
-  code_only:
-  - data/context/langchain/repo/README.md
-  additional:
-  - data/context/langchain/issues/lcel_issues.md
-  - data/context/langchain/community/reddit_lcel.md
+context_dir: data/context/langchain

@@ -1,11 +1,4 @@
 task_id: crewai_001
 project: crewai
 topic: 'Getting started with CrewAI: installation and first project'
-word_target: 300-500
-reference_docs: &id001
-- data/context/crewai/repo/README.md
-context_sources:
-  code_only: *id001
-  additional:
-  - data/context/crewai/issues/setup_issues.md
-  - data/context/crewai/community/reddit_getting_started.md
+context_dir: data/context/crewai

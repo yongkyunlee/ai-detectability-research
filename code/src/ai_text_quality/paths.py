@@ -23,17 +23,15 @@ LINGUISTIC_DIR = RESULTS_DIR / "linguistic"
 SUMMARY_DIR = RESULTS_DIR / "summary"
 
 # ── Condition directories ────────────────────────────────────────────
-C1_DIR = GENERATED_DIR / "c1_code_only"
-C2_DIR = GENERATED_DIR / "c2_context_rich"
-C3_DIR = GENERATED_DIR / "c3_style_constrained"
-C4_DIR = GENERATED_DIR / "c4_humanized"
+C1_DIR = GENERATED_DIR / "c1_context_rich"
+C2_DIR = GENERATED_DIR / "c2_style_constrained"
+C3_DIR = GENERATED_DIR / "c3_humanized"
 
 # ── Condition label → directory mapping ──────────────────────────────
 CONDITION_DIRS: dict[str, Path] = {
-    "c1_code_only": C1_DIR,
-    "c2_context_rich": C2_DIR,
-    "c3_style_constrained": C3_DIR,
-    "c4_humanized": C4_DIR,
+    "context_rich": C1_DIR,
+    "style_constrained": C2_DIR,
+    "humanized": C3_DIR,
 }
 
 
@@ -77,7 +75,6 @@ def ensure_dirs() -> None:
         C1_DIR,
         C2_DIR,
         C3_DIR,
-        C4_DIR,
         RESULTS_DIR,
         DETECTION_DIR,
         FACTUAL_DIR,

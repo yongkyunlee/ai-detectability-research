@@ -5,18 +5,11 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 
-class ContextSources(BaseModel):
-    code_only: list[str]
-    additional: list[str] = Field(default_factory=list)
-
-
 class Task(BaseModel):
     task_id: str
     project: str
     topic: str
-    word_target: str
-    reference_docs: list[str] = Field(default_factory=list)
-    context_sources: ContextSources
+    context_dir: str
 
 
 class Claim(BaseModel):

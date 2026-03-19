@@ -1,11 +1,4 @@
 task_id: duckdb_002
 project: duckdb
 topic: Importing CSV and Parquet files in DuckDB
-word_target: 300-500
-reference_docs: &id001
-- data/context/duckdb/repo/README.md
-context_sources:
-  code_only: *id001
-  additional:
-  - data/context/duckdb/issues/csv_import_issues.md
-  - data/context/duckdb/community/reddit_data_import.md
+context_dir: data/context/duckdb

@@ -1,11 +1,4 @@
 task_id: crewai_008
 project: crewai
 topic: Multi-agent collaboration patterns in CrewAI
-word_target: 300-500
-reference_docs: &id001
-- data/context/crewai/repo/README.md
-context_sources:
-  code_only: *id001
-  additional:
-  - data/context/crewai/issues/collaboration_issues.md
-  - data/context/crewai/community/reddit_multi_agent.md
+context_dir: data/context/crewai

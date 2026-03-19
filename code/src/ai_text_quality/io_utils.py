@@ -79,10 +79,10 @@ def save_prompt(
 LENGTH_LABELS = {"800-1000": "medium", "1500-2000": "long"}
 
 
-def write_grouped_prompts(records: list[dict]) -> list[Path]:
+def write_grouped_prompts(records: list[dict], prefix: str = "prompts") -> list[Path]:
     """Write prompt records to text files grouped by model + condition + length.
 
-    Each file is named ``prompts_{model_key}_{condition}_{length}.txt`` and
+    Each file is named ``{prefix}_{model_key}_{condition}_{length}.txt`` and
     contains all prompts for that combination, separated by clear delimiters.
     Returns the list of file paths written.
     """
@@ -96,7 +96,7 @@ def write_grouped_prompts(records: list[dict]) -> list[Path]:
 
     written: list[Path] = []
     for (model_key, condition, length), recs in sorted(groups.items()):
-        path = PROMPTS_DIR / f"prompts_{model_key}_{condition}_{length}.txt"
+        path = PROMPTS_DIR / f"{prefix}_{model_key}_{condition}_{length}.txt"
         lines: list[str] = []
         for i, rec in enumerate(recs, 1):
             lines.append("=" * 80)

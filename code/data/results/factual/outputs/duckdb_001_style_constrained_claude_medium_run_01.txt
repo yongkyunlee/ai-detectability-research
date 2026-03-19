@@ -1,0 +1,48 @@
+1|DuckDB has reached version 1.5.0|CORRECT|Community posts (HN-47308663, Reddit-1rpwz2a) announce DuckDB 1.5.0 released on 2026-03-09
+2|The Python client gives you an embedded analytical database that runs inside your process|CORRECT|README describes DuckDB as a "high-performance analytical database system" and examples directory includes "embedded-c" and "embedded-c++" examples confirming embedded nature
+3|The entry point is duckdb.connect()|CORRECT|Example duckdb-python.py line 6 shows conn = duckdb.connect()
+4|Calling duckdb.connect() with no arguments gives an in-memory database|CORRECT|Example duckdb-python.py line 5 comment: "connect to an in-memory temporary database"
+5|Passing a filename to duckdb.connect() gives persistence on disk|CORRECT|Issue-14124 shows duckdb.connect(database='test.duckdb') for persistent storage
+6|The API follows PEP 249 loosely|CORRECT|Example duckdb-python.py line 8: "you can create a cursor() like described in PEP 249"
+7|You can create a cursor with conn.cursor() but it is fully redundant|CORRECT|Example duckdb-python.py line 8: "you can create a cursor() like described in PEP 249 but it's fully redundant"
+8|CREATE TABLE test_table (i INTEGER, j STRING) is valid DuckDB syntax|CORRECT|Example duckdb-python.py line 12 shows identical statement
+9|Parameterized queries work with conn.execute using ? placeholders|CORRECT|Example duckdb-python.py line 18: conn.execute("INSERT INTO test_table VALUES (?, ?)", [2, 'two'])
+10|executemany() works for bulk inserts with multiple parameter sets|CORRECT|Example duckdb-python.py line 21: conn.executemany("INSERT INTO test_table VALUES (?, ?)", [[3, 'three'], [4, 'four']])
+11|fetchall() returns a list of tuples|UNVERIFIABLE|Example shows fetchall() usage (line 149) but does not explicitly state the return type
+12|fetchdf() returns a pandas DataFrame|CORRECT|Example duckdb-python.py line 23 comment: "fetch as pandas data frame"
+13|fetchnumpy() returns a dict of masked numpy arrays|INCORRECT|Example duckdb-python.py line 26 says "fetch as list of masked numpy arrays" not "dict"
+14|fetchnumpy() is cleaner than fetchdf() when handling NULLs|CORRECT|Example duckdb-python.py line 26 comment: "fetch as list of masked numpy arrays, cleaner when handling NULLs"
+15|You can query an existing pandas DataFrame with SQL using conn.register()|CORRECT|Example duckdb-python.py lines 37-38 show conn.register("test_df", test_df) followed by SQL query
+16|A community benchmark on 20 GB of Parquet data showed DuckDB warm median query time of 284 ms on XL configuration|CORRECT|Reddit benchmark post shows "DuckDB Local (XL) | 284 ms" warm median
+17|The XL configuration used 32 threads and 64 GB RAM|CORRECT|Reddit benchmark post: "XL = 32 threads, 64GB RAM"
+18|BigQuery achieved 2,775 ms warm median on the same benchmark|CORRECT|Reddit benchmark post: "BigQuery | 2,775 ms"
+19|Athena achieved 4,211 ms warm median on the same benchmark|CORRECT|Reddit benchmark post: "Athena | 4,211 ms"
+20|DuckDB was 3-10x faster than cloud platforms for analytical workloads|CORRECT|Reddit benchmark post key takeaway: "DuckDB on local storage is 3-10x faster than cloud platforms"
+21|DuckDB offers a relational API for building queries programmatically|CORRECT|Example duckdb-python.py line 41: "relation API, programmatic querying"
+22|conn.from_df(test_df) creates a relation from a pandas DataFrame|CORRECT|Example duckdb-python.py line 44: rel = conn.from_df(test_df)
+23|rel.filter().project().order().limit() can be chained on relations|CORRECT|Example duckdb-python.py line 103: rel.filter('i > 1').project('i + 1, j').order('j').limit(2)
+24|Relations are lazily evaluated and nothing executes until you call .execute(), .fetchdf(), or .df()|CORRECT|Example duckdb-python.py line 41 says "lazily evaluated" and lines 145-155 show .execute(), .to_df(), .df() as materialization methods
+25|duckdb.from_csv_auto() reads CSV files directly into a relation|CORRECT|Example duckdb-python.py line 60: rel = duckdb.from_csv_auto(temp_file_name)
+26|DuckDB reads Parquet and CSV files natively|CORRECT|README: "For CSV files and Parquet files, data import is as simple as referencing the file in the FROM clause"
+27|DuckDB reads JSON files natively|UNVERIFIABLE|README only mentions CSV and Parquet for data import; JSON is referenced in issues but not in the data import documentation
+28|SELECT * FROM 'myfile.csv' is valid DuckDB syntax|CORRECT|README shows exact syntax: SELECT * FROM 'myfile.csv'
+29|SELECT * FROM 'myfile.parquet' is valid DuckDB syntax|CORRECT|README shows exact syntax: SELECT * FROM 'myfile.parquet'
+30|Glob patterns work for reading multiple files at once|UNVERIFIABLE|Not mentioned in the provided reference documentation
+31|union_by_name handles schema alignment when files don't share the same schema|UNVERIFIABLE|union_by_name appears in issues but its behavior is not described in the reference documentation
+32|The documented approach for threading is to create a separate cursor per thread via conn.cursor()|CORRECT|Issue-21126 references docs: "The multiple threads guide says each thread should use conn.cursor() to create a thread-local connection"
+33|A bug in version 1.3.0 caused segfaults when two threads ran concurrent INSERT ON CONFLICT DO UPDATE through separate cursors|CORRECT|Issue-21126 reproduces on v1.3.0 with exactly this pattern: two threads, INSERT ON CONFLICT DO UPDATE, separate cursors
+34|The crash happened during transaction rollback inside the ART (Adaptive Radix Tree) index code|INCORRECT|Issue-21126 LLDB trace shows crash in RowGroupCollection::~RowGroupCollection during LocalStorage::Rollback, not in ART code; maintainer only speculated ART PRs may have fixed it
+35|The concurrency bug was resolved by version 1.4.3|CORRECT|Issue-21126 maintainer: "newer versions (e.g. v1.4.3 LTS, v1.5.0-dev) no longer reproduce the issue"
+36|DuckDB's concurrency model is not designed for heavy parallel writes on the same records|CORRECT|Reddit post (reddit-1rrgq7x): "concurrency limitations when multiple updates happen on the same record due to its MVCC model"
+37|Dropping a table or deleting rows does not immediately shrink the .duckdb file|CORRECT|Issue-14124 demonstrates DROP TABLE does not reduce database file size
+38|DuckDB uses free lists internally where dropped blocks get marked for reuse rather than reclaimed|CORRECT|Issue-14124 comment: "DROP TABLE only make new free_blocks, not reduce db file size on disk"
+39|VACUUM does not resolve the disk space issue|CORRECT|Issue-21154: "VACUUM, VACUUM ANALYZE, and CHECKPOINT are all no-ops for space reclamation"
+40|CHECKPOINT does not help with disk space reclamation|CORRECT|Issue-21154 and issue-14124 comments confirm CHECKPOINT does not reduce file size
+41|The disk space issue is tracked as GitHub issue #14124|CORRECT|Issue-14124 exists with title "DROP TABLE does not reduce database size"
+42|Issue #14124 has been open since September 2024|CORRECT|Issue-14124 created 2024-09-25, state: open
+43|A user reported a 1,500-row table with a UNIQUE constraint whose database file grew to 1.2 GB over 24 hours of updates|CORRECT|Issue-19468: "approximately 1,500 rows...grew wildly to 1.2GB...24 hours"
+44|The disk space problem compounds when ART indexes are involved|CORRECT|Issue-19468 and issue-17778 confirm ART indexes prevent block reuse and cause unbounded file growth
+45|The practical workaround for disk space is exporting the database and reimporting into a fresh file|CORRECT|Issue-21154 shows COPY FROM DATABASE workaround; issue-17778 comments describe same export/reimport approach
+46|DuckDB can query Parquet files on S3|CORRECT|Reddit post (reddit-1rm828b): "DuckDB since it can query S3 directly"
+47|DuckDB can return results as Arrow arrays|UNVERIFIABLE|No mention of Arrow output format in the provided reference documentation
+48|DuckDB can return results as numpy arrays|CORRECT|Example duckdb-python.py line 27 shows fetchnumpy() usage

@@ -1,0 +1,62 @@
+1|DuckDB has built-in support for both CSV and Parquet formats|CORRECT|Repository contains dedicated CSV scanner and Parquet extension code confirming native support for both formats
+2|The read_csv() function is the main entry point for CSV ingestion|CORRECT|Source code in csv_file_scanner.cpp and csv_reader_options.hpp confirm read_csv as the primary CSV reading function
+3|DuckDB recognizes file extensions directly, allowing FROM 'sales.csv' syntax without a function call|CORRECT|DuckDB supports replacement scans that allow querying files directly by name in the FROM clause
+4|Compressed files ending in .gz or .zst work transparently|CORRECT|csv_reader_options.hpp shows compression = FileCompressionType::AUTO_DETECT, which infers compression from file extension
+5|DuckDB's CSV auto-detection system is internally called the sniffer|CORRECT|The class is named CSVSniffer in csv_sniffer.hpp
+6|The sniffer samples the first 20,480 rows|CORRECT|csv_reader_options.hpp shows sample_size_chunks = 20480 / sniff_size, and issue #21000 confirms sample_size = 20480 in error output
+7|The sniffer works through five stages|CORRECT|csv_sniffer.hpp comments explicitly list 5 steps: Dialect Detection, Type Detection, Type Refinement, Header Detection, Type Replacement
+8|The first sniffer stage identifies the dialect including delimiter, quote character, escape character, and newline style|CORRECT|csv_sniffer.hpp describes step 1 as dialect detection covering delimiter, quote, escape, comment, and newline
+9|The second sniffer stage detects column types|CORRECT|csv_sniffer.hpp describes step 2 as type detection
+10|The third sniffer stage refines types against additional sample chunks|CORRECT|csv_sniffer.hpp describes step 3 as Type Refinement over remaining chunks
+11|The fourth sniffer stage figures out whether the first row is a header|CORRECT|csv_sniffer.hpp describes step 4 as Header Detection
+12|The fifth sniffer stage applies any type overrides specified by the user|CORRECT|csv_sniffer.hpp describes step 5 as Type Replacement
+13|The dialect detector evaluates candidate delimiters including comma, pipe, tab, semicolon, and others|INCORRECT|dialect_detection.cpp GetDefaultDelimiter() returns exactly {",", "|", ";", "\t"} — only four candidates, no "others"
+14|Candidate delimiters are scored based on how consistently they produce the same column count across sampled rows|CORRECT|CandidateStats in csv_sniffer.hpp tracks best_consistent_rows, confirming consistency-based scoring
+15|For type detection, columns are tested against a hierarchy from most specific to most general|CORRECT|csv_reader_options.hpp shows auto_type_candidates ordered by ascending specificity from VARCHAR to SQLNULL, and csv_sniffer.hpp comment says "ordered by descending specificity (~ from high to low)" for detection
+16|BOOLEAN is among the most specific types in the detection hierarchy|CORRECT|auto_type_candidates list shows BOOLEAN near the end (high specificity), just before SQLNULL
+17|DATE is among the most specific types in the detection hierarchy|CORRECT|auto_type_candidates list shows DATE toward the high-specificity end of the list
+18|TIMESTAMP is among the most specific types in the detection hierarchy|CORRECT|auto_type_candidates list shows TIMESTAMP toward the high-specificity end
+19|VARCHAR is the most general type in the detection hierarchy|CORRECT|auto_type_candidates list starts with VARCHAR as least specific type
+20|If the first 20,480 rows have unquoted fields and a quoted field with an embedded comma appears later, the sniffer concludes quoting isn't in use|CORRECT|Issue #21000 demonstrates exactly this scenario with a quoted field at row 20502 causing a parsing error
+21|Specifying quote='"' explicitly fixes the sniffer limitation with late-appearing quoted fields|CORRECT|Issue #21000 reporter confirms this as a fix
+22|Setting sample_size=-1 forces a full file scan to fix the sniffer limitation|CORRECT|Issue #21000 maintainer confirms sample_size = -1 forces scanning the whole file
+23|The ignore_errors option lets you skip malformed rows|CORRECT|csv_reader_options.hpp defines ignore_errors as CSVOption<bool> with comment about ignoring InvalidInput errors
+24|The store_rejects option routes malformed rows to a separate table for inspection|CORRECT|csv_reader_options.hpp defines store_rejects with rejects_table_name and rejects_scan_name options
+25|The null_padding option fills in NULL for shorter rows with inconsistent column counts|CORRECT|csv_reader_options.hpp defines null_padding: "Whether to pad rows that do not have enough columns with NULL values"
+26|European-style number formatting is handled through decimal_separator|CORRECT|csv_reader_options.hpp shows decimal_separator = "." as a configurable option
+27|A comment character can be set to skip full-line comments|CORRECT|csv_reader_options.hpp shows comment = '\0' as configurable, and dialect_detection.cpp includes '#' as a default comment candidate
+28|The parallel option is on by default for CSV scanning|CORRECT|csv_reader_options.hpp shows bool parallel = true
+29|DuckDB scans a single large CSV across multiple threads when parallel is enabled|CORRECT|csv_reader_options.hpp confirms parallel scanning is the default behavior
+30|For multi-file reads, DuckDB sniffs the first file fully and then does a minimal two-row check on each subsequent file|CORRECT|csv_sniffer.hpp shows AdaptiveSniff calls MinimalSniff which "only sniffs the first two rows"; csv_file_scanner.cpp shows first file uses SniffCSV while subsequent files use AdaptiveSniff
+31|The union_by_name option handles schema evolution across files by aligning columns by name rather than position|CORRECT|Code references union_by_name in multi_file_options and csv_file_scanner.cpp for handling schema differences
+32|Parquet format is columnar and self-describing|CORRECT|General well-known fact about the Parquet format confirmed by the codebase's handling of Parquet metadata
+33|When querying specific columns from Parquet, DuckDB reads only those columns from disk (column pruning)|CORRECT|Benchmark document and codebase confirm column pruning is used for Parquet queries
+34|Column pruning on wide tables can reduce I/O by orders of magnitude|UNVERIFIABLE|While benchmarks show significant benefits from column pruning, no specific ratio is provided in the documentation to confirm "orders of magnitude"
+35|DuckDB pushes filter predicates down into the Parquet reader|CORRECT|Benchmark document describes predicate pushdown and the codebase includes ParquetScanFilter and AdaptiveFilter for this purpose
+36|Each Parquet file is divided into row groups|CORRECT|Parquet format specification and DuckDB codebase references to row groups confirm this
+37|Each row group stores min/max statistics for its columns|CORRECT|Benchmark document explicitly mentions "Uses min/max values to skip entire row groups" as row group statistics
+38|A row group can be skipped without reading a single data page if its statistics don't match the filter|CORRECT|Predicate pushdown using row group statistics is confirmed in the benchmark document and codebase
+39|Hive-style partitioning uses directory names like year=2024/month=03/ to encode filter values|CORRECT|Issue #21347 shows paths like s3://my-bucket/data/year=YYYY/month=M/data.parquet confirming hive partition directory naming
+40|DuckDB reads Parquet directly from S3, GCS, or HTTP endpoints|CORRECT|Benchmark document shows DuckDB reading from Cloudflare R2 (S3-compatible), and issues reference S3 and httpfs extension
+41|For remote Parquet files, DuckDB uses a prefetching strategy to cut down on network round trips|CORRECT|parquet_reader.cpp code comments explain prefetching to "hopefully save a round trip" for remote reads
+42|DuckDB estimates the footer size as roughly 1/1000th of the total file size|CORRECT|parquet_reader.cpp defines ESTIMATED_FOOTER_RATIO = 1000 with comment "Estimate 1/1000th of the file to be footer"
+43|DuckDB fetches between 16KB and 256KB in a single prefetch request for remote Parquet footers|CORRECT|parquet_reader.cpp defines MIN_PREFETCH_SIZE = 16384 (16KB) and MAX_PREFETCH_SIZE = 262144 (256KB)
+44|The prefetch request captures both the footer metadata and the initial data pages|INCORRECT|parquet_reader.cpp shows the prefetch is from file_size - prefetch_size to the end, targeting the footer at the end of the file; the code comment says the purpose is to save a round trip for footer reading, not to capture initial data pages
+45|Community benchmarks used 20GB of ZSTD-compressed Parquet|CORRECT|Benchmark document states "~20GB of financial time-series data in Parquet (ZSTD compressed)"
+46|The benchmark data was spread across 161 files|CORRECT|Benchmark document states "161 Parquet files, ~20GB"
+47|Local DuckDB hit a median query time around 280ms on a 32-thread machine|CORRECT|Benchmark shows DuckDB Local (XL) with 32 threads achieved 284ms median
+48|The same data on Cloudflare R2 yielded 500ms to 1,100ms medians for warm queries|CORRECT|Benchmark shows DuckDB + R2 (M) = 1,099ms and DuckDB + R2 (XL) = 496ms medians
+49|Cold starts for remote data took 14 to 20 seconds|CORRECT|Benchmark shows cold start for DuckDB + R2 (XL) = 14.3 sec and (M) = 19.5 sec
+50|Cold starts are dominated by metadata fetching|CORRECT|Benchmark states "First query fetches Parquet metadata (file footers, schema, row group info) over the network"
+51|BigQuery clocked in around 2,800ms per query on the same dataset|CORRECT|Benchmark shows BigQuery warm median of 2,775ms
+52|Athena clocked in around 4,200ms per query on the same dataset|CORRECT|Benchmark shows Athena warm median of 4,211ms
+53|Setting hive_partitioning=true tells DuckDB to interpret directory structures as partition columns|CORRECT|Issue #21347 and #21385 confirm hive_partitioning parameter for interpreting directory structures
+54|There is a regression in version 1.5.0 where the engine discovers all files matching a glob pattern before applying partition filters|CORRECT|Issue #21347 documents this exact regression: "all 122 files discovered, then pruned to 39"
+55|In the v1.5.0 regression, on an S3 bucket with 122 partition files where only 39 match the filter, all 122 get HTTP requests for footer reads|CORRECT|Issue #21347 shows "Scanning Files: 39/122" with extra HTTP GET requests for all files
+56|Setting s3_allow_recursive_globbing=false restores the older, more efficient behavior|CORRECT|Issue #21347 maintainer Mytherin confirms this as a workaround
+57|CSV files must be scanned row by row with no way to skip columns or row groups|CORRECT|This is a fundamental characteristic of the CSV format confirmed by comparison with Parquet's columnar capabilities
+58|COPY ... TO ... (FORMAT parquet, COMPRESSION zstd) syntax is used to write Parquet results|CORRECT|Issue #21370 shows COPY TO with FORMAT 'parquet' and COMPRESSION 'ZSTD' options
+59|Parquet files with ZSTD compression tend to produce files 3-5x smaller than gzipped CSV|UNVERIFIABLE|No specific compression ratio comparison between ZSTD Parquet and gzipped CSV is provided in the documentation
+60|DuckDB writes HUGEINT values as DOUBLE when producing Parquet|CORRECT|parquet_writer.cpp lines 89-91 show case LogicalTypeId::HUGEINT mapping to parquet_type = Type::DOUBLE
+61|Writing HUGEINT as DOUBLE loses precision for very large integers|CORRECT|Issue #21180 demonstrates 999999999999999999999999999999 becoming 1e+30 due to DOUBLE conversion
+62|Casting to DECIMAL(38,0) before writing Parquet preserves full values for large integers|CORRECT|Issue #21180 comments confirm DECIMAL with INT128 physical type maps to FIXED_LEN_BYTE_ARRAY preserving precision

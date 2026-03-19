@@ -1,0 +1,41 @@
+1|LangChain is a Python framework for building LLM-powered applications and agents|CORRECT|README describes LangChain as "a framework for building agents and LLM-powered applications" and CLAUDE.md confirms it is a Python monorepo
+2|LangChain provides a standard interface for models, embeddings, vector stores, and retrieval|CORRECT|README states LangChain helps developers "through a standard interface for models, embeddings, vector stores, and more"
+3|LangChain offers model interoperability allowing you to swap providers without rewriting application logic|CORRECT|README lists "Model interoperability" as a key feature: "Swap models in and out as your engineering team experiments"
+4|LangChain is a monorepo|CORRECT|CLAUDE.md states "This is a Python monorepo with multiple independently versioned packages"
+5|The main package is at version 1.2.12|CORRECT|pyproject.toml shows version = "1.2.12"
+6|LangChain requires Python 3.10 or higher|CORRECT|pyproject.toml shows requires-python = ">=3.10.0,<4.0.0"
+7|LangChain's core dependencies pull in langchain-core, langgraph, and pydantic|CORRECT|pyproject.toml lists dependencies: langchain-core, langgraph, and pydantic
+8|The install command is "pip install langchain"|CORRECT|README quickstart shows "pip install langchain"
+9|The LangChain team uses uv internally|CORRECT|CLAUDE.md confirms the monorepo uses uv for dependency management
+10|You can install LangChain with "uv add langchain"|CORRECT|README quickstart shows "uv add langchain" as an alternative
+11|The OpenAI integration package is langchain-openai|CORRECT|pyproject.toml lists openai = ["langchain-openai"] in optional dependencies
+12|The Anthropic integration package is langchain-anthropic|CORRECT|pyproject.toml lists anthropic = ["langchain-anthropic"] in optional dependencies
+13|The Ollama integration package for local models is langchain-ollama|CORRECT|pyproject.toml lists ollama = ["langchain-ollama"] in optional dependencies
+14|The pyproject.toml lists optional dependency groups for each provider|CORRECT|pyproject.toml has [project.optional-dependencies] with entries for openai, anthropic, ollama, etc.
+15|"pip install langchain[openai]" works to install the OpenAI integration|CORRECT|pyproject.toml defines openai = ["langchain-openai"] under optional-dependencies, enabling this syntax
+16|The quickstart code uses "from langchain.chat_models import init_chat_model"|CORRECT|README quickstart shows exactly this import
+17|The quickstart uses init_chat_model("openai:gpt-5.4")|CORRECT|README quickstart shows model = init_chat_model("openai:gpt-5.4")
+18|The quickstart uses model.invoke("Hello, world!")|CORRECT|README quickstart shows result = model.invoke("Hello, world!")
+19|The init_chat_model function takes a provider-prefixed model string|CORRECT|README quickstart demonstrates "openai:gpt-5.4" as a provider-prefixed string
+20|The quickstart is three lines of code|CORRECT|README quickstart contains exactly three lines: import, model init, and invoke
+21|initialize_agent has been deprecated since version 0.1|CORRECT|Issue #29277 states "This function has been deprecated since 0.1"
+22|GitHub issue #29277 documents the effort to replace initialize_agent in the docs|CORRECT|Issue #29277 is titled "docs: Replace initialize_agent use with langgraph.prebuilt.create_react_agent"
+23|The replacement for initialize_agent is langgraph.prebuilt.create_react_agent|CORRECT|Issue #29277 documents replacing initialize_agent with langgraph.prebuilt.create_react_agent
+24|create_react_agent builds on LangGraph for durable execution, streaming, and human-in-the-loop workflows|UNVERIFIABLE|The documentation mentions LangGraph for agent orchestration but does not specifically list these three features
+25|ConversationalRetrievalChain doesn't work with ConversationBufferMemory when return_source_documents=True|CORRECT|Issue #2303 documents this exact incompatibility with the ValueError
+26|The memory object expects a single output key but return_source_documents gives two keys: answer and source_documents|CORRECT|Issue #2303 shows the error "ValueError: One output key expected, got dict_keys(['answer', 'source_documents'])"
+27|The error thrown is a ValueError|CORRECT|Issue #2303 shows "ValueError: One output key expected, got dict_keys(['answer', 'source_documents'])"
+28|The workaround is to set output_key='answer' on the memory object|CORRECT|Issue #2303 comment by ToddKerpelman shows this exact workaround
+29|The workaround code is ConversationBufferMemory(memory_key='chat_history', return_messages=True, output_key='answer')|CORRECT|Issue #2303 shows this exact code in ToddKerpelman's comment
+30|Issue #2303 has been open since April 2023|INCORRECT|Issue #2303 was created 2023-04-02 but its state is "closed", not open
+31|Issue #2303 was still receiving comments into 2026|CORRECT|Issue #2303 shows Updated: 2026-03-07, confirming activity into 2026
+32|A Reddit thread from early 2026 described a developer feeling "overwhelmed by the ecosystem"|CORRECT|Reddit post from 2026-01-12 is titled "Feeling a bit overwhelmed by the ecosystem"
+33|The Reddit developer had solid Python skills and was unsure about the "order of operations"|CORRECT|Reddit post states "I have a decent handle on Python" and "I'm struggling with the 'order of operations'"
+34|langchain-core is described by the team as having the largest install base in the LLM ecosystem|CORRECT|langchain-core README states "Core components have the largest install base in the LLM ecosystem"
+35|Some teams are moving toward custom orchestration writing their own Python loops for prompt flow|CORRECT|Reddit post reddit-1r8eeb6 states "I'm finding myself stripping away libraries and just writing raw Python loops for my agents because I want more control over the prompt flow"
+36|One developer said "the frameworks are getting heavier and heavier"|CORRECT|Reddit post reddit-1r8eeb6 states "I feel like the frameworks are getting heavier and heavier"
+37|A chaos engineering test against a standard LangChain agent reported a 5.2% robustness score|CORRECT|HN post hn-46587182 reports "The agent scored a 5.2% robustness score"
+38|57 out of 60 adversarial tests failed in the chaos engineering test|CORRECT|HN post hn-46587182 states "57 out of 60 adversarial tests failed"
+39|The chaos engineering test showed a 0% pass rate on prompt injection attacks|CORRECT|HN post hn-46587182 states "Prompt Injection: 0% pass rate"
+40|One production team on Reddit reported pandas and a PDF splitter were installed despite only needing inference|UNVERIFIABLE|No matching Reddit post found in the reference documentation
+41|langchain-community drags in a wider set of packages|UNVERIFIABLE|The documentation lists it as an optional dependency but does not detail its transitive dependencies

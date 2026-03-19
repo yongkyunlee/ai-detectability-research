@@ -1,0 +1,45 @@
+1|Window functions let you compute rankings, running totals, and row-level comparisons without collapsing your result set the way GROUP BY does|CORRECT|This is a standard description of window functions consistent with how DuckDB implements them
+2|DuckDB is an embedded analytical database|CORRECT|DuckDB is widely described as an embedded analytical database in the documentation and community posts
+3|A window function operates over a "window" of rows related to the current row|CORRECT|Standard SQL window function semantics, supported in DuckDB source code
+4|PARTITION BY splits the data into independent groups|CORRECT|Standard SQL window function semantics implemented in DuckDB
+5|ORDER BY determines the sequence within each partition|CORRECT|Standard SQL window function semantics implemented in DuckDB
+6|The frame clause controls exactly which rows in the partition contribute to the computation|CORRECT|Standard SQL window function semantics implemented in DuckDB
+7|DuckDB supports ROWS frame mode (physical row offsets)|CORRECT|Source code window_expression.hpp defines CURRENT_ROW_ROWS, EXPR_PRECEDING_ROWS, EXPR_FOLLOWING_ROWS
+8|DuckDB supports RANGE frame mode (logical value ranges)|CORRECT|Source code window_expression.hpp defines CURRENT_ROW_RANGE, EXPR_PRECEDING_RANGE, EXPR_FOLLOWING_RANGE
+9|DuckDB supports GROUPS frame mode (peer group offsets)|CORRECT|Source code window_expression.hpp defines CURRENT_ROW_GROUPS, EXPR_PRECEDING_GROUPS, EXPR_FOLLOWING_GROUPS
+10|DuckDB implements the EXCLUDE CURRENT ROW option|CORRECT|WindowExcludeMode enum includes CURRENT_ROW = 1 in window_expression.hpp
+11|DuckDB implements the EXCLUDE GROUP option|CORRECT|WindowExcludeMode enum includes GROUP = 2 in window_expression.hpp
+12|DuckDB implements the EXCLUDE TIES option|CORRECT|WindowExcludeMode enum includes TIES = 3 in window_expression.hpp
+13|DuckDB implements the EXCLUDE NO OTHERS option|CORRECT|WindowExcludeMode enum includes NO_OTHER = 0 in window_expression.hpp
+14|The QUALIFY clause was borrowed from Teradata's SQL dialect|UNVERIFIABLE|No mention of Teradata found anywhere in the DuckDB documentation or source code provided
+15|QUALIFY filters are applied after the window functions compute their results over the full dataset|CORRECT|Issue #21198 confirms: windowed counts are computed before the qualify predicate is applied
+16|Combining multiple window conditions in QUALIFY can remove rows that were counted in the original window computation|CORRECT|Issue #21198 demonstrates exactly this behavior with count(distinct price) partitioned by two different columns
+17|DuckDB uses a segment tree structure for standard aggregates like SUM or AVG over sliding frames|CORRECT|Source file window_segment_tree.cpp implements WindowSegmentTree for window aggregates
+18|The segment tree has a fanout of 16|CORRECT|window_segment_tree.cpp line 53: static constexpr idx_t TREE_FANOUT = 16
+19|The segment tree pre-computes partial aggregations over blocks of rows|CORRECT|window_segment_tree.cpp shows levels_flat_native storing intermediate aggregate states at multiple levels
+20|Evaluating an aggregate over any contiguous range requires combining only O(log n) partial states|CORRECT|The hierarchical tree structure with fanout 16 and multiple levels implies logarithmic query complexity
+21|For ranking functions, DuckDB tracks partition boundaries and peer group boundaries using validity masks|CORRECT|window_rank_function.cpp uses ValidityMask for partition_mask and order_mask in WindowPeerGlobalState
+22|The DENSE_RANK implementation counts set bits in the order mask between partition start and the current row|CORRECT|window_rank_function.cpp lines 237-268 show dense_rank counting valid bits in order_mask from partition_begin to row_idx using RowIsValid and CountValid
+23|DuckDB supports secondary ordering within window functions through an ORDER BY clause on the function arguments|CORRECT|WindowPeerExecutor processes arg_orders from wexpr and creates token trees for secondary ordering
+24|FIRST_VALUE(price ORDER BY timestamp) lets you specify an ordering independent of the frame ordering|CORRECT|WindowValueExecutor has arg_order_idx for ORDER BY argument expressions, WindowFirstValueExecutor inherits this
+25|Secondary ordering is implemented using token trees which are merge sort trees|CORRECT|window_token_tree.hpp describes WindowTokenTree as "a merge sort tree that uses integer tokens for the comparison values"
+26|Token trees can efficiently map between the frame ordering and the argument ordering|CORRECT|WindowTokenTree provides Rank and PeerEnd methods used by ranking functions to map between orderings
+27|DuckDB v1.5.0 introduced an optimization called "top_n_window_elimination"|UNVERIFIABLE|The optimization exists in the source code and was present in v1.5.0, but the documentation does not specify in which version it was first introduced
+28|The top_n_window_elimination optimization rewrites ROW_NUMBER() filtered to equal 1 into an aggregate-based plan|CORRECT|Issue #21348 confirms the optimizer rewrites ROW_NUMBER() = 1 into arg_max + HASH_GROUP_BY + SEMI JOIN plan
+29|The rewritten plan can result in two separate scans of the underlying files|CORRECT|Issue #21348 shows the rewritten plan uses two TABLE_SCANs joined by HASH_JOIN (SEMI)
+30|On S3, each scan translates to HTTP range requests|CORRECT|Issue #21348 explains the second full-column scan generates separate HTTP range requests per column chunk per file
+31|For wide tables with many columns, the request count can explode|CORRECT|Issue #21348 shows ~90 columns causing ~4200 GET requests (roughly 39 files x 90 columns x 1-2 row groups)
+32|One user reported going from 80 HTTP requests to over 4,200 after upgrading|CORRECT|Issue #21348 shows exactly 81 requests in v1.4.4 vs 4,214 in v1.5.0
+33|Query time nearly tripled|CORRECT|Issue #21348 shows wall clock time going from 11.6s to 31.5s (nearly tripled)
+34|The workaround is to disable the specific optimization with SET disabled_optimizers='top_n_window_elimination'|CORRECT|Issue #21348 comment by hawkfish confirms this exact workaround
+35|The workaround includes wrapping the source in a MATERIALIZED CTE|CORRECT|Issue #21348 shows MATERIALIZED CTE as a workaround that forces a single scan
+36|When QUALIFY rn <= 50 is rewritten to use arg_min_max_n, the internal heap pre-allocates all 50 slots per group upfront|CORRECT|Issue #21431 comment by Mytherin: "arg_min_max_n pre-allocates all 50 slots up-front"
+37|If the actual maximum rank per group is much smaller, most slots sit empty, wasting memory|CORRECT|Issue #21431: "MAX(rn) is 3 in this case, so these slots are almost all empty"
+38|This can cause out-of-memory failures that did not occur with the original window-based plan|CORRECT|Issue #21431 title is "OOM with TopN Window Elimination" and shows the query causes OOM with the optimization enabled
+39|LAG and LEAD do not respect the window frame specification|CORRECT|Issue #21330 confirms: hawkfish stated "the lag function does not use window framing" which is expected behavior
+40|LAG and LEAD ignoring frames matches the SQL standard and PostgreSQL's behavior|CORRECT|Issue #21330 shows PostgreSQL returns the same result, confirming consistent behavior
+41|The workaround for LAG is to use a secondary ordering on the function argument: LAG(ts ORDER BY ts)|CORRECT|Issue #21330 comment confirms: "A workaround is specifying a secondary ordering (lag(ts order by ts))"
+42|Independent benchmarks on 20GB of financial time-series data show DuckDB's window function performance on local storage is roughly 3x faster than BigQuery|CORRECT|Reddit benchmark shows Window Functions: DuckDB Local XL 947ms vs BigQuery 3,013ms, ratio ~3.2x
+43|Independent benchmarks on 20GB of financial time-series data show DuckDB is roughly 5x faster than Athena for window-heavy queries|CORRECT|Reddit benchmark shows Window Functions: DuckDB Local XL 947ms vs Athena 5,389ms, ratio ~5.7x
+44|Window functions over remote storage are a weak point since they often require multiple passes over the data|CORRECT|Reddit benchmark shows Window Functions: DuckDB+R2 12,187ms vs DuckDB Local 947ms, a massive gap compared to other query types
+45|One benchmark showed window function queries taking over 12 seconds against remote storage compared to under 1 second locally|CORRECT|Reddit benchmark shows Window Functions: DuckDB+R2 XL 12,187ms vs DuckDB Local XL 947ms

@@ -1,0 +1,44 @@
+1|LCEL stands for LangChain Expression Language|CORRECT|The blog's expansion matches the standard name used in LangChain documentation
+2|LCEL is the declarative composition layer in LangChain's langchain-core package|CORRECT|The runnables module lives in langchain-core and provides the composition primitives
+3|Everything in LCEL descends from one abstract base class called Runnable|CORRECT|Source base.py line 124 shows class Runnable(ABC, Generic[Input, Output])
+4|Runnable is generic over Input and Output|CORRECT|Source base.py line 124: class Runnable(ABC, Generic[Input, Output])
+5|Runnable defines invoke, ainvoke, batch, abatch, stream, and astream methods|CORRECT|All six methods are defined in the Runnable class in base.py (invoke at line 822, ainvoke at 844, batch at 867, abatch at 1002, stream at 1130, astream at 1151)
+6|The batch implementation by default runs invoke in parallel across a thread pool|CORRECT|base.py batch docstring states "Default implementation runs invoke in parallel using a thread pool executor"
+7|The async batch implementation uses asyncio.gather|CORRECT|base.py abatch docstring states "Default implementation runs ainvoke in parallel using asyncio.gather"
+8|When you write runnable_a | runnable_b you get a RunnableSequence|CORRECT|base.py __or__ method (line 618) returns RunnableSequence(self, coerce_to_runnable(other))
+9|The __or__ method on Runnable handles the coercion automatically|CORRECT|__or__ calls coerce_to_runnable(other) to convert plain functions, dicts, etc. into Runnables
+10|The two core composition primitives are RunnableSequence and RunnableParallel|CORRECT|RunnableParallel docstring states "One of the two main composition primitives, alongside RunnableSequence"
+11|RunnableParallel runs multiple runnables concurrently on the same input and collects outputs into a dict|CORRECT|RunnableParallel docstring: "Invokes Runnables concurrently, providing the same input to each"
+12|A dict literal in a sequence gets coerced to a RunnableParallel internally|CORRECT|coerce_to_runnable handles dict coercion to RunnableParallel
+13|The code example sequence.invoke(1) returns {'mul_2': 4, 'mul_5': 10}|CORRECT|Input 1 goes through lambda x: x+1 giving 2, then parallel: 2*2=4 and 2*5=10
+14|RunnableLambda can be imported from langchain_core.runnables|CORRECT|__init__.py exports RunnableLambda from langchain_core.runnables
+15|RunnablePassthrough acts as an identity function passing its input through unchanged|CORRECT|passthrough.py docstring: "Behaves almost like the identity function"
+16|RunnablePassthrough.assign() lets you add new keys to a dict-shaped output without losing existing ones|CORRECT|passthrough.py lines 206-223 show assign() returns RunnableAssign which merges new keys with existing dict
+17|RunnableBranch handles conditional logic|CORRECT|branch.py docstring: "Selects which branch to run based on a condition"
+18|RunnableBranch takes a list of (condition, runnable) pairs and a default|CORRECT|branch.py docstring: "initialized with a list of (condition, Runnable) pairs and a default branch"
+19|RunnableBranch evaluates conditions in order, running the first matching branch|CORRECT|branch.py implementation evaluates conditions sequentially and runs first match
+20|RunnableLambda wraps any plain function into a Runnable|CORRECT|base.py RunnableLambda docstring: "Converts a python callable into a Runnable"
+21|The @chain decorator does the same thing as RunnableLambda|CORRECT|base.py chain function (line 6227) simply returns RunnableLambda(func)
+22|The @chain decorator sets the runnable's name to the function name|CORRECT|chain docstring: "Sets the name of the Runnable to the name of the function" and RunnableLambda.__init__ sets self.name = func_for_name.__name__
+23|.with_retry() wraps a runnable with retry logic backed by the tenacity library|CORRECT|retry.py imports from tenacity (Retrying, AsyncRetrying, wait_exponential_jitter, stop_after_attempt, retry_if_exception_type)
+24|with_retry by default retries up to 3 attempts with exponential jitter|CORRECT|with_retry defaults: stop_after_attempt=3, wait_exponential_jitter=True
+25|You can customize which exceptions trigger retries, the backoff parameters, and the attempt limit|CORRECT|with_retry parameters include retry_if_exception_type, wait_exponential_jitter, and stop_after_attempt
+26|.with_fallbacks() takes a list of alternative runnables|CORRECT|with_fallbacks method accepts a fallbacks parameter which is a list of Runnables
+27|If the primary runnable fails, with_fallbacks tries each fallback in sequence|CORRECT|fallbacks.py docstring: "Fallbacks are tried in order until one succeeds or all fail"
+28|The documentation shows a pattern of falling back from Anthropic to OpenAI|CORRECT|fallbacks.py example shows ChatAnthropic with fallback to ChatOpenAI
+29|Fallbacks are tried in order until one succeeds or all fail|CORRECT|fallbacks.py docstring explicitly states this
+30|The exception_key parameter lets you pass the original exception to fallback runnables as part of their input|CORRECT|fallbacks.py: exception_key "If string is specified then handled exceptions will be passed to fallbacks as part of the input under the specified key"
+31|A RunnableSequence preserves the streaming properties of its components|CORRECT|RunnableSequence documentation confirms streaming is preserved when components support transform
+32|If every component in a sequence implements the transform method, the whole chain can stream input to output|CORRECT|RunnableSequence docstring describes this streaming behavior
+33|RunnableLambda doesn't support transform by default|CORRECT|RunnableSequence docstring (line 2846): "RunnableLambdas do not support transform by default!"
+34|Dropping a plain lambda into a streaming chain blocks at that step until the lambda completes|CORRECT|RunnableLambda._transform (line 5062): "By definitions, RunnableLambdas consume all input before emitting output"
+35|To stream arbitrary logic you need to subclass Runnable and implement transform yourself|INCORRECT|RunnableLambda supports streaming output via generator functions (inspect.isgeneratorfunction check at line 5075); subclassing is not the only option
+36|Issue #30667 in langchain-core documents a memory leak|CORRECT|Issue 30667 is open, titled "core: leak when using object member in a RunnableSequence"
+37|Issue #30667 was reported against version 0.3.50|CORRECT|Issue system info shows langchain_core: 0.3.50
+38|The memory leak occurs when using bound methods inside a RunnableSequence|CORRECT|Issue describes the leak occurring when using thing.call (a bound method) in a RunnableSequence
+39|The root cause is an @lru_cache on an internal utility function that holds strong references to callables|CORRECT|Root cause is @lru_cache(maxsize=256) on get_function_nonlocals in runnables/utils.py holding strong references
+40|The @lru_cache prevents garbage collection|CORRECT|The lru_cache holds strong references to Callable arguments, preventing GC of bound method objects
+41|The workaround is to split the chain and invoke the segments separately|CORRECT|Issue discussion confirms splitting the chain into separate Runnables and invoking sequentially as a workaround
+42|As of langchain-core version 1.2.20, LCEL is a stable and central part of the LangChain ecosystem|CORRECT|pyproject.toml shows version = "1.2.20" and LCEL is indeed the core composition layer
+43|Schema introspection is available via input_schema and output_schema properties|CORRECT|base.py defines input_schema property (line 366) and output_schema property (line 442) on the Runnable class
+44|The parallel branches run concurrently in both sync via threads and async via asyncio modes|CORRECT|RunnableParallel runs branches concurrently using threads for sync and asyncio for async execution

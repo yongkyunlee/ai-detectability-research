@@ -1,0 +1,60 @@
+1|The read_csv() function is the main entry point for CSV ingestion in DuckDB|CORRECT|Confirmed in src/function/table/read_csv.cpp as the primary CSV reading function
+2|DuckDB recognizes file extensions directly so FROM 'sales.csv' in the FROM clause is enough to query a file without an explicit function call|CORRECT|read_csv.cpp lines 163-179 show replacement scan applies to files ending with .csv and .tsv
+3|Compressed variants ending in .gz or .zst are handled transparently|CORRECT|csv_reader_options.hpp shows FileCompressionType::AUTO_DETECT as default, supporting gzip and zstandard
+4|DuckDB's CSV auto-detection system is internally called the sniffer|CORRECT|The source class is named CSVSniffer in csv_sniffer.hpp
+5|When querying a CSV without specifying formatting details DuckDB samples the first 20,480 rows|CORRECT|csv_reader_options.hpp shows sample_size_chunks = 20480 / sniff_size (2048), yielding 20,480 rows
+6|The sniffer works through five stages|CORRECT|csv_sniffer.hpp lines 81-86 list exactly five steps in the SniffCSV method
+7|Stage 1 identifies the dialect including delimiter, quote character, escape character, and newline style|CORRECT|csv_sniffer.hpp step 1 is Dialect Detection which generates CSV options for delimiter, quote, escape, etc.
+8|Stage 2 detects column types|CORRECT|csv_sniffer.hpp step 2 is Type Detection
+9|Stage 3 refines types against additional sample chunks|CORRECT|csv_sniffer.hpp step 3 is Type Refinement for remaining chunks
+10|Stage 4 determines whether the first row is a header|CORRECT|csv_sniffer.hpp step 4 is Header Detection
+11|Stage 5 applies user-specified type overrides|CORRECT|csv_sniffer.hpp step 5 is Type Replacement where user-specified types replace detected types
+12|The dialect detector evaluates candidate delimiters including comma, pipe, tab, semicolon, and others|INCORRECT|GetDefaultDelimiter() in dialect_detection.cpp returns exactly four candidates: comma, pipe, semicolon, and tab with no others
+13|Delimiters are scored based on how consistently they produce the same number of columns across sampled rows|CORRECT|dialect_detection.cpp AnalyzeDialectCandidate tracks consistent_rows counting rows matching num_cols to select the best candidate
+14|For type detection columns are tested against a hierarchy ranging from the most specific (BOOLEAN, DATE, TIMESTAMP) down to the most general (VARCHAR)|CORRECT|csv_reader_options.hpp shows type hierarchy in ascending specificity: VARCHAR, DOUBLE, BIGINT, TIMESTAMP_TZ, TIMESTAMP, DATE, TIME, BOOLEAN, SQLNULL confirming the general concept
+15|Each type is promoted upward when values don't fit|CORRECT|The type detection promotes from specific to general types when values cannot be parsed as the more specific type
+16|If the first 20,480 rows contain only unquoted fields and a quoted field with an embedded comma appears later the sniffer concludes no quoting is in use and fails on that row|CORRECT|Issue #21000 confirms this exact scenario with error on line 20502 showing quote detected as empty
+17|The fix is to specify quote='"' explicitly|CORRECT|Issue #21000 confirms passing quote='"' as a workaround
+18|The fix is to set sample_size=-1 to force scanning the entire file|CORRECT|Issue #21000 comment by szarnyasg confirms sample_size=-1 forces full file scan for dialect detection
+19|ignore_errors lets you skip malformed rows|CORRECT|csv_reader_options.hpp confirms ignore_errors parameter for skipping rows with parsing errors
+20|store_rejects routes rejected rows into a separate table for inspection|CORRECT|csv_reader_options.hpp confirms store_rejects parameter for storing rejected rows
+21|null_padding fills in NULL for rows that have fewer columns than expected|CORRECT|csv_reader_options.hpp confirms null_padding parameter; dialect_detection.cpp shows padding logic
+22|decimal_separator accommodates European-style number formatting|CORRECT|read_csv.cpp confirms decimal_separator parameter for numeric parsing
+23|thousands parameter accommodates number formatting where commas and periods swap roles|CORRECT|read_csv.cpp confirms thousands separator parameter
+24|comment designates a character that marks full-line comments to skip|CORRECT|read_csv.cpp and dialect_detection.cpp confirm comment parameter; default candidates are no-comment and #
+25|parallel is enabled by default|CORRECT|csv_reader_options.hpp line 126 shows bool parallel = true
+26|parallel allows DuckDB to scan even a single large CSV across multiple threads|CORRECT|The parallel parameter enables multi-threaded scanning of individual CSV files
+27|For multi-file reads DuckDB sniffs the first file fully|CORRECT|csv_multi_file_info.cpp SchemaDiscovery function performs full sniffing on the first file
+28|DuckDB performs a minimal two-row check on subsequent files to verify schema compatibility|CORRECT|csv_multi_file_info.cpp MinimalSniff reads only two rows for subsequent files
+29|The union_by_name option handles schema evolution across files by aligning columns by name rather than position|CORRECT|multi_file_options.hpp confirms union_by_name option for name-based column alignment
+30|Parquet is a columnar self-describing format|CORRECT|Well-established fact about the Apache Parquet format confirmed by the codebase structure
+31|When selecting specific columns from Parquet DuckDB reads only those columns from disk ignoring others (column pruning)|CORRECT|parquet_reader.cpp CreateReaderRecursive processes column_indexes to selectively read only required columns
+32|DuckDB pushes filter predicates down into the Parquet reader|CORRECT|parquet_reader.cpp PrepareRowGroupBuffer uses filter.CheckStatistics to push predicates
+33|Each Parquet file is divided into row groups|CORRECT|parquet_reader.cpp processes row groups with group_idx_list tracking which groups to read
+34|Each row group stores min/max statistics for its columns|CORRECT|parquet_reader.cpp accesses group.columns[].meta_data.statistics for min/max values
+35|If a row group's statistics show filters cannot match DuckDB skips that entire group|CORRECT|parquet_reader.cpp uses FilterPropagateResult::FILTER_ALWAYS_FALSE to skip row groups
+36|Hive-style partitioning uses directory names like year=2024/month=03/ to encode filter values|CORRECT|Issue #21347 confirms hive partition paths like s3://bucket/data/year=YYYY/month=M/data.parquet
+37|With hive partitioning whole files can be eliminated before any data is touched|CORRECT|Issue #21347 shows Scanning Files: 39/122 demonstrating file-level pruning
+38|DuckDB can read Parquet directly from S3, GCS, or HTTP endpoints|CORRECT|parquet_reader.cpp handles remote files with IsRemoteFile() and FILE_FLAGS_DIRECT_IO
+39|For remote files DuckDB estimates the footer size as roughly 1/1000th of the total file size|CORRECT|parquet_reader.cpp ESTIMATED_FOOTER_RATIO = 1000
+40|DuckDB fetches between 16KB and 256KB in a single request for remote Parquet files|CORRECT|parquet_reader.cpp MIN_PREFETCH_SIZE = 16384 (16KB) and MAX_PREFETCH_SIZE = 262144 (256KB)
+41|The prefetch captures both the footer metadata and the initial data pages|UNVERIFIABLE|The code prefetches from file_size - prefetch_size to file_size targeting the footer; whether it intentionally captures data pages is not explicitly documented
+42|Benchmarks used 20GB of ZSTD-compressed Parquet spread across 161 files|CORRECT|Reddit benchmark post confirms ~20GB ZSTD-compressed data across 161 Parquet files
+43|Local DuckDB achieved a median query time around 280ms|CORRECT|Reddit post shows DuckDB Local XL median of 284ms which rounds to approximately 280ms
+44|The 280ms benchmark was on a 32-thread machine|INCORRECT|Reddit post shows the machine had an AMD EPYC 9224 24-Core with 48 threads; 32 threads was the DuckDB XL configuration setting not the machine's thread count
+45|The same data on Cloudflare R2 yielded 500ms to 1,100ms medians for warm queries|CORRECT|Reddit post shows DuckDB + R2 XL at 496ms and M at 1,099ms matching the 500-1100ms range
+46|Cold starts took 14 to 20 seconds|CORRECT|Reddit post shows cold starts of 14.3 sec (XL) and 19.5 sec (M) fitting the 14-20 second range
+47|Cold starts are dominated by metadata fetching|CORRECT|Reddit post states first query fetches Parquet metadata (file footers, schema, row group info) over the network
+48|BigQuery clocked in around 2,800ms per query on the same data|CORRECT|Reddit post shows BigQuery median of 2,775ms which rounds to approximately 2,800ms
+49|Athena clocked in around 4,200ms per query on the same data|CORRECT|Reddit post shows Athena median of 4,211ms which rounds to approximately 4,200ms
+50|Enabling hive_partitioning=true tells DuckDB to interpret directory structures as partition columns|CORRECT|Confirmed by issue #21347 and parquet_multi_file_info.cpp hive_partitioning option
+51|There is a notable regression in version 1.5.0 where the engine discovers all files before applying partition filters|CORRECT|Issue #21347 confirms this regression in v1.5.0 showing all 122 files discovered then pruned to 39
+52|On an S3 bucket with 122 partition files where only 39 match the filter all 122 receive HTTP requests for footer reads|CORRECT|Issue #21347 shows Scanning Files: 39/122 with extra HTTP GET requests for non-matching files
+53|Setting s3_allow_recursive_globbing=false restores the older more efficient behavior|CORRECT|Issue #21347 comment by Mytherin confirms this workaround
+54|CSV files must be scanned sequentially row by row with no way to skip columns or row groups|CORRECT|CSV format has no metadata for random access; unlike Parquet there are no row group statistics or columnar storage
+55|Type information in CSV must be inferred rather than read from metadata|CORRECT|CSV format contains no schema metadata; DuckDB's sniffer must infer types from data
+56|Writing results to Parquet uses COPY ... TO ... (FORMAT parquet, COMPRESSION zstd) syntax|CORRECT|parquet_writer.cpp confirms FORMAT parquet and compression codec support including ZSTD
+57|Parquet files tend to produce files 3-5x smaller than gzipped CSV|UNVERIFIABLE|No documentation in the reference materials provides this specific compression ratio comparison
+58|DuckDB writes HUGEINT values as DOUBLE when producing Parquet|CORRECT|parquet_writer.cpp lines 89-92 map HUGEINT and UHUGEINT to Parquet Type::DOUBLE; confirmed by issue #21180
+59|Writing HUGEINT as DOUBLE loses precision for very large integers|CORRECT|Issue #21180 demonstrates 999999999999999999999999999999 becoming 1e+30
+60|Casting to DECIMAL(38,0) before writing preserves the full value|CORRECT|Issue #21180 comments confirm DECIMAL large enough for INT128 is stored as fixed-length byte array preserving precision

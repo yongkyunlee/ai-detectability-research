@@ -1,0 +1,61 @@
+1|DuckDB is an embedded analytical database|CORRECT|README describes DuckDB as "a high-performance analytical database system" and it runs embedded within the process
+2|DuckDB runs inside your Python process|CORRECT|Python example shows in-process usage with import duckdb and conn = duckdb.connect()
+3|DuckDB needs zero configuration|CORRECT|Example shows no configuration steps needed beyond import and connect
+4|DuckDB can query files on local disk with plain SQL|CORRECT|README shows SELECT * FROM 'myfile.csv' and SELECT * FROM 'myfile.parquet' directly in FROM clause
+5|The install command is pip install duckdb|CORRECT|Issue-21126 comments reference "pip install duckdb --upgrade" confirming pip as the install method
+6|No external services need to be configured|CORRECT|README and examples show no external service dependencies; DuckDB is embedded
+7|No daemon processes are required|CORRECT|DuckDB is described as embedded and examples show direct in-process usage with no daemon
+8|The database engine ships as a compiled extension bundled into the Python package|UNVERIFIABLE|Documentation does not describe the packaging architecture of the Python distribution
+9|duckdb.connect() creates an in-memory connection|CORRECT|Python example line 6: conn = duckdb.connect() with comment "connect to an in-memory temporary database"
+10|Passing a file path to duckdb.connect() creates a persistent database|CORRECT|Issue-14124 shows duckdb.connect(database='test.duckdb', read_only=False) for persistent storage
+11|A read_only=True flag is available on duckdb.connect()|CORRECT|Issue-14124 shows the read_only parameter on duckdb.connect()
+12|duckdb.sql() uses a default module-level connection|UNVERIFIABLE|The Python example does not show or mention duckdb.sql(); only duckdb.query_df() and other module-level functions are shown
+13|duckdb.query() uses a default module-level connection|UNVERIFIABLE|The Python example shows duckdb.query_df() but not duckdb.query() as a standalone function
+14|DuckDB exposes a default module-level connection|CORRECT|Python example shows module-level functions like duckdb.df(), duckdb.filter(), duckdb.from_csv_auto() that use a built-in default connection
+15|The execute method takes any SQL statement|CORRECT|Python example shows conn.execute() with CREATE TABLE, INSERT, and SELECT statements
+16|Parameterized queries use positional ? placeholders|CORRECT|Python example line 18: conn.execute("INSERT INTO test_table VALUES (?, ?)", [2, 'two'])
+17|executemany accepts an iterable of parameter tuples for bulk loading|CORRECT|Python example line 21: conn.executemany("INSERT INTO test_table VALUES (?, ?)", [[3, 'three'], [4, 'four']])
+18|fetchall() returns plain Python tuples|UNVERIFIABLE|The example shows fetchall() but does not explicitly state the return type is tuples
+19|fetchone() returns plain Python tuples|UNVERIFIABLE|The example mentions fetchone() but does not explicitly state the return type is tuples
+20|fetchdf() returns a pandas DataFrame on a query result|CORRECT|Python example line 24: conn.execute("SELECT * FROM test_table").fetchdf() with comment "fetch as pandas data frame"
+21|fetchnumpy() returns dictionary-keyed masked NumPy arrays|INCORRECT|Python example comment says "fetch as list of masked numpy arrays" not dictionary-keyed
+22|fetchnumpy() masking handles NULL values|CORRECT|Python example comment says "fetch as list of masked numpy arrays, cleaner when handling NULLs"
+23|You can register a pandas DataFrame under a name with conn.register()|CORRECT|Python example line 37: conn.register("test_df", test_df) to make DataFrame available as a view
+24|You can query registered DataFrames with SQL|CORRECT|Python example line 38: conn.execute("SELECT j FROM test_df WHERE i > 1").fetchdf() after registering
+25|You can combine SQL tables and DataFrames in the same query|UNVERIFIABLE|Documentation does not explicitly show joining a database table with a registered DataFrame in one query
+26|DuckDB reads CSV files straight from a SELECT statement|CORRECT|README shows SELECT * FROM 'myfile.csv' directly
+27|DuckDB reads Parquet files straight from a SELECT statement|CORRECT|README shows SELECT * FROM 'myfile.parquet' directly
+28|DuckDB reads JSON files straight from a SELECT statement|CORRECT|Community HN comment confirms "Being able to use SQL on CSV and json/jsonl files is pretty sweet" and Repere description mentions CSV/JSON/Parquet support
+29|Glob patterns let you treat a folder of files as one table|CORRECT|Community HN comment mentions "Support for glob reading, like: select * from 'tsa20*.csv' - so you can read hundreds of files as if they were one file"
+30|The built-in CSV parser infers column types automatically|CORRECT|Community HN comment states "The .csv parser is amazing. Auto assigns types well"
+31|For Parquet files DuckDB pushes predicates and column selections down into the reader|UNVERIFIABLE|Documentation does not explicitly describe DuckDB's Parquet predicate pushdown behavior for its own reader
+32|There is a programmatic interface called the Relation API|CORRECT|Python example line 41: "relation API, programmatic querying. relations are lazily evaluated chains of relational operators"
+33|A relation wraps a lazy query plan built through method calls|CORRECT|Python example describes relations as "lazily evaluated chains of relational operators"
+34|The Relation API supports the filter method|CORRECT|Python example line 85: rel.filter('i > 1')
+35|The Relation API supports the project method|CORRECT|Python example line 88: rel.project('i, j')
+36|The Relation API supports the order method|CORRECT|Python example line 94: rel.order('j')
+37|The Relation API supports the limit method|CORRECT|Python example line 97: rel.limit(2)
+38|The Relation API supports the aggregate method|CORRECT|Python example line 106: rel.aggregate("sum(i)")
+39|The Relation API supports the join method|CORRECT|Python example line 123: rel.join(rel2, 'i')
+40|The Relation API supports the union method|CORRECT|Python example line 119: rel.union(rel)
+41|The Relation API supports the distinct method|CORRECT|Python example line 115: rel.distinct()
+42|Nothing executes until you materialize with fetchdf(), fetchall(), or execute()|CORRECT|Python example shows lazy relations materialized via rel.execute() at line 145 and result fetched at line 148-149
+43|You can create relations from DataFrames|CORRECT|Python example line 44: rel = conn.from_df(test_df)
+44|You can create relations from CSV files using duckdb.from_csv_auto()|CORRECT|Python example line 60: rel = duckdb.from_csv_auto(temp_file_name)
+45|You can open multiple cursors from a single connection|CORRECT|Python example line 9: cursor = conn.cursor() and issue-21126 shows multiple cursors from one connection
+46|Multiple cursors enable concurrent read queries within one process|UNVERIFIABLE|Issue-21126 mentions the multiple threads guide says each thread should use conn.cursor() but does not explicitly confirm concurrent read support
+47|Earlier versions had stability issues with concurrent writes through separate cursors|CORRECT|Issue-21126 demonstrates segfault with two cursors doing concurrent INSERT on DuckDB v1.3.0
+48|Recent releases v1.4.0 and later fixed several concurrent write problems|CORRECT|Issue-21126 comment confirms "newer versions (e.g. v1.4.3 LTS, v1.5.0-dev) no longer reproduce the issue"
+49|Single-writer pattern is the safest default for production workloads|CORRECT|Reddit post confirms DuckDB has "concurrency limitations when multiple updates happen on the same record due to its MVCC model"
+50|DuckDB runs inside your process and shares your application's memory budget|CORRECT|DuckDB is embedded and community discussion confirms memory is shared with the application process
+51|DuckDB uses columnar compression|UNVERIFIABLE|Documentation does not explicitly describe columnar compression in the provided references
+52|DuckDB uses streaming execution|UNVERIFIABLE|Benchmark discussion mentions "vectorized execution engine" but not streaming execution specifically
+53|Heavily partitioned Parquet exports can spike memory|CORRECT|Issue-11817 documents OOM errors during partitioned COPY operations even with small data
+54|Very wide cross joins can spike memory|UNVERIFIABLE|Documentation does not specifically mention cross joins as memory culprits
+55|Iterating over partition values and exporting each subset individually is a workaround for memory issues|CORRECT|Issue-11817 comment by diwu-sf suggests "run repeated COPY commands with subquery filtering the source table down to just a specific partition"
+56|DuckDB is not great for high-concurrency transactional workloads|CORRECT|Reddit post confirms DuckDB has concurrency limitations and user is looking for alternatives for high-concurrency read/write workloads
+57|DuckDB is not suitable where dozens of users need simultaneous write access|CORRECT|Reddit post and issue-21126 confirm concurrent write limitations
+58|DuckDB is SQLite's analytical counterpart|UNVERIFIABLE|No documentation explicitly makes this comparison
+59|DuckDB is lightweight and embedded|CORRECT|README describes it as embedded; community HN comment notes "It's small! The Web Assembly version is 2mb! The CLI is 16mb"
+60|Community benchmarks on moderate datasets show sub-second response times on consumer hardware|CORRECT|Reddit benchmark shows 881ms median on 20GB Parquet with 8 threads/16GB RAM configuration
+61|DuckDB often beats cloud warehouses for the same workload|CORRECT|Reddit benchmark shows DuckDB 3-10x faster than BigQuery and Athena on identical queries

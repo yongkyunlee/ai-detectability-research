@@ -1,0 +1,45 @@
+1|DuckDB's read_csv function does automatic dialect detection|CORRECT|Issue #21000 shows delimiter, quote, escape, header, date_format all marked as "Auto-Detected" in error output
+2|The CSV sniffer automatically detects delimiter, quoting character, header presence, and date format|CORRECT|Issue #21000 error output shows all four parameters as "(Auto-Detected)"
+3|The syntax FROM read_csv('data.csv') works to query a CSV file in DuckDB|CORRECT|Issue #21000 reproduction uses FROM read_csv('test.csv') and README shows SELECT * FROM 'myfile.csv'
+4|By default the sniffer inspects the first 20,480 rows (sample_size=20480)|CORRECT|Source code csv_reader_options.hpp shows sample_size_chunks = 20480 / sniff_size; issue #21000 error output shows sample_size = 20480
+5|A CSV quoting issue was reported against DuckDB v1.4.4|CORRECT|Issue #21000 states DuckDB Version v1.4.4 (Andium) 6ddac802ff
+6|The problematic CSV had a field containing "Beth, Bens. Co." deep in the file|CORRECT|Issue #21000 shows the original line as Bob,"Beth, Bens. Co." on line 20502
+7|The sniffer decided no quoting was in use for the problematic file|CORRECT|Issue #21000 error output shows quote = (empty) (Auto-Detected)
+8|The error message was "Expected Number of Columns: 2 Found: 3"|CORRECT|Issue #21000 error output shows exactly "Expected Number of Columns: 2 Found: 3"
+9|Pandas, Polars, data.table, and readr all handled the same file correctly with default settings|CORRECT|Issue #21000 states "I also tested this with csv readers of pandas, polars, data.table, readr, and base R...They all read it correctly by default"
+10|Passing quote = '"' explicitly is a workaround for the quoting detection issue|CORRECT|Issue #21000 states "This can be fixed with either explicitly passing quote = '\"' as an argument to read_csv()"
+11|Setting sample_size = -1 forces a full-file scan for dialect detection|CORRECT|Issue #21000 comment by szarnyasg recommends "sample_size = -1, so DuckDB is forced to scan the whole file when trying to detect the CSV's dialect"
+12|union_by_name=true merges multiple CSVs with different schemas by column name rather than position|CORRECT|multi_file_options.hpp shows union_by_name as a boolean option; union_by_name.hpp header exists for this functionality
+13|ignore_errors=true skips malformed rows instead of failing|CORRECT|Issue #21000 error output suggests "Enable ignore errors (ignore_errors=true) to skip this row"
+14|all_varchar forces every column to VARCHAR|CORRECT|csv_reader_options.hpp shows "bool all_varchar = false" with comment "Consider all columns to be of type varchar"
+15|strict_mode=false relaxes standard compliance checking|CORRECT|Issue #21000 error output suggests "Disable the parser's strict mode (strict_mode=false) to allow reading rows that do not comply with the CSV standard"
+16|As of v1.4.4, remote CSVs on S3 are not cached in DuckDB's external file cache|CORRECT|Issue #21088 reports that remote CSVs are never cached in the external file cache, confirmed on DuckDB v1.4.4
+17|Parquet and JSON readers cache remote files properly|CORRECT|Issue #21088 comment mentions "blob reader and json reader" already have CachingMode::CACHE_REMOTE_ONLY; the issue implicitly confirms Parquet files are cached (only CSV is missing caching)
+18|The CSV reader was missing the CachingMode::CACHE_REMOTE_ONLY flag|CORRECT|Issue #21088 comment shows the fix involves adding CachingMode::CACHE_REMOTE_ONLY to csv_file_handle.cpp
+19|Every query re-downloads the entire CSV when remote caching is missing|CORRECT|Issue #21088 states "DuckDB will always have to re-download the entire CSV for every query"
+20|A fix was submitted for the CSV caching issue|CORRECT|Issue #21088 is in closed state and comments discuss the implementation fix
+21|DuckDB applies column pruning for Parquet files, reading only the columns a query references|CORRECT|Issue #20958 documents column pruning behavior for Parquet; benchmark post describes column pruning for Parquet queries
+22|DuckDB applies predicate pushdown for Parquet, applying WHERE filters at the storage layer|CORRECT|Issue #19277 discusses filter pushdown behavior on Parquet expressions; issue #21348 mentions Parquet reader with filters
+23|DuckDB uses row group statistics with min/max metadata to skip data chunks in Parquet|CORRECT|Issue #21348 describes DuckDB using in-file column statistics and row-group statistics for partition pruning
+24|A community benchmark tested 20GB of ZSTD-compressed Parquet data|CORRECT|Reddit post reddit-1qon39x describes "~20GB of financial time-series data in Parquet (ZSTD compressed)"
+25|DuckDB on local SSD with 8 threads and 16GB RAM hit an 881ms warm median across 57 queries|CORRECT|Reddit benchmark shows DuckDB Local (M) = 881 ms warm median with M = 8 threads, 16GB RAM; 57 queries total
+26|With 32 threads and 64GB RAM the warm median dropped to 284ms|CORRECT|Reddit benchmark shows DuckDB Local (XL) = 284 ms with XL = 32 threads, 64GB RAM
+27|BigQuery needed 2,775ms for the same workload|CORRECT|Reddit benchmark table shows BigQuery warm median = 2,775 ms
+28|Athena needed 4,211ms for the same workload|CORRECT|Reddit benchmark table shows Athena warm median = 4,211 ms
+29|DuckDB was 3-10x faster than cloud platforms on the benchmark|CORRECT|Reddit benchmark states "DuckDB on local storage is 3-10x faster than cloud platforms"
+30|The benchmark hardware was an AMD EPYC with a SATA SSD|CORRECT|Reddit benchmark lists CPU: AMD EPYC 9224 24-Core and Disk: Samsung 870 EVO 1TB (SATA SSD)
+31|read_parquet supports hive-partitioned data through hive_partitioning and hive_types parameters|CORRECT|multi_file_options.hpp shows hive_partitioning boolean and hive_types_schema map; issue #21385 demonstrates their usage
+32|The hive_types parameter can cast partition columns to specific types like USMALLINT|CORRECT|Issue #21385 shows hive_types = {'airline_id': UUID, 'number_mod_10': USMALLINT} syntax working
+33|v1.5.0 introduced a regression where explicit partition naming in glob patterns caused dramatic slowdowns|CORRECT|Issue #21385 confirms v1.5.0 regression with explicit partition naming taking 1m1s vs 420ms in v1.4.4
+34|A CREATE VIEW that took 420ms in v1.4.4 ballooned to over 61 seconds in v1.5.0|CORRECT|Issue #21385 shows exact timings: 420ms in v1.4.4 vs 1m1.44s in v1.5.0
+35|The workaround is SET s3_allow_recursive_globbing = false|CORRECT|Issues #21347 and #21385 both confirm this workaround; Mytherin (DuckDB dev) recommends it
+36|Switching to ** glob patterns instead of explicit partition_name=* paths also works around the regression|CORRECT|Issue #21385 shows using **/*.parquet restores normal performance (434ms vs 1m1s)
+37|A fix shipped in the httpfs extension for the hive partitioning regression|CORRECT|Issue #21385 shows a development build of httpfs extension (PR #284, #286) was released for testing with the fix
+38|Cold starts showed 14-20 seconds of overhead on first query when reading from Cloudflare R2|CORRECT|Reddit benchmark shows DuckDB + R2 cold starts of 14.3 sec (XL) and 19.5 sec (M)
+39|DuckDB needs to fetch Parquet metadata including file footers, schema, and row group info over the network before planning queries|CORRECT|Reddit benchmark states "First query fetches Parquet metadata (file footers, schema, row group info) over the network"
+40|Subsequent queries drop back to approximately 1 second since metadata gets cached|CORRECT|Reddit benchmark shows DuckDB + R2 warm median of 1,099 ms (M) and 496 ms (XL), approximately 1 second
+41|Both read_csv and read_parquet support glob patterns|CORRECT|README shows CSV querying; issues show both CSV and Parquet with glob patterns; multi_file infrastructure supports both
+42|Both CSV and Parquet formats support union_by_name for heterogeneous schemas|CORRECT|union_by_name is defined in multi_file_options.hpp which is shared by both CSV and Parquet readers
+43|Both CSV and Parquet work against remote storage|CORRECT|Issue #21088 demonstrates remote CSV on S3; issues #21347 and #21385 demonstrate remote Parquet on S3
+44|A pandas DataFrame materializes the entire file in RAM|UNVERIFIABLE|Reddit post reddit-1rm828b discusses pandas memory issues with large files but does not explicitly confirm full materialization behavior
+45|DuckDB can query S3 directly without loading everything into memory|CORRECT|Reddit post reddit-1rm828b discusses moving from pandas to DuckDB for S3 querying to avoid memory issues; DuckDB architecture supports streaming

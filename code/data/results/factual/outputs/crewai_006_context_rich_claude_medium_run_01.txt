@@ -1,0 +1,63 @@
+1|CrewAI's unified memory system replaces what was once a fragmented collection of short-term, long-term, entity, and external memory stores|CORRECT|Documentation states the single Memory class "replaces separate short-term, long-term, entity, and external memory types with one intelligent API"
+2|At the core of CrewAI's current design sits a single Memory class that consolidates all memory operations behind one API|CORRECT|Source code confirms a unified Memory class in unified_memory.py and docs describe it as a single API
+3|The system relies on an LLM to analyze content at write time and determine where it belongs|CORRECT|Documentation confirms LLM is used on save to infer scope, categories, importance, and metadata via analyze_for_save()
+4|The method to store memories is called remember()|CORRECT|Source code confirms remember() method on the Memory class
+5|When remember() is called without specifying organizational details, the LLM decides on scope placement, category assignment, and an importance score between zero and one|CORRECT|Documentation confirms LLM infers scope placement, categories, and importance score during save analysis
+6|Every save without explicit metadata triggers an inference call|CORRECT|Documentation confirms LLM analysis is triggered when fields are not explicitly provided
+7|The framework uses lazy initialization so the LLM is only instantiated when actually needed|CORRECT|Source code confirms lazy LLM initialization via _llm property; docs state "The LLM is initialized lazily -- it's only created when first needed"
+8|If the analysis call fails, the memory still gets stored under a default root scope with a neutral importance score|CORRECT|Source code shows fallback to default scope "/" with importance 0.5 on analysis failure in analyze.py
+9|Nothing is dropped when analysis fails|CORRECT|Documentation states "No exception is raised for these analysis failures; only storage or embedder failures will raise"
+10|The system supports fully local operation using models served through Ollama|CORRECT|Documentation shows both LLM and embedder can use Ollama for fully local/private operation
+11|Memories are organized into a tree of scopes resembling a filesystem|CORRECT|Documentation describes hierarchical scope tree with paths like /project/alpha
+12|A scope like /project/alpha/architecture provides a natural boundary for retrieval|CORRECT|Documentation uses similar scope path examples like /project/alpha
+13|When an agent recalls within a scope, the search is restricted to that subtree|CORRECT|Documentation confirms MemoryScope restricts all operations to a subtree
+14|Individual agents can receive a MemoryScope that confines their reads and writes to a private subtree|CORRECT|Source code confirms MemoryScope class wraps a Memory with a root_path, providing remember(), recall(), and forget() methods
+15|A MemorySlice provides a read-only view across multiple disjoint scopes|CORRECT|Source code confirms MemorySlice class with read_only=True default that searches across multiple scopes
+16|Sharing memory across separate crew instances was a longstanding request from the CrewAI community|CORRECT|Issue #714 from 2024 requested this feature, confirming it was a community request
+17|Earlier versions of CrewAI had no clean mechanism for sharing memory across crew instances|CORRECT|Issue #714 confirms no built-in mechanism existed; a third-party SDK was suggested as workaround
+18|The current unified memory is backed by LanceDB on disk|CORRECT|Source code uses LanceDBStorage and lancedb>=0.29.2 is in dependencies; docs confirm LanceDB as default backend
+19|Multiple crews can be pointed at the same storage directory|CORRECT|Documentation confirms the same Memory instance or storage path can be shared by multiple crews
+20|The scoping system provides isolation boundaries that prevent unintended interference between crews|CORRECT|Documentation confirms scopes restrict operations to subtrees, providing isolation
+21|Each recalled result receives a composite score blending three weighted signals|CORRECT|Source code function compute_composite_score() confirms three-signal composite scoring
+22|The first signal is semantic similarity from the embedding search|CORRECT|Source code confirms semantic similarity as one of the three scoring components
+23|The second signal is a recency factor that decays exponentially with a configurable half-life|CORRECT|Source code shows decay = 0.5^(age_days / half_life_days)
+24|The third signal is the importance score assigned at write time|CORRECT|Source code confirms importance score as the third scoring component
+25|The default weights are semantic relevance at 0.5, recency at 0.3, and importance at 0.2|CORRECT|Source code and docs confirm default weights: semantic_weight=0.5, recency_weight=0.3, importance_weight=0.2
+26|The scoring weights are tunable per use case|CORRECT|Documentation shows weights can be configured per Memory instance
+27|Shallow recall performs a direct vector search with composite scoring|CORRECT|Documentation confirms shallow recall is direct vector search with composite scoring, no LLM calls
+28|Shallow recall returns in roughly 200 milliseconds|CORRECT|Documentation states shallow recall is "Fast (~200ms), no LLM calls"
+29|Deep recall is the default recall mode|CORRECT|Source code confirms depth="deep" is the default
+30|In deep recall, the LLM distills the query into targeted sub-queries|CORRECT|RecallFlow source confirms analyze_query_step generates up to 3 recall sub-queries
+31|Deep recall selects candidate scopes|CORRECT|RecallFlow source confirms filter_and_chunk step selects candidate scopes (max 20)
+32|Deep recall searches in parallel across selected scopes|CORRECT|RecallFlow uses ThreadPoolExecutor for parallel search across scopes
+33|Deep recall routes results through a confidence threshold|CORRECT|RecallFlow has decide_depth router that routes based on confidence thresholds
+34|If confidence falls below a configurable floor, the system spends an exploration budget on additional LLM-driven rounds of context extraction|CORRECT|Source confirms exploration_budget parameter and recursive_exploration step when confidence is low
+35|Short queries skip the LLM distillation step entirely|CORRECT|Source code confirms short queries (below query_analysis_threshold) skip LLM analysis
+36|When a crew executes tasks sequentially, prior task outputs are concatenated and injected as context for downstream tasks|CORRECT|Issue #4661 confirms _execute_tasks() passes all prior task raw outputs via aggregate_raw_outputs_from_task_outputs()
+37|In a five-task crew, the final task can receive thousands of tokens of unfiltered prior output|CORRECT|Issue #4661 documents ~8,000+ tokens of unfiltered prior output in multi-task crews
+38|Community members have reported context window overflows and degraded output quality from concatenated context|CORRECT|Issue #4661 reports these problems from community members
+39|A feature request for opt-in context summarization has been proposed to compress inter-task context through a small LLM call after each task completes|CORRECT|Issue #4661 proposes context_strategy="summarized" with per-task LLM compression
+40|When the same agent is reused across multiple tasks, the executor accumulates messages from all prior executions|CORRECT|Issues #4319 and #4389 confirm message accumulation bug (4->8->12 messages)
+41|System prompts duplicate and user messages stack up due to executor message accumulation|CORRECT|Issue #4319 describes duplicate system messages and stacking user messages
+42|The accumulated context leads to empty or invalid responses from the LLM|CORRECT|Issue #4319 reports "Invalid response from LLM call - None or empty" as a result
+43|The executor message accumulation bug has been documented repeatedly in the issue tracker|CORRECT|Multiple issues (#4319, #4389) and multiple PRs (5 PRs) document this bug
+44|The experimental agent executor handles message accumulation correctly by resetting state at the start of each invocation|CORRECT|Issue #4389 confirms the experimental AgentExecutor correctly resets state
+45|The production executor required explicit patching to fix message accumulation|CORRECT|Issues #4319 and #4389 confirm the production executor needed explicit fixes (self.messages.clear())
+46|Tasks with asynchronous execution spawn worker threads that do not inherit context variables from the calling thread|CORRECT|Issue #4822 confirms threading.Thread() is used without copying contextvars.Context
+47|This silently breaks observability tools like OpenTelemetry and tracing SDKs that rely on context propagation|CORRECT|Issue #4822 specifically mentions OpenTelemetry trace context and Langfuse session context being lost
+48|The unified memory system handles threading more carefully using contextvars.copy_context() in its background save pool|CORRECT|Source code confirms contextvars.copy_context() usage in encoding_flow.py, recall_flow.py, and lancedb_storage.py
+49|The memory system serializes writes through a single-threaded executor to prevent race conditions against LanceDB|CORRECT|Source code confirms ThreadPoolExecutor(max_workers=1) for writes and store_lock for serialization
+50|Within a single batch, items are compared against each other using cosine similarity and near-exact duplicates are dropped before reaching storage|CORRECT|Encoding flow step 2 performs intra-batch dedup using cosine similarity matrix with batch_dedup_threshold of 0.98
+51|Across batches, newly written content is compared against existing records|CORRECT|Encoding flow step 3 performs parallel similarity search against existing storage records
+52|When cross-batch similarity exceeds a configurable threshold, the LLM decides whether to keep, update, merge, or delete the existing record|INCORRECT|Source code lists consolidation actions as keep, update, delete, and insert_new — not "merge"; the blog substitutes "merge" for "insert_new"
+53|The consolidation logic runs as part of a five-step encoding flow|CORRECT|Encoding flow docstring confirms exactly 5 steps
+54|The first encoding step is batch embedding|CORRECT|Step 1 is batch embed — one embedder call for all items
+55|The second encoding step is intra-batch deduplication|CORRECT|Step 2 is intra-batch dedup using cosine similarity
+56|The third encoding step is parallel similarity search against storage|CORRECT|Step 3 is parallel find similar using ThreadPoolExecutor
+57|The fourth encoding step is parallel LLM analysis for field resolution and consolidation decisions|CORRECT|Step 4 runs concurrent LLM calls for field resolution and consolidation analysis
+58|The fifth encoding step is a bulk write|CORRECT|Step 5 is execute plans with batch re-embed and bulk insert
+59|Up to eight concurrent storage searches can run simultaneously in the encoding pipeline|CORRECT|Source code shows ThreadPoolExecutor(max_workers=min(len(active), 8)) for storage searches
+60|Up to ten concurrent LLM calls can run simultaneously in the encoding pipeline|CORRECT|Source code shows ThreadPoolExecutor(max_workers=10) for LLM analysis calls
+61|Third-party projects like crewai-soul offer markdown-based alternatives for memory storage|CORRECT|Reddit post confirms crewai-soul stores memories in markdown files (SOUL.md, MEMORY.md)
+62|crewai-soul provides human-readable, git-versionable memory stores|CORRECT|Reddit post confirms crewai-soul uses markdown files that are human-readable and git-versionable with no database required
+63|External preference learning services aim to capture structured behavioral preferences that raw memory logs miss|CORRECT|HN post about pref0 describes it as learning user preferences from corrections, distinct from raw memory storage

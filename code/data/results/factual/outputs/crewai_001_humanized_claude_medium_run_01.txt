@@ -1,0 +1,33 @@
+1|CrewAI requires Python 3.10 or newer up through 3.13|CORRECT|pyproject.toml specifies requires-python = ">=3.10,<3.14"
+2|CrewAI uses UV for dependency management|CORRECT|README states "CrewAI uses UV for dependency management and package handling"
+3|UV is described as a fast Rust-based Python package manager from Astral|UNVERIFIABLE|Documentation links to docs.astral.sh/uv/ but does not describe UV as Rust-based or from Astral
+4|By default, CrewAI talks to OpenAI|CORRECT|README states "By default your agents will use the OpenAI API when querying the model"
+5|CrewAI supports Anthropic as an LLM provider|CORRECT|LLMs documentation shows native SDK integration for Anthropic
+6|CrewAI supports Google Gemini as an LLM provider|CORRECT|LLMs documentation shows native SDK integration for Google Gemini API
+7|CrewAI supports Groq as an LLM provider|CORRECT|CLI documentation lists Groq as an available LLM provider
+8|CrewAI supports local models through Ollama|CORRECT|LLMs documentation shows Ollama configuration example with model "ollama/llama3:70b"
+9|Ollama integration works via the LiteLLM integration layer|CORRECT|LLMs doc states "All other providers are powered by LiteLLM" and Ollama is in that category, not among native integrations
+10|The core installation command is "uv pip install crewai"|CORRECT|README shows this exact command for installation
+11|The tools bundle install command is "uv pip install 'crewai[tools]'"|CORRECT|README shows this exact command for installing optional tools
+12|The tools bundle includes web search, file reading, and directory traversal capabilities|CORRECT|Tools documentation lists SerperDevTool (web search), FileReadTool (file reading), and DirectoryReadTool (directory reading)
+13|tiktoken requires a Rust compiler to build from source|CORRECT|README troubleshooting states "Ensure Rust compiler is installed" for tiktoken build issues
+14|Running "uv pip install tiktoken --prefer-binary" pulls a prebuilt wheel|CORRECT|README troubleshooting recommends this exact command to use a pre-built wheel
+15|CrewAI ships with a CLI that generates a project skeleton|CORRECT|CLI documentation shows the "crewai create" command for scaffolding projects
+16|The CLI command to scaffold a project is "crewai create crew latest-ai-development"|CORRECT|README shows this exact command as an example
+17|The scaffolded project structure contains pyproject.toml, .env, src/ with main.py, crew.py, tools/custom_tool.py, config/agents.yaml, and config/tasks.yaml|INCORRECT|README shows the structure also includes .gitignore, README.md, __init__.py, and tools/__init__.py which the blog omits
+18|Agents in CrewAI have three core attributes: a role, a goal, and a backstory|CORRECT|Agents documentation lists role, goal, and backstory as required parameters
+19|The role defines what the agent does|CORRECT|Agents documentation states role "Defines the agent's function and expertise within the crew"
+20|The goal drives the agent's decision-making|CORRECT|Agents documentation states goal is "The individual objective that guides the agent's decision-making"
+21|The backstory provides context that shapes how the LLM interprets instructions|CORRECT|Agents documentation states backstory "Provides context and personality to the agent, enriching interactions"
+22|The {topic} placeholders in YAML get filled in at runtime when kicking off the crew|CORRECT|Agents documentation states "Variables in your YAML files (like {topic}) will be replaced with values from your inputs when running the crew"
+23|The agent field in tasks.yaml links each task to the responsible agent|CORRECT|Tasks documentation shows agent as "The agent responsible for executing the task"
+24|The output_file on a task tells CrewAI to write the final result to disk automatically|CORRECT|Tasks documentation describes output_file as "File path for storing the task output"
+25|In a sequential process, output from one task feeds directly into the next task as context without explicit wiring|CORRECT|Tasks documentation states "the output of one task is automatically relayed into the next one"
+26|The crew class in crew.py is decorated with @CrewBase|CORRECT|README and docs show @CrewBase decorator on the crew class
+27|The @agent and @task decorators automatically collect instances into self.agents and self.tasks|CORRECT|Crews documentation confirms "Automatically collected by the @agent decorator" and "Automatically collected by the @task decorator"
+28|Method names in Python code must match the keys in YAML files|CORRECT|Agents documentation states "The names you use in your YAML files should match the method names in your Python code"
+29|The command to run the crew is "crewai run"|CORRECT|CLI documentation shows "crewai run" as the command to run crews
+30|Process.sequential executes tasks in the order they are defined|CORRECT|Processes documentation states "Sequential: Executes tasks sequentially, ensuring tasks are completed in an orderly progression"
+31|Process.hierarchical introduces a manager agent that delegates tasks to crew members based on their capabilities|CORRECT|Processes documentation describes hierarchical as organizing tasks where "the manager allocates tasks to agents based on their capabilities"
+32|The hierarchical approach requires specifying a manager_llm|INCORRECT|Processes documentation states "A manager language model (manager_llm) or a custom manager agent (manager_agent) must be specified" so manager_agent is an alternative
+33|The context parameter on tasks can explicitly control which outputs feed into which steps|CORRECT|Tasks documentation states context allows specifying "Other tasks whose outputs will be used as context for this task"

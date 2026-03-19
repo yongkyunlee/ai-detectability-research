@@ -1,0 +1,55 @@
+1|A community benchmark tested DuckDB on a 20GB Parquet dataset|CORRECT|Reddit benchmark post confirms ~20GB of financial time-series Parquet data
+2|The benchmark clocked DuckDB at 284ms median query time|CORRECT|Reddit benchmark shows DuckDB Local XL warm median of 284ms
+3|The benchmark used 32 threads and 64GB RAM|CORRECT|Reddit benchmark XL config is 32 threads, 64GB RAM
+4|DuckDB was roughly 10x faster than BigQuery on the same queries|CORRECT|BigQuery warm median was 2,775ms; 2775/284 ≈ 9.8x, roughly 10x
+5|DuckDB was roughly 15x faster than Athena on the same queries|CORRECT|Athena warm median was 4,211ms; 4211/284 ≈ 14.8x, roughly 15x
+6|DuckDB's query planner pushes filter predicates down into table scans|CORRECT|Issues #19277, #21312, and #21347 all discuss filter pushdown behavior in DuckDB
+7|On Parquet files, DuckDB can skip entire row groups using min/max statistics|UNVERIFIABLE|The referenced documentation discusses filter pushdown but does not explicitly mention row group skipping via min/max statistics
+8|With hive partitioning, DuckDB can skip entire files based on directory paths|CORRECT|Issue #21347 shows Scanning Files: 39/39 with hive partition filters in v1.4.4
+9|DuckDB won't push filters containing expressions that can throw runtime errors|CORRECT|Issue #19277: Mytherin confirms DuckDB cannot push functions that can return errors into scans
+10|The function sqrt can error on negative inputs|CORRECT|Issue #19277: Mytherin states sqrt(-1) throws "Out of Range Error"
+11|On a table with 780 columns and 800,000 rows, filtering with sqrt took 8.5 seconds|CORRECT|Issue #19277 reports 800,000 rows x 780 columns taking 8.5 seconds with sqrt filter
+12|An error-safe equivalent would achieve approximately 500ms on the same data|UNVERIFIABLE|The 500ms figure in issue #19277 is from Polars, not DuckDB with an error-safe filter; DuckDB workarounds gave 0.4-0.5s but via different approaches
+13|The filter pushdown limitation was reported and confirmed as issue #19277|CORRECT|Issue #19277 exists, state: closed, labeled reproduced
+14|The limitation was confirmed as expected behavior|CORRECT|Mytherin explained it is by design since error-throwing functions cannot be pushed into scans
+15|A fix landed in PR #20744|CORRECT|Issue #19277 mentions PR #20744 resolved the issue (comment by DinosL)
+16|The core rule remains: if your filter expression can throw, it won't push down|CORRECT|Mytherin's explanation in #19277 establishes this as a fundamental design constraint
+17|Subquery-derived filters may not be recognized as pushable by the optimizer|CORRECT|Issue #21312 demonstrates filter pushdown fails with scalar macro in WHERE clause
+18|A user reported a query scanning 309 million rows in 409 seconds|CORRECT|Issue #21312 reports 309,170,896 rows scanned in 409.23 seconds
+19|After materializing the filter value into a variable, the query dropped to 12 files and 4 seconds|CORRECT|Issue #21312: with getvariable workaround, Total Files Read: 12, time 4.33s
+20|The workaround used SET VARIABLE hives = get_hives() and getvariable('hives')|CORRECT|Issue #21312 shows exactly this workaround syntax
+21|This filter pushdown issue was reported as issue #21312|CORRECT|Issue #21312 exists, state: open, labeled under review
+22|DuckDB 1.4.0 changed CTEs from inlining to materialization by default|CORRECT|Issue #20958 confirms regression between 1.3.2 and 1.4.0 due to PR #17459 changing CTE default
+23|The CTE materialization change was made in PR #17459|CORRECT|Issue #20958 references PR #17459 "Make CTE Materialization the Default Instead of Inlining"
+24|Materialized CTEs prevent redundant computation when a CTE is referenced multiple times|CORRECT|This is the stated intent of PR #17459 as described in issue #20958
+25|Materialization creates a barrier the optimizer can't see through for column pruning|CORRECT|Issue #20958 demonstrates column pruning is blocked by CTE materialization
+26|The example involved a wide table with 50 columns|CORRECT|Issue #20958 uses a test setup with 50 columns
+27|With inlining, column pruning scans just the two needed columns|CORRECT|Issue #20958: DuckDB 1.3.2 (inlining) completed in 0.3 seconds showing effective pruning
+28|With materialization, the CTE reads all 50 columns into a temp result|CORRECT|Issue #20958 describes this exact behavior as the cause of the 100x slowdown
+29|On 50 million rows, the difference was between 0.3 seconds and 31 seconds|CORRECT|Issue #20958: 31.64 seconds on v1.4.4 vs 0.3 seconds on v1.3.2 with 50,000,000 rows
+30|This was a 100x regression|CORRECT|Issue #20958 title and content confirm 100x slowdown
+31|The regression was reported against real Splink workloads at the UK Ministry of Justice|CORRECT|Issue #20958 author Robin Linacre affiliated with UK Ministry of Justice, references Splink issue
+32|This was reported as issue #20958|CORRECT|Issue #20958 exists, state: closed, labeled reproduced
+33|Issue #20958 was closed with a fix|CORRECT|Issue #20958 state is closed
+34|The top_n_window_elimination optimizer is new in v1.5.0|CORRECT|Issue #21348 shows this optimization causes new behavior in v1.5.0 not present in v1.4.4
+35|The optimizer rewrites ROW_NUMBER() OVER (...) = 1 patterns into an arg_max-based plan with a semi-join|CORRECT|Issue #21348 confirms rewrite to arg_max + HASH_GROUP_BY -> SEMI JOIN
+36|The rewrite causes two separate scans of the remote files|CORRECT|Issue #21348 confirms the double scan causes the massive increase in HTTP requests
+37|The issue involved 39 files with 90 columns each|CORRECT|Issue #21348: ~40 Parquet files on S3, ~90 columns each, Scanning Files: 39/39
+38|The rewrite turned 81 HTTP GET requests into 4,214|CORRECT|Issue #21348: v1.4.4 had 81 GETs, v1.5.0 had 4,214 GETs
+39|Wall clock time nearly tripled from 11.6s to 31.5s|CORRECT|Issue #21348: v1.4.4: 11.6s, v1.5.0: 31.5s (2.7x increase, nearly tripled)
+40|This was reported as issue #21348|CORRECT|Issue #21348 exists, state: open, labeled reproduced
+41|SET disabled_optimizers='top_n_window_elimination' restores the old single-scan window plan|CORRECT|Issue #21348: hawkfish recommended this workaround to restore the original plan
+42|Wrapping the scan in a MATERIALIZED CTE can block the rewrite|CORRECT|Issue #21348 shows MATERIALIZED CTE as an alternative workaround
+43|A related issue surfaced with QUALIFY rn <= 50 on grouped data where actual max rank was 3|CORRECT|Issue #21431: QUALIFY rn <= 50 with MAX(rn) of only 3
+44|This was reported as issue #21431|CORRECT|Issue #21431 exists, state: open, labeled reproduced
+45|The arg_min_max_n aggregate pre-allocates all N slots up front|CORRECT|Issue #21431: Mytherin confirms arg_min_max_n pre-allocates all 50 slots via BinaryAggregateHeap
+46|When N is 50 but most groups have 3 entries, wasted allocations blow past memory limits|CORRECT|Issue #21431 reproducer shows OOM with 1GB memory limit due to this pre-allocation waste
+47|The DuckDB team acknowledged the fix should change how the binary aggregate heap allocates|CORRECT|Mytherin states he prefers having BinaryAggregateHeap allocate differently to reduce memory usage
+48|DuckDB v1.5.0 introduced hierarchical S3 glob expansion|CORRECT|Issue #21347 discusses new hierarchical S3 glob expansion in v1.5.0
+49|The old behavior discovered only the files matching hive partition filters|CORRECT|Issue #21347: v1.4.4 shows Scanning Files: 39/39, only matching files discovered
+50|The new behavior discovers all files first, then prunes|CORRECT|Issue #21347: v1.5.0 shows Scanning Files: 39/122, all 122 discovered then pruned to 39
+51|On a bucket with 122 partition files, a query needing 39 now issues HTTP requests for all 122 Parquet footers|CORRECT|Issue #21347 confirms 122 total files with 39 needed, all discovered before pruning
+52|This was reported as issue #21347|CORRECT|Issue #21347 exists, state: open, labeled under review
+53|SET s3_allow_recursive_globbing = false is the recommended workaround from DuckDB maintainers|CORRECT|Issue #21347: Mytherin (DuckDB core developer) recommended this workaround
+54|A fix targeting v1.5.1 is in progress|UNVERIFIABLE|The issues do not explicitly mention v1.5.1 as a fix target
+55|DuckDB has a vectorized engine|UNVERIFIABLE|The provided reference documentation does not explicitly describe DuckDB as having a vectorized engine

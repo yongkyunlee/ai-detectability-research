@@ -1,0 +1,32 @@
+1|An Agent wraps a language model with a defined role, goal, and backstory|CORRECT|Agent class in core.py has role, goal, and backstory as core parameters inherited from BaseAgent
+2|A Task has a description, expected output, and an optional agent assignment|CORRECT|Task class in task.py has description (str), expected_output (str), and agent (BaseAgent | None) parameters
+3|A Crew groups agents and tasks together under a process that governs execution order|CORRECT|Crew class has agents (list), tasks (list), and process (Process enum) parameters
+4|When an agent has allow_delegation=True, CrewAI injects two tools into the agent's toolkit automatically|CORRECT|crew.py _prepare_tools checks allow_delegation and calls _add_delegation_tools which injects DelegateWorkTool and AskQuestionTool via AgentTools
+5|One delegation tool lets the agent delegate work to a coworker|CORRECT|DelegateWorkTool in agent_tools/delegate_work_tool.py handles task delegation to other agents
+6|The other delegation tool lets the agent ask a question of a coworker|CORRECT|AskQuestionTool in agent_tools/ask_question_tool.py handles asking questions of other agents
+7|In sequential mode, tasks run one after another in the order they are defined|CORRECT|Process.sequential is the default process type where tasks execute sequentially
+8|The output of each task feeds into the next as context in sequential mode|CORRECT|Task has context parameter (list[Task]) that allows outputs of previous tasks to be used as context
+9|The context parameter on tasks lets you make dependencies explicit|CORRECT|Task.context is defined as list[Task] | None allowing explicit dependency wiring between tasks
+10|You can wire task B to wait for tasks A and C before executing using the context parameter|CORRECT|Task.context accepts a list of tasks, so multiple tasks can be specified as dependencies
+11|Tasks can run asynchronously in CrewAI|CORRECT|Task has async_execution parameter (bool, default False) that enables asynchronous execution
+12|Hierarchical process mode introduces a manager agent that allocates tasks|CORRECT|Process.hierarchical uses a manager agent to orchestrate task execution as shown in crew.py _create_manager_agent
+13|You configure hierarchical mode by setting process=Process.hierarchical on the crew|CORRECT|Crew.process accepts Process enum with Process.hierarchical as a valid value
+14|You can provide a manager_llm so CrewAI creates a manager automatically|CORRECT|Crew has manager_llm parameter; when provided without manager_agent, _create_manager_agent creates one automatically with role, goal, backstory from i18n
+15|You can provide a manager_agent that you define yourself|CORRECT|Crew has manager_agent parameter (BaseAgent | None) as an alternative to manager_llm
+16|The manager gets delegation tools targeting all worker agents|CORRECT|In crew.py _create_manager_agent, manager is created with tools=AgentTools(agents=self.agents).tools() and allow_delegation=True
+17|The manager agent sometimes fails to delegate at all, doing all the work itself and ignoring workers|CORRECT|Issue #4783 documents this exact bug: manager agents cannot delegate to worker agents and perform all work themselves
+18|This delegation failure happens when delegation tools are not properly injected during dynamic manager creation|CORRECT|Issue #4783 identifies the root cause as delegation tools not being properly configured during dynamic manager creation
+19|Setting allow_delegation=False on worker agents prevents delegation loops|CORRECT|allow_delegation defaults to False in BaseAgent; setting it False prevents agents from receiving DelegateWorkTool and AskQuestionTool, avoiding circular delegation
+20|allow_delegation defaults to False for agents|CORRECT|BaseAgent defines allow_delegation: bool = Field(default=False)
+21|CrewAI's Flows system provides a higher-level orchestration layer|CORRECT|flow.py module provides Flow class with decorators for building event-driven workflows
+22|Flows use @start and @listen decorators to chain operations|CORRECT|flow.py defines start() and listen() decorator functions that create StartMethod and ListenMethod wrappers
+23|Flows manage shared state|CORRECT|FlowState class in flow.py is a BaseModel that serves as shared state container with unique id
+24|Flows implement routing logic|CORRECT|flow.py defines @router decorator that creates RouterMethod for conditional flow routing based on return values
+25|Flows integrate with CrewAI's unified memory system|CORRECT|Memory class supports scope/slice views; Flows can use Memory instances and MemoryScope/MemorySlice for cross-crew memory
+26|CrewAI's memory system organizes knowledge into hierarchical scopes|CORRECT|Memory.remember() and recall() accept scope parameter as hierarchical path (e.g. "/company/team/user"); Memory.scope() returns MemoryScope, Memory.list_scopes() lists children
+27|You can give agents private workspaces while maintaining shared knowledge|CORRECT|MemoryRecord has private field; when True, only visible to recall from same source. MemoryScope provides namespace isolation
+28|When memory is enabled on a crew, facts are automatically extracted from task outputs and stored|CORRECT|base_agent_executor_mixin.py _save_to_memory extracts memories from task output using memory.extract_memories() and saves via memory.remember_many()
+29|Before each subsequent task, the agent recalls relevant context from memory and injects it into its prompt|UNVERIFIABLE|Memory tools (recall/remember) are added to agents via _add_memory_tools in crew.py, but automatic pre-task recall injection is not explicitly shown in the examined code
+30|The unified memory system supports scoped views and memory slices|CORRECT|Memory class has scope() method returning MemoryScope and slice() method returning MemorySlice for multi-scope views
+31|Early versions of CrewAI made it difficult to pass memory state between separate crew instances|CORRECT|Issue #714 (created 2024-05-30) documents difficulty sharing memory information between crew instances
+32|During training mode, all agents have allow_delegation forced to False|CORRECT|crew.py train method sets agent.allow_delegation = False for all agents in the crew

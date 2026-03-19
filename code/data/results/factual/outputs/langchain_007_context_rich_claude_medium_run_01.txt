@@ -1,0 +1,40 @@
+1|LCEL is built around one central abstraction: the Runnable|CORRECT|The Runnable class in langchain_core/runnables/base.py is the base abstraction for all LCEL components
+2|Every component in an LCEL pipeline (prompt template, chat model, output parser, custom function) implements the Runnable interface|CORRECT|All these components inherit from or implement the Runnable protocol in langchain_core
+3|A Runnable exposes invoke for a single call|CORRECT|The invoke method is defined on the Runnable base class in langchain_core/runnables/base.py
+4|A Runnable exposes batch for processing multiple inputs|CORRECT|The batch method is defined on the Runnable base class in langchain_core/runnables/base.py
+5|A Runnable exposes stream for incremental output|CORRECT|The stream method is defined on the Runnable base class in langchain_core/runnables/base.py
+6|A Runnable exposes async counterparts ainvoke, abatch, and astream|CORRECT|All three async methods are defined on the Runnable base class in langchain_core/runnables/base.py
+7|Any chain built with LCEL automatically inherits synchronous, asynchronous, batched, and streaming execution modes from its constituent parts|CORRECT|RunnableSequence inherits all execution modes from the Runnable base class
+8|The pipe operator chains Runnables into a RunnableSequence|CORRECT|The __or__ method on Runnable returns RunnableSequence(self, coerce_to_runnable(other))
+9|The output of one step in a RunnableSequence becomes the input to the next|CORRECT|RunnableSequence._transform passes each step's output as input to the next step
+10|ChatPromptTemplate is imported from langchain_core.prompts|CORRECT|ChatPromptTemplate is exported in langchain_core/prompts/__init__.py
+11|ChatOpenAI is imported from langchain_openai|CORRECT|ChatOpenAI is exported in langchain_openai/__init__.py
+12|StrOutputParser is imported from langchain_core.output_parsers|CORRECT|StrOutputParser is exported in langchain_core/output_parsers/__init__.py
+13|ChatPromptTemplate has a from_template method|CORRECT|from_template is a class method on ChatPromptTemplate in langchain_core/prompts/chat.py
+14|RunnableSequence orchestrates execution, threading callbacks and configuration through each step|CORRECT|RunnableSequence._transform patches config with callbacks via run_manager.get_child() for each step
+15|Streaming propagates end-to-end if every component in the sequence supports a transform method that maps streaming input to streaming output|CORRECT|RunnableSequence docstring states: "if all components of the sequence implement a transform method...then the sequence will be able to stream input to output"
+16|When a component lacks streaming support (e.g., a RunnableLambda wrapping a plain function), the framework accumulates that step's input before continuing|CORRECT|Source code comment: "steps that don't natively support transforming an input stream will buffer input in memory until all available, and then start emitting output"
+17|Partial streaming still works for the rest of the pipeline when one component buffers|CORRECT|The _transform method continues streaming through subsequent steps even when one step buffers
+18|RunnableParallel runs a dictionary of Runnables concurrently|CORRECT|RunnableParallel invokes its steps concurrently using an executor in langchain_core/runnables/base.py
+19|RunnableParallel returns a dictionary of their outputs|CORRECT|RunnableParallel returns dict[str, Any] with results keyed by the step names
+20|RunnableParallel is imported from langchain_core.runnables|CORRECT|RunnableParallel is exported in langchain_core/runnables/__init__.py
+21|RunnablePassthrough is imported from langchain_core.runnables|CORRECT|RunnablePassthrough is exported in langchain_core/runnables/__init__.py
+22|A dict literal appearing inside a pipe expression is automatically coerced into a RunnableParallel|CORRECT|coerce_to_runnable function checks isinstance(thing, dict) and returns RunnableParallel(thing)
+23|RunnablePassthrough forwards inputs unchanged|CORRECT|RunnablePassthrough docstring states it "behaves almost like the identity function" and its invoke uses the identity function
+24|RunnableBranch evaluates a series of condition-runnable pairs and executes the first branch whose condition returns true|CORRECT|RunnableBranch docstring: "the first condition that evaluates to True is selected, and the corresponding Runnable is run"
+25|RunnableBranch falls back to a default if no condition matches|CORRECT|RunnableBranch docstring: "If no condition evaluates to True, the default branch is run"
+26|Any Runnable can be wrapped with .with_fallbacks() to specify alternative Runnables to try when the primary one raises an exception|CORRECT|with_fallbacks method is defined on the Runnable base class and returns RunnableWithFallbacks
+27|.with_retry() decorates a Runnable with configurable retry logic|CORRECT|with_retry method is defined on the Runnable base class and returns RunnableRetry
+28|.with_retry() uses exponential backoff and jitter|CORRECT|with_retry has wait_exponential_jitter parameter (default True) and imports wait_exponential_jitter from tenacity
+29|.with_retry() targets specific exception types|CORRECT|with_retry accepts retry_if_exception_type parameter of type tuple[type[BaseException], ...]
+30|The fallback and retry modifiers return new Runnables that compose just like anything else|CORRECT|with_fallbacks returns RunnableWithFallbacks and with_retry returns RunnableRetry, both subclasses of Runnable
+31|RunnableLambda wraps any callable into a Runnable|CORRECT|RunnableLambda docstring: "converts a python callable into a Runnable"
+32|The @chain decorator is imported from langchain_core.runnables|CORRECT|chain is exported in langchain_core/runnables/__init__.py
+33|The @chain decorator converts a function into a named Runnable|CORRECT|chain decorator docstring: "Sets the name of the Runnable to the name of the function"
+34|Runnables invoked inside a @chain-decorated function are automatically traced as dependencies|CORRECT|chain decorator docstring: "Any runnables called by the function will be traced as dependencies"
+35|Wrapping a bound method in a RunnableLambda inside a RunnableSequence can create reference cycles that prevent garbage collection|INCORRECT|Issue #30667 documents this as a memory leak caused by @lru_cache on get_function_nonlocals holding strong references to callables, not reference cycles
+36|The memory leak issue with RunnableLambda and bound methods is documented in the LangChain issue tracker|CORRECT|Issue #30667 titled "core: leak when using object member in a RunnableSequence" documents this exact problem
+37|The memory leak issue was traced back to internal caching of function metadata|CORRECT|Issue #30667 identifies @lru_cache on get_function_nonlocals in runnables/utils.py as the root cause
+38|The default batch implementation parallelizes via thread pools|CORRECT|Runnable.batch docstring: "Default implementation runs invoke in parallel using a thread pool executor"
+39|The async batch implementation uses asyncio.gather|CORRECT|Runnable.abatch uses gather_with_concurrency which wraps asyncio.gather with optional concurrency limits
+40|Thread pool batching works well for IO-bound tasks but does not speed up CPU-bound transformations|CORRECT|Runnable.abatch docstring: "Default implementation of batch works well for IO bound runnables"

@@ -1,0 +1,32 @@
+1|CrewAI requires Python 3.10 or newer (up through 3.13)|CORRECT|Documentation (pyproject.toml and installation.mdx) states requires-python >=3.10 <3.14, which means up through 3.13
+2|CrewAI uses UV for dependency management|CORRECT|README and installation.mdx both state CrewAI uses UV for dependency management and package handling
+3|UV is a Rust-based Python package manager from Astral|UNVERIFIABLE|Documentation links to docs.astral.sh/uv/ but does not describe UV as Rust-based within CrewAI docs
+4|By default, CrewAI talks to OpenAI|CORRECT|agents.mdx states LLM defaults to the model specified in OPENAI_MODEL_NAME or gpt-4; README confirms agents use OpenAI API by default
+5|You can swap in Anthropic, Google Gemini, Groq, or local models through Ollama via the LiteLLM integration layer|INCORRECT|llms.mdx states CrewAI provides native SDK integrations for OpenAI, Anthropic, and Google Gemini; only Groq and Ollama use LiteLLM
+6|The core installation command is uv pip install crewai|CORRECT|README shows uv pip install crewai as the install command
+7|The tools bundle is installed with uv pip install 'crewai[tools]'|CORRECT|README shows uv pip install 'crewai[tools]' for optional tools
+8|The extra agent tools include web search, file reading, and directory traversal|UNVERIFIABLE|Documentation describes crewai[tools] as optional features with additional tools but does not enumerate specific tools in the install section
+9|tiktoken requires a Rust compiler to build from source|CORRECT|README troubleshooting states Ensure Rust compiler is installed for tiktoken wheel building
+10|If tiktoken install fails, try uv pip install tiktoken --prefer-binary to pull a prebuilt wheel|CORRECT|README troubleshooting shows this exact command as a solution
+11|CrewAI ships with a CLI that generates a project skeleton|CORRECT|README and installation.mdx show the crewai create crew command for scaffolding
+12|The command to scaffold a project is crewai create crew latest-ai-development|CORRECT|README shows crewai create crew latest-ai-development as an example
+13|The scaffolded project directory structure contains pyproject.toml, .env, src/ with main.py, crew.py, tools/custom_tool.py, config/agents.yaml, and config/tasks.yaml|CORRECT|README and installation.mdx show all these files in the generated structure
+14|The scaffolded project does not include .gitignore, README.md, __init__.py, or knowledge/ directory|INCORRECT|Both README and installation.mdx show .gitignore, README.md, __init__.py files, and installation.mdx shows knowledge/ directory in the scaffold
+15|Agents in CrewAI are autonomous units characterized by three core attributes: a role, a goal, and a backstory|CORRECT|agents.mdx states role, goal, and backstory are required parameters that shape the agent's behavior
+16|The role establishes what the agent does|CORRECT|agents.mdx describes role as defining the agent's function and expertise within the crew
+17|The goal drives the agent's decision-making|CORRECT|agents.mdx describes goal as the individual objective that guides the agent's decision-making
+18|The backstory provides context that shapes how the LLM interprets instructions|CORRECT|agents.mdx describes backstory as providing context and personality to the agent, enriching interactions
+19|The {topic} placeholders in YAML get filled in at runtime when you kick off the crew|CORRECT|agents.mdx and quickstart.mdx confirm variables like {topic} are replaced with values from inputs when running the crew
+20|The agent field in tasks.yaml links each task to the agent responsible for it|CORRECT|tasks.mdx shows agent as an optional parameter for the agent responsible for executing the task
+21|The output_file on a task tells CrewAI to write the final result to disk automatically|CORRECT|tasks.mdx describes output_file as file path for storing the task output
+22|In a sequential process, the output from the research task feeds directly into the reporting task as context without explicit wiring|CORRECT|processes.mdx states output of one task serves as context for the next; tasks.mdx confirms output is automatically relayed to the next task
+23|In crew.py, you create a class decorated with @CrewBase|CORRECT|README and crews.mdx show @CrewBase decorator on the crew class
+24|The import statement is from crewai.project import CrewBase, agent, crew, task|CORRECT|README and quickstart.mdx show this exact import
+25|The @agent and @task decorators automatically collect instances into self.agents and self.tasks|CORRECT|crews.mdx confirms agents are automatically collected by the @agent decorator and tasks by the @task decorator
+26|The method names must match the keys in the YAML files|CORRECT|quickstart.mdx states naming consistency allows CrewAI to automatically link configurations with code
+27|The command to run the crew is crewai run|CORRECT|README and quickstart.mdx show crewai run as the execution command
+28|Process.sequential executes tasks in the order they are defined|CORRECT|processes.mdx states sequential executes tasks sequentially in orderly progression
+29|CrewAI supports Process.hierarchical|CORRECT|processes.mdx lists hierarchical as a supported process type
+30|Process.hierarchical introduces a manager agent that delegates tasks to crew members based on their capabilities|CORRECT|processes.mdx describes hierarchical as having a manager agent that delegates and manages tasks
+31|The hierarchical approach requires specifying a manager_llm|INCORRECT|processes.mdx states either manager_llm OR manager_agent must be specified, not only manager_llm
+32|The context parameter on tasks explicitly controls which outputs feed into which steps|CORRECT|tasks.mdx describes context as other tasks whose outputs will be used as context for this task

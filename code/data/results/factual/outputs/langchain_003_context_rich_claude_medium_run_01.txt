@@ -1,0 +1,51 @@
+1|LangChain has an agent-and-tool architecture for building autonomous agents|CORRECT|The repo README describes LangChain as "the agent engineering platform" and the codebase contains agents/ and tools/ modules
+2|A LangChain agent selects an action (tool call), the framework executes it, feeds the result back as an observation, and the model decides the next action or returns a final answer|CORRECT|factory.py implements this loop with model node and tools node in a StateGraph with conditional edges
+3|The loop continues until the model determines it has enough information or a configured stopping condition kicks in|CORRECT|factory.py conditional edges route to END when no tool calls remain, and middleware like ModelCallLimitMiddleware can enforce stopping conditions
+4|The framework's create_agent function encapsulates the agent loop pattern|CORRECT|create_agent is defined in factory.py (line 673) and exported from langchain.agents.__init__.py
+5|create_agent accepts a model specified as a string like "openai:gpt-4"|CORRECT|factory.py line 674 shows model: str | BaseChatModel, and docstring (line 700) gives example "openai:gpt-4"
+6|create_agent accepts an instantiated chat model as the model parameter|CORRECT|factory.py line 674 shows model: str | BaseChatModel
+7|create_agent accepts a list of tools|CORRECT|factory.py line 675 shows tools: Sequence[BaseTool | Callable[..., Any] | dict[str, Any]] | None
+8|create_agent optionally accepts a system prompt|CORRECT|factory.py line 677 shows system_prompt: str | SystemMessage | None = None
+9|create_agent constructs a state graph under the hood|CORRECT|factory.py imports StateGraph from langgraph and builds the graph in create_agent
+10|The state graph has a model node and a tools node that pass control back and forth through conditional edges|CORRECT|factory.py lines 1486-1521 add conditional edges between model and tools nodes
+11|When the model's response contains tool calls, execution routes to the tools node|CORRECT|factory.py _make_model_to_tools_edge checks for pending_tool_calls and routes to "tools" node
+12|When the model's response contains no tool calls, the agent exits the loop and returns|CORRECT|factory.py conditional edge routes to exit_node (END) when no tool calls are present
+13|The conditional routing logic inspects the model's output at each step to determine the next destination|CORRECT|factory.py _make_model_to_tools_edge inspects last AI message for tool calls to determine routing
+14|Pending tool calls get dispatched potentially in parallel via LangGraph's Send mechanism|CORRECT|factory.py line 1723 uses Send("tools", ToolCallWithContext(...)) for each tool call, imported from langgraph.types
+15|If a tool is marked with return_direct=True, its output goes straight to the user without another model pass|CORRECT|factory.py line 1477-1481 checks return_direct and routes to exit_node; BaseTool has return_direct field
+16|The simplest approach to defining tools uses the @tool decorator on a plain Python function|CORRECT|The @tool decorator is defined in core/tools/convert.py and exported from langchain_core.tools
+17|The framework inspects the function signature and docstring to generate a schema for the @tool decorator|CORRECT|convert.py creates StructuredTool from function, which uses create_schema_from_function to inspect signature; docstring becomes description
+18|Type hints determine the argument types in the generated schema|CORRECT|create_schema_from_function in tools/base.py uses type hints from function signatures to build the schema
+19|The docstring provides the description the model relies on to understand what the tool does|CORRECT|convert.py extracts docstring for tool description; StructuredTool.from_function uses parse_docstring
+20|You can subclass BaseTool directly for more complex tool scenarios|CORRECT|BaseTool is defined in core/tools/base.py as an abstract base class designed for subclassing
+21|Subclassing BaseTool gives explicit control over the argument schema via Pydantic models|CORRECT|BaseTool has args_schema field that accepts Pydantic models or JSON schema dicts
+22|Subclassing BaseTool supports custom validation logic|CORRECT|BaseTool includes handle_validation_error field and input parsing/validation in its run() method
+23|BaseTool supports the ability to return artifacts alongside content|CORRECT|BaseTool has response_format field supporting "content_and_artifact" mode
+24|The StructuredTool variant sits between the @tool decorator and BaseTool subclassing|CORRECT|StructuredTool extends BaseTool and has from_function() classmethod; @tool decorator creates StructuredTool internally
+25|StructuredTool lets you create tools from functions while still providing a custom args_schema|CORRECT|StructuredTool.from_function() accepts args_schema parameter alongside a function
+26|LangChain's middleware system provides wrap_tool_call hooks that let you intercept tool execution|CORRECT|wrap_tool_call is defined in AgentMiddleware base class in middleware/types.py and exported from middleware/__init__.py
+27|wrap_tool_call hooks can implement retry logic|CORRECT|ToolRetryMiddleware uses wrap_tool_call to implement retry logic (middleware/tool_retry.py)
+28|wrap_tool_call hooks can substitute fallback behavior without modifying the tools themselves|CORRECT|The wrap_tool_call pattern intercepts tool execution externally; LLMToolEmulator substitutes tool responses via wrap_tool_call
+29|Built-in middleware for tool retries helps prevent runaway loops|CORRECT|ToolRetryMiddleware is a built-in middleware class in middleware/tool_retry.py
+30|Built-in middleware for tool call limits helps prevent runaway loops|CORRECT|ToolCallLimitMiddleware is a built-in middleware class in middleware/tool_call_limit.py
+31|Middleware components can hook into before and after the agent runs|CORRECT|AgentMiddleware defines before_agent/after_agent hooks in middleware/types.py
+32|Middleware components can hook into before and after each model call|CORRECT|AgentMiddleware defines before_model/after_model hooks in middleware/types.py
+33|Middleware components can hook around individual tool executions|CORRECT|AgentMiddleware defines wrap_tool_call hook in middleware/types.py
+34|You can write middleware with a before_model hook that checks state and injects a human approval confirmation step|INCORRECT|The actual HumanInTheLoopMiddleware uses after_model hook (line 288 of human_in_the_loop.py), not before_model, because tool calls to approve only exist after the model runs
+35|The human_in_the_loop middleware pattern pauses execution, solicits input, and resumes the agent loop based on the response|CORRECT|HumanInTheLoopMiddleware uses langgraph interrupt() to pause, receives HITLResponse with decisions, then processes them to resume
+36|A wrap_model_call handler can inspect the current request and modify the tool list before the model sees it|CORRECT|LLMToolSelectorMiddleware uses wrap_model_call to filter tools via request.override(tools=...) before calling handler (tool_selection.py)
+37|Dynamic tool selection can add or remove tools based on conversation context|CORRECT|LLMToolSelectorMiddleware filters tools based on user query; factory.py error template acknowledges middleware can add tools via wrap_model_call
+38|LangSmith integration provides tracing for agent observability|CORRECT|factory.py imports traceable from langsmith (line 26) and uses it for tracing agent execution
+39|Each iteration of the agent loop involves at least one LLM call|CORRECT|The model node in the state graph calls the LLM on every iteration of the loop
+40|ModelCallLimitMiddleware acts as a circuit breaker for model calls|CORRECT|ModelCallLimitMiddleware enforces model call limits and can end the agent or raise error (middleware/model_call_limit.py)
+41|ToolCallLimitMiddleware acts as a circuit breaker for tool calls|CORRECT|ToolCallLimitMiddleware enforces tool call limits with exit behaviors: continue, error, or end (middleware/tool_call_limit.py)
+42|LangChain supports structured output through two strategies: provider strategy and tool strategy|CORRECT|structured_output.py defines ProviderStrategy and ToolStrategy as the two approaches, plus AutoStrategy for auto-detection
+43|The provider strategy uses the model's native structured output capabilities to constrain responses to a specific schema|CORRECT|ProviderStrategy uses model's native response_format with json_schema type (structured_output.py lines 285-304)
+44|The tool strategy adds a special response tool that the model calls when it wants to return a structured answer|CORRECT|ToolStrategy creates StructuredTool from schema via OutputToolBinding, which the model calls to provide structured output
+45|The tool strategy effectively turns the stopping condition into a tool choice|CORRECT|When the model calls the structured output tool, factory.py routes to exit_node, making it a stopping condition
+46|Not all models support structured output natively|CORRECT|_supports_provider_strategy in factory.py checks model capabilities and only certain models are supported
+47|The framework's auto-detection logic checks model capabilities and selects the appropriate strategy|CORRECT|AutoStrategy triggers _supports_provider_strategy check in factory.py (lines 1190-1200) to auto-select strategy
+48|The framework falls back to the tool-based approach when the model does not support native structured output|CORRECT|factory.py lines 1195-1200 show fallback from AutoStrategy to ToolStrategy when provider strategy is not supported
+49|The older initialize_agent API has been replaced by the graph-based create_agent|CORRECT|Issue #29277 confirms initialize_agent deprecated since 0.1; create_agent is the current API in langchain_v1
+50|create_agent is graph-based|CORRECT|create_agent builds a LangGraph StateGraph and returns a CompiledStateGraph
+51|LangChain integrates with LangGraph for complex multi-agent workflows|CORRECT|factory.py imports extensively from langgraph (StateGraph, ToolNode, Command, Send, etc.) and builds agents as LangGraph graphs

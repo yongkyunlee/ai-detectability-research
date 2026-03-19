@@ -1,0 +1,61 @@
+1|LangChain bills itself as an agent engineering platform|CORRECT|README.md line 12: "The agent engineering platform."
+2|LangChain is at version 1.2|CORRECT|pyproject.toml shows version 1.2.12
+3|LangChain provides a standard interface layer across models, embeddings, vector stores, and tools|CORRECT|README describes model interoperability and integrations with model providers, tools, vector stores, and more
+4|BaseChatModel is an abstraction you write against in LangChain|CORRECT|BaseChatModel class exists in langchain_core/language_models/chat_models.py
+5|Runnable is an abstraction you write against in LangChain|CORRECT|Runnable class exists in langchain_core/runnables/base.py
+6|PromptTemplate is an abstraction you write against in LangChain|CORRECT|PromptTemplate exists in langchain_core/prompts/prompt.py and is exported from langchain_core.prompts
+7|LangChain is distributed as a family of Python packages|CORRECT|Monorepo structure with multiple independently versioned packages confirmed in CLAUDE.md
+8|The main package is simply called langchain|CORRECT|The package name is "langchain" per pyproject.toml
+9|You can install langchain with pip or uv|CORRECT|README shows both "pip install langchain" and "uv add langchain"
+10|The install command is pip install langchain|CORRECT|README quickstart shows "pip install langchain"
+11|Installing langchain pulls in langchain-core|CORRECT|pyproject.toml lists langchain-core>=1.2.10 as a dependency
+12|langchain-core contains the base abstractions every other package depends on|CORRECT|Core README: "LangChain Core contains the base abstractions that power the LangChain ecosystem"
+13|langchain-core contains Runnables|CORRECT|Runnable class and RunnableSequence exist in langchain_core/runnables/
+14|langchain-core contains prompt templates|CORRECT|ChatPromptTemplate, PromptTemplate etc. exist in langchain_core/prompts/
+15|langchain-core contains output parsers|CORRECT|StrOutputParser, JsonOutputParser, PydanticOutputParser exist in langchain_core/output_parsers/
+16|langchain-core contains the callback system|CORRECT|BaseChatModel imports callback-related classes from langchain_core
+17|You will not import from langchain-core directly in most cases|INCORRECT|The blog's own code examples import ChatPromptTemplate and StrOutputParser from langchain_core, and the API reference shows these as the canonical import paths
+18|The project maintains first-party integrations for OpenAI|CORRECT|OpenAI partner package exists in libs/partners/openai/
+19|The project maintains first-party integrations for Anthropic|CORRECT|Anthropic partner package exists in libs/partners/anthropic/
+20|The project maintains first-party integrations for Ollama|CORRECT|Ollama partner package exists in libs/partners/ollama/
+21|The project maintains first-party integrations for DeepSeek|CORRECT|DeepSeek partner package exists in libs/partners/deepseek/
+22|The project maintains first-party integrations for xAI|CORRECT|xAI partner package exists in libs/partners/xai/
+23|The install command for GPT models is pip install langchain-openai|CORRECT|langchain-openai package exists as a partner integration
+24|The install command for Claude models is pip install langchain-anthropic|CORRECT|langchain-anthropic package exists as a partner integration
+25|The install command for local models via Ollama is pip install langchain-ollama|CORRECT|langchain-ollama package exists as a partner integration
+26|Each provider package is independently versioned|CORRECT|Each partner package has its own pyproject.toml with independent version numbers
+27|Chat models are the primary interface for interacting with LLMs|CORRECT|BaseChatModel is the central class in langchain_core/language_models/chat_models.py
+28|LangChain wraps every provider behind the BaseChatModel class|CORRECT|BaseChatModel is the abstract base class that all chat model providers implement
+29|BaseChatModel exposes invoke method|CORRECT|invoke method exists at line 389 in chat_models.py
+30|BaseChatModel exposes stream method|CORRECT|stream method exists at line 480 in chat_models.py
+31|BaseChatModel exposes batch method|CORRECT|batch method inherited from Runnable base class
+32|BaseChatModel exposes async counterparts of invoke, stream, and batch|CORRECT|ainvoke at line 416, astream at line 607, and abatch exist in chat_models.py
+33|init_chat_model factory lets you instantiate any supported model from a single function call|CORRECT|init_chat_model exists in langchain/chat_models/base.py and is exported from langchain.chat_models
+34|init_chat_model uses a provider:model string format|CORRECT|Documentation states: "The model name, optionally prefixed with provider (e.g., 'openai:gpt-4o')"
+35|ChatPromptTemplate handles system-plus-user message pairs with variable placeholders|CORRECT|ChatPromptTemplate exists in langchain_core/prompts/chat.py and supports from_messages with system/human tuples
+36|Templates are themselves Runnables|CORRECT|BasePromptTemplate extends RunnableSerializable per langchain_core/prompts/base.py line 39-40
+37|StrOutputParser extracts the text content from a message object|CORRECT|StrOutputParser exists in langchain_core/output_parsers/string.py
+38|JsonOutputParser handles cases where you need typed structures back|CORRECT|JsonOutputParser exists in langchain_core/output_parsers/json.py
+39|PydanticOutputParser handles cases where you need typed structures back|CORRECT|PydanticOutputParser exists in langchain_core/output_parsers/pydantic.py
+40|Many current models support structured output natively through tool calling so you may not need a parser|CORRECT|output_parsers __init__.py states "Today, most LLMs support structured output natively. In such cases, using output parsers may be unnecessary"
+41|The LangChain Expression Language is the composition mechanism|CORRECT|LCEL uses the Runnable interface and pipe operator for composition, documented in the codebase
+42|Every component implements the Runnable interface|CORRECT|Prompt templates extend RunnableSerializable, models extend Runnable via BaseLanguageModel, parsers extend BaseTransformOutputParser which extends Runnable
+43|You can chain components together with the pipe operator|CORRECT|__or__ method is defined on the Runnable class in runnables/base.py enabling the | syntax
+44|A chain built with LCEL automatically inherits support for streaming, async execution, and batching|CORRECT|RunnableSequence inherits all Runnable protocol methods including stream, ainvoke, batch
+45|init_chat_model is importable from langchain.chat_models|CORRECT|langchain/chat_models/__init__.py exports init_chat_model from langchain.chat_models.base
+46|ChatPromptTemplate is importable from langchain_core.prompts|CORRECT|langchain_core/prompts/__init__.py exports ChatPromptTemplate
+47|StrOutputParser is importable from langchain_core.output_parsers|CORRECT|langchain_core/output_parsers/__init__.py exports StrOutputParser
+48|ChatPromptTemplate has a from_messages class method|CORRECT|from_messages method exists at line 1119 of langchain_core/prompts/chat.py
+49|The pipe operator constructs a RunnableSequence under the hood|CORRECT|RunnableSequence class exists in langchain_core/runnables/base.py at line 2817
+50|chain.stream() provides streaming output|CORRECT|stream method is part of the Runnable interface
+51|chain.ainvoke() provides async support|CORRECT|ainvoke method exists on Runnable at line 844 of runnables/base.py
+52|init_chat_model supports configurable fields for selecting the provider at runtime|CORRECT|configurable_fields parameter documented at line 289 of chat_models/base.py with options None, 'any', or list of fields
+53|LangChain integrates with dozens of vector stores|UNVERIFIABLE|Documentation mentions vector store integrations but does not enumerate a specific count of "dozens"
+54|You can bind external functions to the model using bind_tools|CORRECT|bind_tools method exists on BaseChatModel at line 1549 of chat_models.py
+55|The create_agent function exists in langchain|CORRECT|create_agent is defined in langchain/agents/factory.py and exported from langchain.agents
+56|create_agent is backed by LangGraph under the hood|CORRECT|factory.py imports StateGraph, ToolNode, and other components from langgraph
+57|create_agent gives you a ReAct-style loop|UNVERIFIABLE|The docstring says "calls tools in a loop until a stopping condition is met" which is functionally ReAct, but the term "ReAct" is not used in the create_agent documentation
+58|create_agent has middleware for retries|CORRECT|tool_retry.py and model_retry.py middleware exist in langchain/agents/middleware/
+59|create_agent has middleware for rate limiting|INCORRECT|The middleware available includes tool_call_limit and model_call_limit (total call count caps), not rate limiting (requests per time unit)
+60|create_agent has middleware for human-in-the-loop approval|CORRECT|human_in_the_loop.py middleware exists in langchain/agents/middleware/
+61|You can use model.with_structured_output(MyPydanticModel) to get validated typed responses|CORRECT|with_structured_output method exists on BaseChatModel at line 1568 of chat_models.py

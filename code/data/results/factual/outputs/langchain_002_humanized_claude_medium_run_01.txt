@@ -1,0 +1,38 @@
+1|VectorStore and BaseRetriever are two interfaces at the foundation of LangChain RAG pipelines|CORRECT|VectorStore is defined in langchain_core/vectorstores/base.py and BaseRetriever in langchain_core/retrievers.py as foundational abstractions
+2|VectorStore handles storing and looking up document embeddings|CORRECT|VectorStore class has methods like add_texts, similarity_search, max_marginal_relevance_search for embedding storage and lookup
+3|LangChain supports Chroma for lightweight local use|CORRECT|Chroma integration exists in libs/partners/chroma/langchain_chroma/vectorstores.py
+4|LangChain supports FAISS for high-performance in-memory search|CORRECT|FAISS vectorstore exists in langchain_classic/vectorstores/faiss.py (moved to langchain_community)
+5|LangChain supports Pinecone for managed cloud deployments|CORRECT|PineconeHybridSearchRetriever exists in langchain_classic/retrievers/pinecone_hybrid_search.py referencing langchain_community.retrievers
+6|LangChain supports Qdrant for managed cloud deployments|UNVERIFIABLE|No Qdrant integration found in the available reference documentation
+7|LangChain supports pgvector for PostgreSQL|UNVERIFIABLE|No pgvector integration found in the available reference documentation
+8|BaseRetriever takes a string query and returns a list of Document objects|CORRECT|BaseRetriever is typed as RunnableSerializable[RetrieverInput, RetrieverOutput] where RetrieverInput=str and RetrieverOutput=list[Document]
+9|Every retriever implements _get_relevant_documents|CORRECT|_get_relevant_documents is an @abstractmethod on BaseRetriever in langchain_core/retrievers.py
+10|_get_relevant_documents has an optional async counterpart|CORRECT|_aget_relevant_documents is optional; if not overridden, it auto-wraps the sync version using run_in_executor
+11|Vector stores can be converted into retrievers through .as_retriever()|CORRECT|VectorStore.as_retriever() method exists in langchain_core/vectorstores/base.py and returns a VectorStoreRetriever
+12|.as_retriever() wraps the store in a VectorStoreRetriever conforming to the standard interface|CORRECT|as_retriever() creates a VectorStoreRetriever which inherits from BaseRetriever
+13|Both VectorStore and BaseRetriever implement LangChain's Runnable interface|INCORRECT|VectorStore inherits from ABC only, not Runnable. Only BaseRetriever inherits from RunnableSerializable
+14|Chroma is imported from langchain_chroma|CORRECT|Chroma class is in libs/partners/chroma/langchain_chroma/vectorstores.py and example code shows from langchain_chroma import Chroma
+15|ChatOpenAI and OpenAIEmbeddings are imported from langchain_openai|CORRECT|langchain_openai/__init__.py exports both ChatOpenAI and OpenAIEmbeddings
+16|ChatPromptTemplate is imported from langchain_core.prompts|CORRECT|ChatPromptTemplate is exported from langchain_core/prompts/__init__.py
+17|The k parameter is passed to as_retriever() via search_kwargs dict|CORRECT|Documentation in VectorStore.as_retriever() shows search_kwargs={"k": 1} as the pattern
+18|Plain similarity search is the default retrieval mode|CORRECT|VectorStoreRetriever has search_type: str = "similarity" as the default
+19|Maximal marginal relevance (MMR) balances similarity to the query against diversity among returned documents|CORRECT|VectorStore.max_marginal_relevance_search() exists and VectorStoreRetriever supports search_type="mmr"
+20|Most vector store implementations support MMR as a search type parameter|CORRECT|The base VectorStore class defines max_marginal_relevance_search and VectorStoreRetriever validates "mmr" as an allowed search type
+21|Pinecone's hybrid search retriever combines BM25-style term matching with vector similarity|CORRECT|PineconeHybridSearchRetriever exists in langchain_community.retrievers for hybrid search
+22|ParentDocumentRetriever indexes small child chunks for accurate matching then returns the larger parent document|CORRECT|ParentDocumentRetriever docstring states it splits and stores small chunks, fetches small chunks during retrieval, then looks up parent IDs to return larger documents
+23|ParentDocumentRetriever needs both a vector store and a separate document store|CORRECT|ParentDocumentRetriever inherits from MultiVectorRetriever which requires vectorstore and docstore fields
+24|ParentDocumentRetriever needs two text splitters configured at different sizes|INCORRECT|Only child_splitter is required. parent_splitter is optional and defaults to None, in which case raw documents are used as parents
+25|A history-aware retriever uses an LLM to reformulate queries into standalone search terms before hitting the vector store|CORRECT|create_history_aware_retriever in langchain_classic/chains/history_aware_retriever.py uses prompt | llm | StrOutputParser() | retriever to reformulate queries
+26|LangChain supports ensemble approaches through MergerRetriever which combines results from multiple sources|CORRECT|MergerRetriever exists in langchain_classic/retrievers/merger_retriever.py and merges results from a list of retrievers
+27|MergerRetriever interleaves results from multiple retrievers in priority order|CORRECT|MergerRetriever.merge_documents() iterates through results round-robin style, taking one document from each retriever in order
+28|Chroma's in-memory mode can retain state across iterations within the same Python session even with persist_directory=None|CORRECT|Issue #28774 confirms that Chroma reuses the same in-memory storage within a single Python process despite creating new instances
+29|Explicitly resetting the Chroma client prevents stale data from contaminating results|CORRECT|Issue #28774 workaround shows using client.reset() to fix the persistence problem
+30|create_retriever_tool wraps a retriever as an agent-usable tool|CORRECT|create_retriever_tool in langchain_core/tools/retriever.py creates a StructuredTool wrapper around a retriever
+31|create_retriever_tool migrated from langchain.tools.retriever to langchain_community|UNVERIFIABLE|No evidence of create_retriever_tool existing in langchain_community; it exists in langchain_core.tools and is re-exported from langchain_classic.tools.retriever
+32|create_retriever_tool now lives in langchain_core.tools|CORRECT|create_retriever_tool is defined in langchain_core/tools/retriever.py and exported from langchain_core/tools/__init__.py
+33|ContextualCompressionRetriever has moved to the langchain_classic package|CORRECT|ContextualCompressionRetriever is in langchain_classic/retrievers/contextual_compression.py
+34|LangChain mitigates indirect prompt injection by wrapping retrieved context in XML delimiters|UNVERIFIABLE|No evidence of XML delimiter wrapping for retrieved context found in the retriever or RAG-related source code
+35|LangChain prepends instructions to ignore embedded directives in retrieved context|UNVERIFIABLE|No evidence of instruction prepending for prompt injection defense found in the source code
+36|FAISS is fast and simple but does not persist data|CORRECT|FAISS vectorstore is in-memory by default with no built-in persistence mechanism in its base implementation
+37|Chroma with a persist directory works for prototyping and moderate-scale applications|UNVERIFIABLE|No explicit documentation about scale characteristics of Chroma with persist_directory found in the reference documentation
+38|The async pathway for Pinecone hybrid retrieval has been an open gap|UNVERIFIABLE|The Pinecone hybrid search retriever in the repo is a deprecated re-export stub; async support status cannot be determined from available code

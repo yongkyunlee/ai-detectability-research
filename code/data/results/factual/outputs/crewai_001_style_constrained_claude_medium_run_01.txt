@@ -1,0 +1,48 @@
+1|CrewAI is a multi-agent orchestration framework|CORRECT|README describes it as "Multi-AI Agent orchestration framework"
+2|CrewAI allows agents to collaborate sequentially or through a managed hierarchy|CORRECT|Processes docs describe sequential and hierarchical process types
+3|The framework is built around two core abstractions: Crews and Flows|CORRECT|README lists Crews and Flows as the two main approaches
+4|Crews are teams of agents that collaborate on tasks|CORRECT|Crews docs: "a collaborative group of agents working together to achieve a set of tasks"
+5|Flows are event-driven and manage state and control execution|CORRECT|Flows docs: "event-driven workflows" that "manage state and control the flow of execution"
+6|Each agent gets three required attributes: a role, a goal, and a backstory|CORRECT|Agents docs: "role, goal, and backstory are required and shape the agent's behavior"
+7|Agent attributes shape how the underlying LLM behaves when processing tasks|CORRECT|Agents docs: role, goal, backstory "shape the agent's behavior" and the LLM defaults description confirms this
+8|Agents can carry tools and decide when to invoke them during task execution|CORRECT|Agents docs list tools parameter as "Capabilities or functions available to the agent"
+9|CrewAI requires Python >=3.10 and <3.14|CORRECT|Installation docs and pyproject.toml confirm "Python >=3.10 and <3.14"
+10|CrewAI uses uv as its dependency manager|CORRECT|Installation docs: "CrewAI uses the uv as its dependency management and package handling tool"
+11|The command to install uv is "curl -LsSf https://astral.sh/uv/install.sh \| sh"|CORRECT|Installation docs show this exact command
+12|The command to install the CrewAI CLI is "uv tool install crewai"|CORRECT|Installation docs show "uv tool install crewai"
+13|You can verify the installation with "uv tool list"|CORRECT|Installation docs: "To verify that crewai is installed, run: uv tool list"
+14|After installation you should see something like "crewai v0.102.0" in the output|CORRECT|Installation docs show "crewai v0.102.0" as expected output
+15|If you get a PATH warning after install, run "uv tool update-shell" to fix it|CORRECT|Installation docs warn about PATH and show "uv tool update-shell" command
+16|CrewAI 0.175.0 requires openai >= 1.13.3|CORRECT|Installation docs state "CrewAI 0.175.0 requires openai >= 1.13.3"
+17|Even if using Anthropic or Google models, the OpenAI SDK is still a transitive dependency|CORRECT|Installation docs list openai as a requirement without qualification by provider
+18|The CLI command to scaffold a project is "crewai create crew latest-ai-development"|CORRECT|README shows "crewai create crew latest-ai-development" as example
+19|The scaffolded project includes src/latest_ai_development/config/agents.yaml|CORRECT|Installation docs show config/agents.yaml in project structure under src/
+20|The scaffolded project includes tasks.yaml in the config directory|CORRECT|Installation docs show config/tasks.yaml in project structure
+21|The scaffolded project includes a crew.py orchestration file|CORRECT|Installation docs show crew.py in project structure
+22|The scaffolded project includes a main.py entry point|CORRECT|Installation docs show main.py in project structure
+23|The scaffolded project includes a .env file for API keys|CORRECT|Installation docs show .env in project structure
+24|The scaffolded project includes a knowledge/ directory for RAG-style knowledge bases|CORRECT|Installation docs show knowledge/ directory in project structure
+25|Agent names in agents.yaml must match the method names in crew.py|CORRECT|Agents docs: "The names you use in your YAML files should match the method names in your Python code"
+26|Task names in tasks.yaml must match the method names in crew.py|CORRECT|Tasks docs: "The names you use in your YAML files should match the method names in your Python code"
+27|CrewAI uses this naming convention to wire YAML configs to Python decorators automatically|CORRECT|Crews docs: "CrewBase class, along with these decorators, automates the collection of agents and tasks"
+28|Variables like {topic} in YAML get interpolated at runtime from inputs passed to the crew|CORRECT|Agents docs: "Variables in your YAML files (like {topic}) will be replaced with values from your inputs"
+29|Each task specifies a description, an expected output format, and the agent responsible|CORRECT|Tasks docs list description, expected_output, and agent as task attributes
+30|The @CrewBase decorator connects YAML configuration to Python code|CORRECT|Crews docs show @CrewBase decorator on the class to enable YAML-based configuration
+31|Methods decorated with @agent return configured Agent objects|CORRECT|Crews docs: "@agent: Denotes a method that returns an Agent object"
+32|Methods decorated with @task return configured Task objects|CORRECT|Crews docs: "@task: Denotes a method that returns a Task object"
+33|The @crew method assembles agents and tasks into a Crew|CORRECT|Crews docs: "@crew: Denotes the method that returns the Crew object"
+34|Process.sequential runs tasks in order|CORRECT|Processes docs: "Sequential: Executes tasks sequentially, ensuring tasks are completed in an orderly progression"
+35|In sequential process, each task's output feeds into the next as context|CORRECT|Processes docs: "the output of one task serving as context for the next"
+36|The command "crewai install" locks and installs dependencies|CORRECT|Installation docs show "crewai install" before running the crew
+37|You need an API key for your LLM provider to run the crew|CORRECT|README: "An OpenAI API key (or other LLM API key)" needed in .env
+38|The quickstart example requires a Serper API key for the search tool|CORRECT|README shows SERPER_API_KEY=YOUR_KEY_HERE as required for SerperDevTool
+39|The default model configuration uses OpenAI's GPT-4|CORRECT|Agents docs: LLM "Defaults to the model specified in OPENAI_MODEL_NAME or gpt-4"
+40|You can swap the model provider by setting the MODEL environment variable|CORRECT|LLM docs show MODEL=model-id in .env configuration
+41|You can specify the LLM directly in agent YAML configuration|CORRECT|LLM docs show llm field in YAML agent configuration
+42|The command to run the crew is "crewai run"|CORRECT|CLI docs confirm "crewai run" command to run crews
+43|Setting verbose=True produces verbose output in the console|CORRECT|Agents docs: verbose parameter enables "detailed execution logs for debugging"
+44|The final output goes to any output_file specified on the last task|CORRECT|Tasks docs show output_file attribute: "File path for storing the task output"
+45|The hierarchical process mode requires a manager_llm or manager_agent|CORRECT|Processes docs: "A manager language model (manager_llm) or a custom manager agent (manager_agent) must be specified"
+46|The hierarchical process adds a delegation layer where a manager decides which agent handles what|CORRECT|Processes docs: "tasks are delegated and executed based on a structured chain of command"
+47|Community discussions consistently flag observability as a pain point for CrewAI|UNVERIFIABLE|Documentation does not contain information about community discussion sentiments
+48|Token costs can climb fast with multi-agent setups since agents re-summarize context between tasks|UNVERIFIABLE|Documentation does not discuss token cost implications of context passing between tasks

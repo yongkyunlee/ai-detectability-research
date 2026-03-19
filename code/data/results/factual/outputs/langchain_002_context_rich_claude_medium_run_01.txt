@@ -1,0 +1,42 @@
+1|VectorStore and BaseRetriever are two key interfaces in LangChain RAG pipelines|CORRECT|Both exist as core abstractions in langchain_core: VectorStore in vectorstores/base.py and BaseRetriever in retrievers.py
+2|A VectorStore handles the storage and lookup of document embeddings|CORRECT|VectorStore in base.py defines add_texts, similarity_search, and related embedding storage/retrieval methods
+3|LangChain supports Chroma as a vector store backend|CORRECT|Chroma is listed in the partners/ directory of the LangChain monorepo
+4|LangChain supports FAISS as a vector store backend|UNVERIFIABLE|FAISS is not in the partners/ directory and is not confirmed in available reference documentation
+5|LangChain supports Pinecone as a vector store backend|CORRECT|PineconeHybridSearchRetriever is referenced in issue-29170 confirming Pinecone integration
+6|LangChain supports Qdrant as a vector store backend|CORRECT|Qdrant is listed in the partners/ directory of the LangChain monorepo
+7|LangChain supports pgvector as a vector store backend|UNVERIFIABLE|pgvector is not found in the partners/ directory or reference documentation
+8|A BaseRetriever takes a string query and returns a list of Document objects|CORRECT|retrievers.py defines RetrieverInput = str and RetrieverOutput = list[Document]
+9|Every retriever implements _get_relevant_documents|CORRECT|_get_relevant_documents is defined as abstract in BaseRetriever in retrievers.py
+10|BaseRetriever optionally supports an async counterpart _aget_relevant_documents|CORRECT|_aget_relevant_documents is an optional override method in BaseRetriever per retrievers.py
+11|Vector stores can be converted into retrievers through the .as_retriever() method|CORRECT|VectorStore.as_retriever() method is defined in vectorstores/base.py
+12|The .as_retriever() method wraps the store in a VectorStoreRetriever|CORRECT|as_retriever() returns a VectorStoreRetriever instance per base.py
+13|VectorStoreRetriever conforms to the standard retriever interface|CORRECT|VectorStoreRetriever extends BaseRetriever in base.py line 964
+14|Not every retrieval strategy depends on vector similarity; keyword search, graph lookups, and API calls all fit the BaseRetriever contract|CORRECT|BaseRetriever contract is generic (string in, list of Documents out) per retrievers.py
+15|Both VectorStore and BaseRetriever implement LangChain's Runnable interface|INCORRECT|VectorStore extends only ABC (base.py line 43); only BaseRetriever extends RunnableSerializable (retrievers.py line 55)
+16|The import path for ChatPromptTemplate is langchain_core.prompts|CORRECT|Standard langchain_core import confirmed by the package structure
+17|The import path for Chroma is langchain_chroma|CORRECT|Chroma is a partner package listed in the partners/ directory
+18|The import path for ChatOpenAI and OpenAIEmbeddings is langchain_openai|CORRECT|OpenAI is a partner package listed in the partners/ directory
+19|The default retrieval mode is plain similarity search|CORRECT|VectorStoreRetriever sets search_type default to "similarity" at base.py line 970
+20|Maximal marginal relevance (MMR) balances similarity to the query against diversity among returned documents|CORRECT|maximal_marginal_relevance function in vectorstores/utils.py implements this algorithm
+21|Most vector store implementations support MMR as a search type parameter|CORRECT|"mmr" is included in VectorStoreRetriever's allowed_search_types at base.py line 976
+22|Pinecone's hybrid search retriever implements hybrid search combining term matching with vector similarity|CORRECT|PineconeHybridSearchRetriever exists per issue-29170
+23|The async pathway for Pinecone hybrid retrieval has been an open gap|CORRECT|Issue-29170 reports missing _aget_relevant_documents in PineconeHybridSearchRetriever
+24|ParentDocumentRetriever indexes small child chunks for accurate matching then returns the larger parent document|CORRECT|Source code shows child_splitter creates small chunks for indexing; parent docs retrieved from docstore
+25|ParentDocumentRetriever requires both a vector store and a separate document store|CORRECT|MultiVectorRetriever (parent class) has both vectorstore and docstore/byte_store fields
+26|ParentDocumentRetriever requires two text splitters configured at different sizes|INCORRECT|Only child_splitter is required; parent_splitter is optional and defaults to None per parent_document_retriever.py line 67
+27|A history-aware retriever uses an LLM to reformulate queries into standalone search terms before hitting the vector store|UNVERIFIABLE|No source code for history-aware retriever found in available reference documentation
+28|LangChain supports ensemble approaches through MergerRetriever|CORRECT|MergerRetriever exists in langchain_classic/retrievers/merger_retriever.py
+29|MergerRetriever combines results from multiple sources|CORRECT|MergerRetriever merges results from multiple retrievers by interleaving (round-robin)
+30|Chroma's in-memory mode retains state across iterations within the same Python session even with persist_directory=None|CORRECT|Issue-28774 confirms this behavior with detailed reproduction evidence
+31|Explicitly resetting the Chroma client prevents stale data from contaminating results|CORRECT|Issue-28774 workaround demonstrates client.reset() resolves the persistence issue
+32|Some vector store backends handle only string and list types in metadata filter conditions|UNVERIFIABLE|Not addressed in available reference documentation
+33|The create_retriever_tool function wraps a retriever as an agent-usable tool|CORRECT|create_retriever_tool in langchain_core/tools/retriever.py creates a StructuredTool from a BaseRetriever
+34|create_retriever_tool has migrated from langchain.tools.retriever to langchain_community and now lives in langchain_core.tools|CORRECT|Issue-16317 documents the migration path; source confirms current location in langchain_core/tools/retriever.py
+35|ContextualCompressionRetriever has moved to the langchain_classic package|CORRECT|Issue-33292 confirms this; source code found in langchain_classic/retrievers/contextual_compression.py
+36|Indirect prompt injection is a technique where an adversary embeds instructions in documents that the model may follow|CORRECT|Issue-34780 describes this threat model in detail
+37|LangChain mitigates indirect prompt injection by wrapping retrieved context in XML delimiters|CORRECT|Issue-34780 lists XML delimiters as a built-in defense mechanism
+38|LangChain prepends instructions to ignore embedded directives in retrieved context|CORRECT|Issue-34780 lists explicit ignore instructions as a built-in defense mechanism
+39|Instruction-level defenses against prompt injection are not bulletproof|CORRECT|Issue-34780 explicitly notes limitations of instruction-based defenses
+40|In-memory options like FAISS don't persist data|UNVERIFIABLE|FAISS implementation not available in reference documentation to verify persistence capabilities
+41|Chroma with a persist directory provides local persistent storage|CORRECT|Issue-28774 discusses persist_directory functionality for Chroma
+42|LangChain supports Milvus as a self-managed vector store deployment option|UNVERIFIABLE|Milvus not found in partners/ directory or reference documentation

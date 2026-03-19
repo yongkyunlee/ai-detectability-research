@@ -1,0 +1,48 @@
+1|A VectorStore handles storage and similarity search|CORRECT|VectorStore base class in langchain_core/vectorstores/base.py defines similarity_search as abstract and provides storage-related methods
+2|A BaseRetriever takes a string query and returns a list of Document objects|CORRECT|retrievers.py defines RetrieverInput = str and RetrieverOutput = list[Document]
+3|The retriever doesn't need to know anything about embeddings or vectors|CORRECT|BaseRetriever in retrievers.py has no references to embeddings or vectors in its interface
+4|A vector store is always a valid backbone for a retriever but a retriever isn't always backed by a vector store|CORRECT|retrievers.py docstring states "Vector stores can be used as the backbone of a retriever, but there are other types of retrievers as well"
+5|You might build a retriever on top of a TF-IDF index|CORRECT|BaseRetriever docstring includes a TFIDFRetriever example using scikit-learn
+6|The BaseRetriever class is in langchain-core|CORRECT|Defined in langchain_core/retrievers.py
+7|langchain-core is currently at version 1.2.20|CORRECT|pyproject.toml shows version = "1.2.20"
+8|BaseRetriever implements the standard Runnable interface|CORRECT|BaseRetriever extends RunnableSerializable which extends Runnable
+9|You call BaseRetriever with invoke or ainvoke|CORRECT|Both invoke and ainvoke methods are defined in retrievers.py
+10|VectorStore.as_retriever() returns a VectorStoreRetriever|CORRECT|as_retriever method at line 905 of base.py returns VectorStoreRetriever(vectorstore=self, ...)
+11|VectorStoreRetriever wraps the underlying store and delegates search calls|CORRECT|_get_relevant_documents delegates to self.vectorstore.similarity_search, max_marginal_relevance_search, etc.
+12|as_retriever() accepts a search_type parameter and a search_kwargs dict|CORRECT|VectorStoreRetriever has search_type and search_kwargs fields, passed via as_retriever kwargs
+13|VectorStoreRetriever supports three search types: similarity, mmr, and similarity_score_threshold|CORRECT|allowed_search_types = ("similarity", "similarity_score_threshold", "mmr") at line 976-980
+14|Plain similarity search is the default search type|CORRECT|search_type: str = "similarity" at line 970
+15|Similarity search finds the k nearest vectors with default k of 4|CORRECT|similarity_search signature shows k: int = 4 at line 362
+16|MMR fetches a larger candidate set via fetch_k defaulting to 20|CORRECT|max_marginal_relevance_search has fetch_k: int = 20 at line 663
+17|MMR iteratively selects documents that balance relevance against diversity|CORRECT|maximal_marginal_relevance in utils.py uses a while loop to iteratively select based on lambda_mult * query_score - (1 - lambda_mult) * redundant_score
+18|The lambda_mult parameter controls the relevance-diversity trade-off|CORRECT|Docstring and MMR algorithm in utils.py confirm lambda_mult controls the trade-off
+19|lambda_mult value of 1.0 gives pure relevance|CORRECT|Docstring says 1 = minimum diversity; algorithm shows equation_score = 1.0 * query_score - 0 * redundant_score = pure relevance
+20|lambda_mult value of 0.0 gives maximum diversity|CORRECT|Docstring says 0 = maximum diversity; algorithm shows equation_score = -redundant_score
+21|lambda_mult default is 0.5|CORRECT|max_marginal_relevance_search signature shows lambda_mult: float = 0.5
+22|Score thresholding filters by a minimum relevance score between 0 and 1|CORRECT|similarity_search_with_relevance_scores filters docs where similarity >= score_threshold
+23|Score threshold is set via search_kwargs={"score_threshold": 0.8}|CORRECT|as_retriever docstring example shows search_kwargs={"score_threshold": 0.8}
+24|The VectorStore base class defines the interface that every integration must implement|CORRECT|VectorStore is an ABC class that all vector store integrations extend
+25|At minimum a store needs similarity_search and from_texts|CORRECT|These are the only two @abstractmethod methods in VectorStore
+26|delete has a default implementation that subclasses can override|CORRECT|delete is not abstract; it has a default implementation that raises NotImplementedError
+27|get_by_ids has a default implementation that subclasses can override|CORRECT|get_by_ids is not abstract; it has a default implementation that raises NotImplementedError
+28|MMR search has a default implementation that subclasses can override|CORRECT|max_marginal_relevance_search is not abstract; it has a default implementation that raises NotImplementedError
+29|Raw distance metrics vary across backends: some use cosine distance, others use Euclidean or inner product|CORRECT|VectorStore provides _euclidean_relevance_score_fn, _cosine_relevance_score_fn, and _max_inner_product_relevance_score_fn
+30|The _select_relevance_score_fn method on VectorStore normalizes scores into a 0-to-1 range|CORRECT|The method docstring says vectorstores should define their own selection-based method of relevance; relevance scores are expected in range [0, 1]
+31|Warnings about scores outside the [0, 1] range can occur|CORRECT|similarity_search_with_relevance_scores issues warnings when scores are outside 0-1 range at lines 532-540
+32|langchain-core ships an InMemoryVectorStore|CORRECT|Defined in langchain_core/vectorstores/in_memory.py
+33|InMemoryVectorStore stores embeddings in a Python dict|CORRECT|self.store: dict[str, dict[str, Any]] = {} at line 169
+34|InMemoryVectorStore uses cosine similarity via numpy|CORRECT|Imports _cosine_similarity from utils which uses numpy for cosine similarity computation
+35|You can optionally install simsimd for faster similarity computation|CORRECT|utils.py tries to import simsimd and uses it when available for faster cosine distance computation
+36|The in-memory store supports all three search types|CORRECT|InMemoryVectorStore implements similarity_search, max_marginal_relevance_search, and inherits similarity_search_with_relevance_scores
+37|InMemoryVectorStore supports metadata filtering via callable functions|CORRECT|filter parameter typed as Callable[[Document], bool] in _similarity_search_with_score_by_vector
+38|InMemoryVectorStore supports persistence through dump and load methods|CORRECT|dump and load methods are defined at lines 516-546
+39|The base VectorStore class provides async versions of every method|CORRECT|Async versions exist for all major methods: asimilarity_search, amax_marginal_relevance_search, adelete, aget_by_ids, etc.
+40|Most async methods fall back to run_in_executor wrapping the synchronous implementation|CORRECT|Multiple async methods use return await run_in_executor(None, self.sync_method, ...) pattern
+41|The InMemoryVectorStore accepts a Python callable as a filter parameter|CORRECT|filter: Callable[[Document], bool] parameter in similarity search methods
+42|The filter function receives a Document and returns a boolean|CORRECT|Type annotation is Callable[[Document], bool] and code constructs Document objects to pass to filter
+43|Other stores like Qdrant or Chroma use their own filter syntax passed through search_kwargs|UNVERIFIABLE|Qdrant and Chroma implementations are not in the reference documentation provided
+44|There is no abstraction layer for metadata filters in langchain-core itself|CORRECT|No universal filter interface exists in langchain-core; InMemoryVectorStore uses callables while the base class has no filter abstraction
+45|The retriever interface integrates into LCEL chains|CORRECT|BaseRetriever extends RunnableSerializable which is part of the LCEL Runnable interface
+46|VectorStoreRetriever automatically populates ls_vector_store_provider in tracing metadata|CORRECT|_get_ls_params at line 1024 sets ls_params["ls_vector_store_provider"]
+47|VectorStoreRetriever automatically populates ls_embedding_provider in tracing metadata|CORRECT|_get_ls_params at lines 1026-1035 sets ls_params["ls_embedding_provider"]
+48|Some community retrievers don't implement _aget_relevant_documents at all|UNVERIFIABLE|Community retriever implementations are not in the reference documentation; the base class does provide a default fallback implementation

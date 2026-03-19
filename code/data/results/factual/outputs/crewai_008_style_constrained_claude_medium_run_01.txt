@@ -1,0 +1,50 @@
+1|CrewAI has two process modes for coordinating agents: sequential and hierarchical|CORRECT|Documentation confirms Process.sequential and Process.hierarchical as the two process modes
+2|Sequential execution is the default process mode in CrewAI|CORRECT|Documentation states "By default, tasks in CrewAI are managed through a sequential process"
+3|In sequential mode, tasks run in order and each task's output becomes context for the next|CORRECT|Documentation confirms "The sequential process ensures tasks are executed one after the other, following a linear progression"
+4|The context parameter on a Task allows overriding which task outputs serve as context|CORRECT|Documentation shows tasks using context parameter to specify which task outputs feed in, e.g. context=[self.write_section_task()]
+5|You can run parallel branches in sequential mode using async_execution=True|CORRECT|Documentation states "To create an asynchronous task, set async_execution=True when defining the task"
+6|A writing task can wait on multiple async tasks via the context parameter like context=[research_ai_task, research_ops_task]|CORRECT|Documentation shows async tasks combined with context parameter for fan-in patterns
+7|Issue #4661 in the CrewAI repo documents the context accumulation problem|CORRECT|Issue #4661 exists and describes inter-task context pollution problem
+8|In a five-task crew, Task 5's prompt can receive over 8,000 tokens of unfiltered prior output|CORRECT|Issue #4661 states "In a 5-task crew, Task 5's prompt contains ~8,000+ tokens of unfiltered prior output"
+9|Context accumulation can trigger context-length errors or degrade LLM quality|CORRECT|Issue #4661 states it causes "ContextLengthExceeded errors or degraded LLM quality"
+10|There is an open feature request for an opt-in context_strategy="summarized" to compress inter-task context|CORRECT|Issue #4661 proposes exactly this feature with context_strategy="summarized" and is in open state
+11|The context_strategy="summarized" feature has not landed yet|CORRECT|Issue #4661 is still open as of the documentation snapshot
+12|The hierarchical process introduces a manager agent that coordinates workers|CORRECT|Documentation states "A manager agent allocates tasks among crew members based on their roles and capabilities"
+13|You can provide a manager_agent directly to set up hierarchical process|CORRECT|Documentation shows manager_agent parameter for Crew configuration
+14|You can specify manager_llm (e.g., manager_llm="gpt-4o") to let CrewAI create a manager automatically|CORRECT|Documentation shows manager_llm="gpt-4o" as an option for hierarchical process
+15|Issue #4783 was filed against version 1.10.1|CORRECT|Issue #4783 reports version 1.10.1 in its details
+16|Issue #4783 was filed as recently as March 2026|CORRECT|Issue #4783 was created 2026-03-09
+17|Issue #4783 reports that dynamically created manager agents sometimes fail to delegate at all|CORRECT|Issue #4783 describes manager agents unable to delegate to worker agents, executing tasks themselves
+18|The manager doing everything itself makes hierarchical process behave like sequential|CORRECT|Issue #4783 states "effectively making the hierarchical process behave like a sequential process"
+19|The root cause of issue #4783 is in the delegation tool injection logic|CORRECT|Issue #4783 identifies the root cause in delegation tool injection where dynamically-created managers don't receive correct delegation tools
+20|The delegation tools don't always get the correct agent references when the manager is created dynamically|CORRECT|Issue #4783 states the manager "Receives delegation tools with wrong agent references" as one of the root causes
+21|Creating the manager agent explicitly rather than relying on dynamic creation is a workaround for the delegation issue|UNVERIFIABLE|Issue #4783 does not explicitly mention this as a workaround, though it implies pre-defined managers work better
+22|Setting allow_delegation=True on the manager and allow_delegation=False on specialists avoids the delegation loop problem|CORRECT|Documentation shows this exact pattern under "Delegation Loops" troubleshooting: manager with allow_delegation=True, specialists with allow_delegation=False
+23|The delegation loop problem occurs when agents bounce tasks back and forth indefinitely because both have delegation enabled|CORRECT|Documentation states under "Delegation Loops": "Agents delegate back and forth indefinitely"
+24|Delegation is opt-in via allow_delegation=True on any agent|CORRECT|Documentation confirms "When allow_delegation=True, agents automatically gain access to powerful collaboration tools"
+25|When delegation is enabled, the agent gets two built-in tools: "Delegate work to coworker" and "Ask question to coworker"|CORRECT|Documentation states "When allow_delegation=True, CrewAI automatically provides agents with two powerful tools" named "Delegate work to coworker" and "Ask question to coworker"
+26|Delegation tools let agents dynamically route work to teammates or gather information mid-task|CORRECT|Documentation describes delegation as enabling agents to "assign tasks to teammates" and "ask specific questions to gather information from colleagues"
+27|Flows use @start and @listen decorators to define an event-driven DAG|CORRECT|Documentation shows @start() and @listen() decorators for defining flow execution patterns
+28|The crewai create flow name_of_flow command scaffolds a project with the right folder structure|CORRECT|Documentation states "You can generate a new CrewAI project that includes all the scaffolding needed to create a flow with multiple crews by running: crewai create flow name_of_flow"
+29|In a flow project, crews live in their own directories under crews/|CORRECT|Documentation shows crews/ directory in the scaffolded folder structure
+30|Each crew directory has config/agents.yaml and config/tasks.yaml|CORRECT|Documentation shows config/agents.yaml and config/tasks.yaml in the crew directory structure
+31|You run a flow with crewai flow kickoff|CORRECT|Documentation states "you can run the flow by executing: crewai flow kickoff"
+32|Starting from version 0.103.0, the unified crewai run command can be used to run flows|CORRECT|Documentation states "Starting from version 0.103.0, you can run flows using the crewai run command"
+33|Flows support unstructured state via a plain dict on self.state|CORRECT|Documentation shows unstructured state using dictionary access on self.state
+34|Flows support structured state via a Pydantic BaseModel|CORRECT|Documentation shows structured state using Pydantic BaseModel subclass
+35|The @router decorator enables conditional branching in flows|CORRECT|Documentation states "The @router() decorator in Flows allows you to define conditional routing logic based on the output of a method"
+36|The @router decorator works by returning a string label that downstream methods can @listen for|CORRECT|Documentation shows @router returning string labels like "success" or "failed" with downstream @listen methods
+37|The @human_feedback decorator requires version 1.8.0+|CORRECT|Documentation states "The @human_feedback decorator requires CrewAI version 1.8.0 or higher"
+38|The @human_feedback decorator pauses the flow for human review|CORRECT|Documentation states it "enables human-in-the-loop workflows by pausing flow execution to collect feedback from a human"
+39|Issues #4319 and #4389 document how CrewAgentExecutor accumulates messages when the same agent is reused across sequential tasks|CORRECT|Both issues describe the message accumulation bug in CrewAgentExecutor when agents are reused
+40|System messages pile up (1, then 2, then 3) when the same agent is reused|CORRECT|Issue #4319 shows "After Task 1: 1 system, After Task 2: 2 system, After Task 3: 3 system" message pattern
+41|The message accumulation eventually crashes with a ValueError: Invalid response from LLM call - None or empty|CORRECT|Issue #4319 documents the crash with exactly "ValueError: Invalid response from LLM call - None or empty"
+42|The experimental AgentExecutor fixes the message accumulation bug|CORRECT|Issue #4389 states "The experimental AgentExecutor (crewai/experimental/agent_executor.py) does not have this bug, it correctly resets all execution state"
+43|The main executor still has the message accumulation bug as of the latest reports|UNVERIFIABLE|Issue #4389 includes a proposed fix but its merge status is unclear from the documentation
+44|Sharing memory between crews has been a pain point since at least May 2024 (issue #714)|CORRECT|Issue #714 was created 2024-05-30 and requests sharing memory between crew instances
+45|Memory persists to LanceDB by default|CORRECT|Documentation states "Default: LanceDB" for memory storage
+46|Memory is stored under .crewai/memory by default|CORRECT|Documentation states stored under "./.crewai/memory"
+47|You can create a single Memory() instance and pass it to multiple crews|CORRECT|Documentation shows Memory() can be shared across crews and agents
+48|memory.scope() can give individual agents their own private slice|CORRECT|Documentation shows memory.scope("/agent/researcher") creating agent-specific memory scopes
+49|A researcher agent might get memory.scope("/agent/researcher") for private findings|CORRECT|Documentation uses exactly this example: memory.scope("/agent/researcher")
+50|The main.py file wires crews together with Flow decorators in a flow project|UNVERIFIABLE|Documentation shows main.py in the scaffolded structure but exact wiring details not explicitly described this way

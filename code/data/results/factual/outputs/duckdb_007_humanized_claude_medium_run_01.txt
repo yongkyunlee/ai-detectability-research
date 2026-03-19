@@ -1,0 +1,42 @@
+1|DuckDB supports all three frame modes from the SQL standard: ROWS, RANGE, and GROUPS|CORRECT|Source code in window implementation supports ROWS, RANGE, and GROUPS frame modes; test files cover all three
+2|ROWS mode is for physical row offsets|CORRECT|Standard SQL definition confirmed by DuckDB's window implementation
+3|RANGE mode is for logical value ranges|CORRECT|Standard SQL definition confirmed by DuckDB's window implementation
+4|GROUPS mode is for peer group offsets|CORRECT|Standard SQL definition confirmed by DuckDB's window implementation
+5|DuckDB supports all four EXCLUDE options: CURRENT ROW, GROUP, TIES, and NO OTHERS|CORRECT|Source code in window_aggregator.hpp defines EXCLUDE_NO_OTHERS, EXCLUDE_CURRENT_ROW, EXCLUDE_GROUP, and EXCLUDE_TIES
+6|RANGE mode includes all rows whose date falls within seven days before the current row's date regardless of physical row count|CORRECT|This is standard RANGE frame semantics as implemented in DuckDB's window functions
+7|DuckDB borrows the QUALIFY clause from Teradata's SQL dialect|UNVERIFIABLE|No mention of Teradata as the source of QUALIFY in the DuckDB documentation or source code
+8|QUALIFY filters apply after window functions compute their results over the full dataset|CORRECT|Issue #21198 confirms: windowed COUNT(DISTINCT) values are computed before the QUALIFY predicate is applied
+9|Combining multiple QUALIFY conditions can remove rows that were counted in the original window computation|CORRECT|Issue #21198 confirms: the intersection of predicates may reduce distinct counts for groups that pass both filters
+10|DuckDB uses a segment tree with a fanout of 16 for window aggregates|CORRECT|Source code window_segment_tree.cpp line 53: static constexpr idx_t TREE_FANOUT = 16
+11|The segment tree pre-computes partial aggregations over blocks of rows|CORRECT|Source code shows WindowSegmentValue combining groups of TREE_FANOUT rows into hierarchical levels
+12|Evaluating an aggregate over any contiguous range combines only O(log n) partial states|CORRECT|The segment tree with fanout 16 enables O(log_16 n) = O(log n) range query complexity by traversing tree levels
+13|ROW_NUMBER, RANK, and DENSE_RANK track partition and peer group boundaries using validity masks|CORRECT|Source code shows WindowPeerGlobalState uses partition_mask and order_mask (ValidityMask types) for boundary tracking
+14|DENSE_RANK incrementally updates rank counters as it scans each partition|CORRECT|Source code shows NextRank() incrementally updates dense_rank counter: dense_rank++ when peer_begin == row_idx
+15|DENSE_RANK counts set bits in the order mask between partition start and the current row to figure out how many distinct peer groups precede it|CORRECT|Source code in window_rank_function.cpp confirms: dense_rank += order_mask.RowIsValid(entry, begin_offset) and dense_rank += tail_mask.CountValid(order_end - order_begin)
+16|DuckDB supports secondary ordering within window functions through an ORDER BY clause on function arguments|CORRECT|Source code shows FIRST_VALUE(a ORDER BY x) OVER (PARTITION BY p ORDER BY s) pattern in window_expression.hpp
+17|FIRST_VALUE(price ORDER BY timestamp) lets you specify an ordering independent of the frame ordering|CORRECT|Source code comment in window_expression.hpp: "FIRST_VALUE(a ORDER BY x) OVER (PARTITION BY p ORDER BY s)"
+18|Secondary ordering internally relies on token trees (merge sort trees)|CORRECT|Source code shows WindowTokenTree extends WindowMergeSortTree and is used for ORDER BY argument expressions in rank and value functions
+19|Version 1.5.0 introduced an optimization called top_n_window_elimination|CORRECT|Issue #21348 confirms this is a v1.5.0 change; source file src/optimizer/topn_window_elimination.cpp exists
+20|When DuckDB detects ROW_NUMBER() filtered to equal 1 via QUALIFY or WHERE, it rewrites to an aggregate-based plan with arg_max|CORRECT|Issue #21348 confirms: plan uses arg_max_nulls_last + HASH_GROUP_BY + SEMI JOIN instead of WINDOW operator
+21|The rewritten plan can produce two separate scans of the underlying files|CORRECT|Issue #21348 confirms: v1.5.0 shows two TABLE_SCANs joined by HASH_JOIN (SEMI)
+22|One lightweight scan to identify the winning rows, then a second to fetch all their columns|CORRECT|Issue #21348: first scan identifies winning rows via aggregate, second scan fetches all columns for those rows
+23|Over S3, each scan translates to HTTP range requests|CORRECT|Issue #21348 discusses HTTP range requests for S3-hosted Parquet files
+24|For wide tables the request count can explode|CORRECT|Issue #21348: ~90 columns cause separate HTTP request per column chunk per file
+25|One user reported going from 80 HTTP requests to over 4,200 after upgrading|CORRECT|Issue #21348: 81 requests in v1.4.4 vs 4,214 in v1.5.0
+26|Query time nearly tripled|CORRECT|Issue #21348: 11.6s in v1.4.4 vs 31.5s in v1.5.0 (wall clock time nearly tripling)
+27|The fix includes disabling the optimization with SET disabled_optimizers='top_n_window_elimination'|CORRECT|Issue #21348: hawkfish confirms this exact command restores the old plan
+28|The fix includes wrapping the source in a MATERIALIZED CTE|CORRECT|Issue #21348 confirms MATERIALIZED CTE forces single scan as workaround
+29|The team is making the optimizer more aware of storage characteristics|UNVERIFIABLE|Issue #21348 shows team is investigating but does not specifically confirm storage-aware optimizer changes as the approach
+30|When QUALIFY rn <= 50 gets rewritten, it uses arg_min_max_n|CORRECT|Issue #21431: Mytherin confirms "This gets rewritten to arg_min_max_n(..., 50)"
+31|The internal heap pre-allocates all 50 slots per group upfront|CORRECT|Issue #21431: "arg_min_max_n pre-allocates all 50 slots up-front"
+32|Most slots sit empty if actual max rank per group is much smaller|CORRECT|Issue #21431: "MAX(rn) is 3 in this case, so these slots are almost all empty"
+33|At scale, this causes out-of-memory failures that did not happen with the original window-based plan|CORRECT|Issue #21431 reproduces OOM; disabling top_n_window_elimination avoids the OOM
+34|LAG and LEAD do not respect the window frame specification|CORRECT|Issue #21330: confirmed as expected behavior - lag function does not use window framing
+35|LAG and LEAD ignoring frame matches the SQL standard and PostgreSQL's behavior|CORRECT|Issue #21330: PostgreSQL reproducer shows identical behavior
+36|LAG and LEAD always look backward or forward by a fixed number of rows within the partition|CORRECT|Issue #21330 confirms LAG returns values outside the specified RANGE frame, using fixed row offset
+37|Using lag(ts ORDER BY ts) provides LAG-like behavior constrained to a value range|CORRECT|Issue #21330: hawkfish suggested "lag(ts order by ts)" as workaround which yields expected result
+38|Independent benchmarks on 20GB of financial time-series data show DuckDB roughly 3x faster than BigQuery for window-heavy queries|CORRECT|Reddit benchmark: Window Functions DuckDB Local XL=947ms vs BigQuery=3,013ms (~3.2x faster)
+39|DuckDB roughly 5x faster than Athena for window-heavy queries|CORRECT|Reddit benchmark: Window Functions DuckDB Local XL=947ms vs Athena=5,389ms (~5.7x faster)
+40|Parquet files on S3 or R2 are a weak point for window functions in DuckDB|CORRECT|Reddit benchmark: Window Functions DuckDB+R2=12,187ms vs DuckDB Local=947ms (12.9x slower remotely)
+41|One benchmark showed window queries taking over 12 seconds remotely compared to under 1 second locally|CORRECT|Reddit benchmark: Window Functions DuckDB+R2 XL=12,187ms vs DuckDB Local XL=947ms
+42|The remote vs local gap for window functions is much larger than for simple scans or aggregations|CORRECT|Reddit benchmark: Scan 208ms vs 407ms (2x), Aggregation 382ms vs 411ms (1.1x), Window 947ms vs 12,187ms (12.9x)

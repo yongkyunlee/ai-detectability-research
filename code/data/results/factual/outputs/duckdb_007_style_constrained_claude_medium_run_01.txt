@@ -1,0 +1,55 @@
+1|DuckDB supports ROW_NUMBER() as a window function|CORRECT|Multiple test files (test_streaming_window.test, test_rownumber_orderby.test) confirm ROW_NUMBER() support
+2|DuckDB supports RANK() as a window function|CORRECT|test_streaming_window.test line 63-65 shows RANK() OVER () with STREAMING_WINDOW
+3|DuckDB supports DENSE_RANK() as a window function|CORRECT|test_dense_rank.test and test_streaming_window.test line 76-78 confirm DENSE_RANK() support
+4|DuckDB supports LEAD() as a window function|CORRECT|test_streaming_lead_lag.test and test_streaming_window.test line 169-172 confirm LEAD() support
+5|DuckDB supports LAG() as a window function|CORRECT|test_streaming_lead_lag.test and test_streaming_window.test line 103-106 confirm LAG() support
+6|DuckDB supports FIRST_VALUE() as a window function|CORRECT|test_streaming_window.test line 271-273 confirms first_value() with STREAMING_WINDOW
+7|DuckDB supports LAST_VALUE() as a window function|CORRECT|test_streaming_window.test line 399 confirms last_value() as a window function
+8|DuckDB supports NTH_VALUE() as a window function|CORRECT|test_nthvalue.test exists in test/sql/window/ confirming NTH_VALUE() support
+9|DuckDB supports SUM() as a windowed aggregate|CORRECT|test_streaming_window.test line 234-242 shows SUM(i) OVER(...) as a window aggregate
+10|DuckDB supports COUNT() as a windowed aggregate|CORRECT|test_streaming_window.test line 192-194 shows COUNT(*) OVER(...) as a window aggregate
+11|DuckDB supports AVG() as a windowed aggregate|UNVERIFIABLE|AVG() as a window aggregate is not explicitly shown in the examined test files, though it is a standard SQL aggregate
+12|DuckDB supports MIN() as a windowed aggregate|CORRECT|test_parallel_window.test_slow and pushdown_window_partition_filter.test show MIN/MAX in window context
+13|DuckDB supports MAX() as a windowed aggregate|CORRECT|test_parallel_window.test_slow line 18 shows max(i) OVER(partition by ...) as a window aggregate
+14|DuckDB supports PARTITION BY for splitting data into groups in window functions|CORRECT|Multiple test files use PARTITION BY in window specifications
+15|DuckDB supports ORDER BY for defining row ordering within window function groups|CORRECT|Multiple test files use ORDER BY in window specifications
+16|DuckDB supports ROWS frame mode in window functions|CORRECT|test_window_rows.test exists and ROWS frames are used throughout test files
+17|DuckDB supports RANGE frame mode in window functions|CORRECT|test_window_range.test_slow exists with extensive RANGE frame testing
+18|DuckDB supports GROUPS frame mode in window functions|CORRECT|test_window_groups.test_slow exists testing GROUPS functionality
+19|GROUPS mode defines boundaries by peer groups rather than individual rows or value ranges|CORRECT|This is the standard SQL definition of GROUPS mode, confirmed by test_window_groups.test_slow description
+20|DuckDB supports the EXCLUDE clause in frame specifications|CORRECT|test_window_exclude.test_slow contains extensive EXCLUDE clause tests
+21|DuckDB supports EXCLUDE NO OTHERS|CORRECT|test_window_range.test_slow contains multiple uses of EXCLUDE NO OTHERS
+22|DuckDB supports EXCLUDE CURRENT ROW|CORRECT|test_window_exclude.test_slow line 226 and others test EXCLUDE CURRENT ROW
+23|DuckDB supports EXCLUDE GROUP|CORRECT|test_window_exclude.test_slow line 257 and others test EXCLUDE GROUP
+24|DuckDB supports EXCLUDE TIES|CORRECT|test_window_exclude.test_slow line 274 and others test EXCLUDE TIES
+25|DuckDB supports QUALIFY which filters rows after window function evaluation|CORRECT|QUALIFY is used in multiple test files including test_streaming_window.test line 378 and topn_window_elimination.test_slow
+26|QUALIFY eliminates the need for subquery nesting when filtering window function results|CORRECT|The QUALIFY clause directly filters on window results without subqueries, confirmed by test usage patterns
+27|You can combine QUALIFY with named windows using WINDOW w AS (...)|UNVERIFIABLE|Both QUALIFY and named windows are confirmed separately, but no test explicitly combines them in the provided documentation
+28|An unpartitioned cumulative sum SUM(x) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) gets executed as a streaming operation|CORRECT|test_streaming_window.test line 234-242 confirms SUM with cumulative frame uses STREAMING_WINDOW
+29|The engine's physical plan shows STREAMING_WINDOW for streaming window cases|CORRECT|test_streaming_window.test uses <REGEX>:.*STREAMING_WINDOW.* to verify physical plan output
+30|SUM(DISTINCT i % 3) OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) gets streaming treatment|CORRECT|test_streaming_window_distinct.test line 15-18 confirms STREAMING_WINDOW for this exact query
+31|DISTINCT combined with FILTER clauses also gets streaming treatment|CORRECT|test_streaming_window_distinct.test line 58-61 confirms SUM(DISTINCT i % 5) FILTER (...) uses STREAMING_WINDOW
+32|If you reference SUM(cnt_trace) OVER () three times in a query, DuckDB computes it once via common subexpression elimination|CORRECT|test_window_cse.test lines 43-63 verify CSE produces only one window operator and only two computations of sum(cnt_trace)
+33|The test suite explicitly verifies that duplicate window expressions collapse into a single window operator|CORRECT|test_window_cse.test lines 47-52 use regex to confirm only one WINDOW operator in the plan
+34|QUANTILE(x, 0.3) OVER () and QUANTILE(x, 0.7) OVER () stay separate because the parameters differ|CORRECT|test_window_cse.test lines 66-77 confirm non-CSE with two quantile_disc computations remaining separate
+35|The ROW_NUMBER() OVER (...) QUALIFY rn <= N pattern gets rewritten by top-N window elimination|CORRECT|topn_window_elimination.test_slow confirms the plan shows no FILTER...WINDOW pattern, meaning the window is eliminated
+36|DuckDB can rewrite top-N window patterns into an equivalent lateral join or an aggregate using ARG_MIN/ARG_MAX|CORRECT|topn_window_elimination.test_slow line 47 mentions arg_min/max and line 87 shows COMPARISON_JOIN...AGGREGATE pattern
+37|The benchmark file topn_window_elimination.benchmark tests this with 10 million rows across 100 partitions|CORRECT|Benchmark creates range(0,100000) x range(0,100) = 10M rows with 100 keys/partitions
+38|When you filter on a column that matches a window's PARTITION BY column, DuckDB pushes the filter below the window operator|CORRECT|pushdown_window_partition_filter.test lines 132-134 show filter pushed into window's Filters when column matches partition
+39|The optimizer avoids pushing filters when a different window function in the same query doesn't partition on that column|CORRECT|pushdown_window_partition_filter.test lines 126-129 and 139-144 confirm filter stays above WINDOW when another window doesn't partition on that column
+40|DuckDB's prefix sort fusion detects when window functions share a sort prefix and combines them into a single sort pass|CORRECT|test_window_fusion.test is titled "Prefix sort fusion" and tests exactly this behavior
+41|If one window needs ORDER BY l_partkey and another needs ORDER BY l_partkey, l_orderkey, DuckDB recognizes the common prefix|CORRECT|test_window_fusion.test uses lineitem table with l_partkey and l_orderkey columns for prefix fusion testing
+42|The test_window_fusion.test file validates this across partitioned and unpartitioned combinations|CORRECT|test_window_fusion.test line 74 has "# Unpartitioned" section and tests both partitioned and unpartitioned cases
+43|Window functions in DuckDB run in parallel across partitions|CORRECT|test_parallel_window.test_slow description is "Hashing and parallel execution" with PRAGMA verify_parallelism
+44|With PRAGMA threads=4, the engine distributes independent partitions across worker threads|CORRECT|test_parallel_window.test_slow line 6 sets PRAGMA threads=4 and line 9 enables verify_parallelism
+45|The partition hashing and parallel execution tests validate against a million-row table with 1,024 partitions|CORRECT|test_parallel_window.test_slow creates range(0, 1000000) and partitions by i % 1024
+46|DuckDB's architecture is that of an in-process analytical engine|UNVERIFIABLE|README describes DuckDB as a "high-performance analytical database system" but does not explicitly state "in-process" in the provided documentation
+47|There is no network overhead between coordinators and workers in DuckDB|UNVERIFIABLE|Not explicitly stated in the provided documentation
+48|The STREAMING_WINDOW path doesn't work for arbitrary frame specifications or partitioned windows|CORRECT|test_streaming_window.test lines 18-28 show SUM/COUNT OVER() (without cumulative frame) do NOT get STREAMING_WINDOW
+49|DuckDB can spill window state to disk|CORRECT|test_window_distinct.test_slow sets temp_directory and memory_limit=500MB for a 1.5GB query, comment says "Trigger external sorting of a partition"
+50|DuckDB supports MODE() as a window function for computing the most frequent value|CORRECT|test_mode_window.test contains mode() used as a window function with sliding frames
+51|DuckDB supports MEDIAN() as a window function|CORRECT|test_quantile_window.test line 18 shows median(r) over (partition by ...) as a window function
+52|DuckDB supports QUANTILE_CONT() for moving quantile calculations as a window function|CORRECT|test_quantile_window.test line 410 shows quantile_cont(i, 0.5) OVER (...) as a window function
+53|DuckDB supports LIST() for collecting values into arrays within a window|CORRECT|test_list_window.test and test_streaming_window.test line 498 show list() used as a window function
+54|The fill() function handles gap-filling over ordered partitions|CORRECT|test_fill.test_slow confirms fill() requires ORDER BY and handles NULL interpolation over partitions
+55|DuckDB version 1.5.0 was released on March 9, 2026|CORRECT|HN post hn-47308663-announcing-duckdb-150.md dated 2026-03-09 links to duckdb.org/2026/03/09/announcing-duckdb-150

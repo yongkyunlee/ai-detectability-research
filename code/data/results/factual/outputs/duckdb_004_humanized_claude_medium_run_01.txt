@@ -1,0 +1,53 @@
+1|DuckDB is an embedded analytical database|CORRECT|README and project description confirm DuckDB is an embedded analytical database
+2|DuckDB's query optimizer has a 35-stage pipeline|CORRECT|optimizer_type.hpp defines OptimizerType enum with 35 values (1-35, excluding INVALID=0)
+3|Early optimizer stages handle expression simplification|CORRECT|EXPRESSION_REWRITER is stage 1 in the enum and runs first in optimizer.cpp
+4|Early optimizer stages handle CTE inlining|CORRECT|CTE_INLINING (enum value 28) runs early in optimizer.cpp at line 139
+5|Early optimizer stages handle aggregate rewriting|CORRECT|AGGREGATE_FUNCTION_REWRITER runs early in optimizer.cpp at line 145
+6|The optimizer converts AVG(x) into SUM(x)/COUNT(x)|CORRECT|aggregate_function_rewriter.cpp contains AvgRewriteRule with comment "AVG(x) -> SUM(x) / COUNT(x)"
+7|Middle stages include filter pushdown|CORRECT|FILTER_PUSHDOWN runs at line 157 of optimizer.cpp, roughly in the early-middle of the pipeline
+8|Middle stages include join order optimization|CORRECT|JOIN_ORDER runs at line 218 of optimizer.cpp
+9|Middle stages include column pruning|CORRECT|UNUSED_COLUMNS runs at line 235 of optimizer.cpp
+10|Middle stages include common subexpression elimination|CORRECT|COMMON_SUBEXPRESSIONS runs at line 247 of optimizer.cpp
+11|End stages include choosing build versus probe sides for hash joins|CORRECT|BUILD_SIDE_PROBE_SIDE runs at line 260 of optimizer.cpp, in the latter portion of the pipeline
+12|End stages include applying late materialization|CORRECT|LATE_MATERIALIZATION runs at line 295 of optimizer.cpp
+13|End stages include propagating statistics|CORRECT|STATISTICS_PROPAGATION runs at line 302 of optimizer.cpp
+14|End stages include reordering filter expressions based on cost heuristics|CORRECT|REORDER_FILTER runs at line 327 of optimizer.cpp, near the end of the pipeline
+15|Each optimizer stage can be individually disabled through the disabled_optimizers setting|CORRECT|settings.hpp defines DisabledOptimizersSetting with name "disabled_optimizers" and optimizer.cpp implements OptimizerDisabled() check
+16|Filter pushdown walks the logical plan top-down|CORRECT|filter_pushdown.cpp Rewrite() function dispatches on operator type and recursively processes children top-down
+17|Filter pushdown pushes filter predicates as close to table scans as possible|CORRECT|filter_pushdown.cpp implementation collects and pushes filters toward leaf scan operators
+18|Inner joins allow filter pushdown to both sides|CORRECT|pushdown_inner_join.cpp gathers join conditions and pushes filters to both sides of inner joins
+19|Left joins restrict filter pushdown to the left side|CORRECT|pushdown_left_join.cpp shows filters referencing left-side columns are pushed freely, while right-side filters are restricted unless they remove NULLs
+20|Outer joins get handled conservatively for filter pushdown|CORRECT|pushdown_outer_join.cpp uses FilterRemovesNull() and ReplaceColRefWithNull() for conservative evaluation before allowing pushdown
+21|Filters involving expressions that can throw runtime errors like sqrt() on negatives cannot be pushed down safely|CORRECT|Issue #19277 confirms this; Mytherin explains DuckDB cannot push functions that can return errors into scans, with sqrt(-1) as the example
+22|Inability to push down error-throwing filters causes full-table scans on wide tables|CORRECT|Issue #19277 shows EXPLAIN ANALYZE output where all 800,000 rows of all 780 columns are scanned due to sqrt() filter not being pushed down
+23|Switching to error-safe function variants yields speedups for filter pushdown|CORRECT|Issue #19277 response states "Using functions that do not return errors in filters should be pushed down correctly"
+24|Scalar macros create a filter pushdown problem where DuckDB cannot trace filters through the macro boundary|CORRECT|Issue #21312 shows filter pushdown not working when filter references output of get_hives() scalar macro, scanning all 309M rows
+25|Replacing a macro with a materialized variable restores filter pushdown behavior|CORRECT|Issue #21312 shows using SET VARIABLE and getvariable() restores proper file filtering (12 files vs all 28)
+26|The remove_unused_columns pass traces column references bottom-up through the plan|CORRECT|remove_unused_columns.cpp VisitOperator() recursively visits children and builds up column reference information bottom-up
+27|The column_lifetime_analyzer creates projection maps dictating which columns are alive at each operator|CORRECT|column_lifetime_analyzer.hpp describes it as traversing the tree to ensure columns are removed when no longer required; GenerateProjectionMap() in the .cpp creates projection maps
+28|Late materialization splits scans into two phases for queries with selective filters|CORRECT|late_materialization.cpp implements two-phase scanning with row-id column projection followed by fetching remaining columns
+29|The first phase of late materialization reads only filter columns and row IDs|CORRECT|late_materialization.cpp ConstructRHS() pushes row-id column for initial scan phase
+30|The second phase of late materialization fetches remaining columns only for surviving rows|CORRECT|late_materialization.cpp and late_materialization_helper.cpp implement second-pass column fetching for qualifying rows
+31|CTE materialization creates a barrier that prevents column pruning from propagating into the CTE definition|CORRECT|Issue #20958 titled "CTE materialisation prevents column pruning for simple pass-through CTEs" confirms this regression from PR #17459
+32|A pass-through CTE over a wide table selecting only two columns might scan all fifty columns if materialized|CORRECT|Issue #20958 shows SEQ_SCAN projecting all 50 columns despite query only needing id and value columns
+33|Queries went from under a second with CTE inlining to over thirty seconds with materialization|CORRECT|Issue #20958 shows 0.3s on v1.3.2 (inlining) vs 31.64s on v1.4.4 (materialization)
+34|DuckDB's execution model is pipeline-based and vectorized|CORRECT|Source code architecture confirms pipeline-based execution with vectorized processing through meta_pipeline.hpp and execution engine
+35|Data flows through operators in chunks rather than individual rows|CORRECT|DuckDB's vectorized execution processes data in batches/chunks as confirmed by the execution engine source code
+36|Vectorized execution improves CPU cache utilization|UNVERIFIABLE|While conceptually true for vectorized engines, the reference documentation does not explicitly discuss CPU cache utilization benefits
+37|Vectorized execution enables SIMD operations|UNVERIFIABLE|While DuckDB likely uses SIMD, the reference documentation does not explicitly discuss SIMD operations
+38|The task scheduler distributes work across threads using a lock-free concurrent queue|CORRECT|task_scheduler.cpp uses moodycamel::ConcurrentQueue (a lock-free data structure) with LightweightSemaphore
+39|Each thread maintains local state to keep synchronization overhead minimal|CORRECT|task_scheduler.cpp ProducerToken struct provides per-producer local state within the concurrent queue
+40|Pipelines are organized into meta-pipelines with explicit dependency edges|CORRECT|meta_pipeline.hpp defines MetaPipeline class with pipeline_dependencies map and GetDependencies() method
+41|The build side of a hash join must complete before the probe side begins|CORRECT|meta_pipeline.hpp comment states "For joins, build out the blocking side before going down the probe side" with dependency enforcement
+42|Multiple threads process different chunks simultaneously within a pipeline|CORRECT|Parallel execution model in task_scheduler.cpp distributes chunks across threads via concurrent queue
+43|For aggregations and joins, work gets partitioned by hash to avoid contention|CORRECT|radix_partitioning.cpp and physical_partitioned_aggregate.cpp implement hash-based work partitioning
+44|Bernoulli and system sampling run single-threaded even when multiple threads are available|CORRECT|Issue #21086 confirms BERNOULLI and SYSTEM sampling do not scale with threads
+45|Bernoulli and system sampling are non-parallelizable due to internal seed handling|CORRECT|Issue #21086 shows PhysicalStreamingSample::ParallelOperator() returns false because seed.IsValid() is always true after CreatePlan sets a seed
+46|Version 1.5.0 introduced hierarchical glob expansion that changed hive partition pruning behavior|CORRECT|Issue #21347 states "this might be related to the new hierarchical S3 glob expansion introduced in 1.5.0"
+47|Users with large partitioned datasets noticed regressions where queries that made 80 requests suddenly made over 4,000|INCORRECT|The 81-to-4214 request increase documented in issue #21348 is primarily caused by top_n_window_elimination rewriting queries to scan files twice, not by hierarchical glob expansion alone; the blog misattributes these numbers to the hive partition pruning context
+48|The top_n_window_elimination rule rewrites ROW_NUMBER() OVER (...) = 1 patterns into aggregate-based plans|CORRECT|Issue #21348 confirms this optimization rewrites the pattern into arg_max + HASH_GROUP_BY -> SEMI JOIN plan
+49|For wide Parquet files on S3, the top_n_window_elimination rewritten plan can require scanning files twice|CORRECT|Issue #21348 shows the rewritten plan uses two TABLE_SCANs joined by HASH_JOIN SEMI, scanning files twice
+50|The double-scan from top_n_window_elimination multiplies HTTP requests by the number of columns|CORRECT|Issue #21348 shows ~4200 GET requests from roughly 39 files x ~90 columns x ~1-2 row groups
+51|Disabling the top_n_window_elimination rule can restore the original request count|CORRECT|Issue #21348 shows disabling the rule changes the plan back to single-scan RANGE -> WINDOW -> FILTER
+52|Materializing intermediate results with a CTE can also restore request count for the top_n_window_elimination issue|CORRECT|Issue #21348 shows MATERIALIZED CTE reduces requests from 4214 to 214
+53|Each of the 35 optimizer stages can be toggled independently with a SET statement|CORRECT|disabled_optimizers setting accepts comma-separated optimizer names; test file shows SET disabled_optimizers TO 'expression_rewriter,filter_pushdown,join_order'

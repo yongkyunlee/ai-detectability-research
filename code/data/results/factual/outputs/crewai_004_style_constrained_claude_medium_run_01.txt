@@ -1,0 +1,57 @@
+1|Tools can be defined by subclassing BaseTool with a Pydantic schema for arguments|CORRECT|Documentation and source code confirm BaseTool class with args_schema (Pydantic BaseModel) in tools/base_tool.py
+2|Tools can be defined using the @tool decorator on a plain function|CORRECT|Documentation shows @tool("Name") decorator on functions as an alternative to subclassing BaseTool
+3|Both BaseTool subclass and @tool decorator paths end up wrapped in CrewStructuredTool internally|CORRECT|Source code confirms BaseTool.to_structured_tool() converts to CrewStructuredTool; parse_tools() in agent_utils.py calls tool.to_structured_tool() for each tool
+4|CrewStructuredTool handles argument validation, caching, and usage tracking|CORRECT|Source code shows CrewStructuredTool performs _parse_args() with model_validate(); BaseTool has cache_function and current_usage_count/max_usage_count attributes
+5|CrewAI re-implements tool calling through prompt engineering using a Thought/Action/Action Input/Observation format|CORRECT|Parser.py documents the expected Thought/Action/Action Input format; mouramax in issue #3154 confirms CrewAI re-implements function calling by chatting with the LLM
+6|CrewAI parses the LLM's text response to extract tool invocations|CORRECT|Parser.py in agents/parser.py implements text parsing to extract Action and Action Input from LLM responses
+7|The install command for CrewAI tools is pip install 'crewai[tools]'|CORRECT|Documentation shows pip install 'crewai[tools]' as the install command
+8|The toolkit includes SerperDevTool|CORRECT|Documentation lists SerperDevTool as a built-in tool
+9|The toolkit includes DirectoryReadTool|CORRECT|Documentation lists DirectoryReadTool as a built-in tool
+10|The toolkit includes FileReadTool|CORRECT|Documentation lists FileReadTool as a built-in tool
+11|The toolkit includes WebsiteSearchTool|CORRECT|Documentation lists WebsiteSearchTool as a built-in RAG tool
+12|The toolkit includes RAG-based search tools for CSV, PDF, JSON, and DOCX files|CORRECT|Documentation lists CSVSearchTool, PDFSearchTool, JSONSearchTool, and DOCXSearchTool as RAG-based tools
+13|There are roughly two dozen other tools beyond those named|CORRECT|Documentation lists approximately 31 total tools; subtracting the 8 specifically named yields ~23 others, consistent with roughly two dozen
+14|Tools are assigned to agents via the tools parameter at construction time|CORRECT|Documentation shows Agent constructor accepts tools parameter: tools=[tool1, tool2]
+15|Each agent only sees the tools assigned to it|CORRECT|Agent configuration shows tools are per-agent; documentation confirms tools are assigned individually
+16|CrewAI 1.9.x introduced a native tool-calling path alongside the original ReAct-style text parsing path|CORRECT|Source code in crew_agent_executor.py shows _invoke_loop() checking llm.supports_function_calling() to choose between native and ReAct paths; issue #4495 confirms regression appeared in 1.9.0+
+17|The ReAct path routes tool execution through CrewStructuredTool.invoke()|CORRECT|Source code shows ReAct path uses CrewStructuredTool with invoke() method in tools/structured_tool.py
+18|CrewStructuredTool.invoke() calls _parse_args() which runs Pydantic model_validate() on arguments|CORRECT|structured_tool.py line 283 calls _parse_args(), and _parse_args() at line 229 calls self.args_schema.model_validate(raw_args)
+19|Validation happens before the _run() method fires in the ReAct path|CORRECT|Source code shows _parse_args() with model_validate() is called before tool execution in CrewStructuredTool
+20|Missing a required field in the ReAct path produces a clean ValidationError|CORRECT|Pydantic model_validate() raises ValidationError for missing required fields, as confirmed by the structured_tool.py validation flow
+21|The native path maps tool names directly to BaseTool.run() bound methods via a dictionary in agent_utils.py|CORRECT|agent_utils.py line 211: available_functions[sanitized_name] = tool.run maps sanitized names to run() bound methods
+22|The native path calls tool_func(**args_dict) with no schema validation in between|CORRECT|Source code confirms native path directly calls available_functions[func_name](**args_dict) without args_schema validation
+23|Empty arguments from providers cause a raw TypeError like '_run() missing 1 required positional argument: query'|CORRECT|Issue #4495 documents this exact TypeError when Bedrock returns empty arguments on the native path
+24|The error gets fed back to the LLM as a generic failure and the agent retries the same broken call|CORRECT|Issue #4495 describes the agent repeatedly attempting the same broken tool call in an infinite loop
+25|Issue #4495 documents this regression in detail|CORRECT|Issue #4495 exists and documents the native tool-calling regression with custom BaseTool wrappers
+26|Code that worked on CrewAI 1.6.1 entered infinite tool-use loops after upgrading to 1.9.3|CORRECT|Issue #4495 states "In crewai==1.6.1, the same code and workflow work as expected" and confirms infinite tool-calling loops in 1.9.3
+27|Sometimes the agent never calls the tool and makes up the observation|CORRECT|Issue #3154 documents agents producing fabricated Observations without executing tool._run()
+28|Issue #3154 documented the fabricated observations problem extensively|CORRECT|Issue #3154 contains detailed reproduction steps, code samples, and multi-contributor analysis of the fabricated observation problem
+29|The agent produces a complete Thought/Action/Action Input/Observation/Final Answer trace but the tool's _run() method never executes|CORRECT|Issue #3154 confirms the agent generates a valid-looking trace but tool.run() is never called, with no logs or side effects
+30|Community reports of fabricated observations occurring with Qwen2.5-72B|CORRECT|Issue #3154 original report uses model openai/DIFY-Qwen2.5-72B-Instruct-GPTQ-Int4
+31|Community reports of fabricated observations occurring with GPT-4|CORRECT|Issue #3154 line 143 states this occurs "also with official models such as GPT-4"
+32|One contributor analyzed the parser and pointed out that the parser prioritizes Final Answer over everything|CORRECT|mouramax in issue #3154 analyzed parser.py and stated "if the LLM responds with 'Final Answer:', CrewAI gives 'Final Answer:' top priority and ends the task"
+33|If the LLM skips the tool call and jumps to a final answer, CrewAI accepts it without complaint|CORRECT|Parser.py checks for Final Answer first (line 95) and returns AgentFinish immediately without validating that a tool was actually called
+34|There is no state-machine validation to catch the sequence violation|CORRECT|mouramax in issue #3154 suggested "the parser could implement something like a state machine" confirming no such validation exists
+35|A mitigation was suggested in the issue discussion to add instructions in the task description|CORRECT|mouramax in issue #3154 lines 277-284 suggests adding "Do NOT provide the 'Observation:' field yourself; it will be provided for you after the tool runs" to the task description
+36|Community testing suggests the mitigation reduces fabricated observations|UNVERIFIABLE|Issue #3154 contains the suggestion and redvelvets agreed to try it, but no confirmed test results are documented
+37|The ToolUsage class in tool_usage.py handles the full lifecycle of a tool call|CORRECT|Source code confirms ToolUsage class exists at tools/tool_usage.py line 73 and manages parsing, execution, and error handling
+38|Tool selection uses SequenceMatcher from Python's difflib for fuzzy name matching|CORRECT|tool_usage.py imports SequenceMatcher from difflib (line 5) and uses it in _select_tool() method (lines 741-750) with a 0.85 threshold
+39|Arguments are parsed through a multi-layer pipeline: first JSON, then ast.literal_eval, then json5, then repair_json from json_repair|CORRECT|tool_usage.py _validate_tool_input() method attempts json.loads (lines 872-877), ast.literal_eval (lines 880-884), json5.loads (lines 889-894), and repair_json from json_repair (lines 897-905) in sequence
+40|The framework tries up to 3 parsing attempts via _max_parsing_attempts|CORRECT|tool_usage.py line 100 sets self._max_parsing_attempts = 3
+41|_max_parsing_attempts is reduced to 2 for larger OpenAI models like gpt-4o, o1, and o3|CORRECT|tool_usage.py lines 113-118 check if model is in OPENAI_BIGGER_MODELS (which includes gpt-4o, o1, o3 among others) and reduce to 2
+42|Every tool result passes through a caching layer with support for custom cache_function callbacks|CORRECT|tool_usage.py lines 343-352 and 575-584 show cache function checks for cache_function attribute on tools in both sync and async paths
+43|The retry boundary does not distinguish between transient failures and deterministic ones|CORRECT|Issue #4495 demonstrates the same broken call being retried infinitely; the retry mechanism in ToolUsage treats all failures uniformly
+44|CrewAI added MCP tool support through MCPToolWrapper and MCPNativeTool|CORRECT|Source code contains both MCPToolWrapper (tools/mcp_tool_wrapper.py) and MCPNativeTool (tools/mcp_native_tool.py)
+45|MCPToolWrapper uses exponential backoff|CORRECT|mcp_tool_wrapper.py contains _retry_with_exponential_backoff() method with wait_time = 2**attempt (line 114)
+46|MCPToolWrapper has 3 retries|CORRECT|mcp_tool_wrapper.py line 11: MCP_MAX_RETRIES = 3
+47|MCPToolWrapper has a 15-second connection timeout|CORRECT|mcp_tool_wrapper.py line 8: MCP_CONNECTION_TIMEOUT = 15
+48|MCPToolWrapper has a 60-second execution timeout|CORRECT|mcp_tool_wrapper.py line 9: MCP_TOOL_EXECUTION_TIMEOUT = 60
+49|MCPNativeTool creates a fresh client per invocation|CORRECT|mcp_native_tool.py _run_async() method shows client = self._client_factory() creating a new client each call
+50|MCPNativeTool creates fresh clients to avoid concurrent execution issues|UNVERIFIABLE|The code creates fresh clients per invocation but the reason is not explicitly stated in the source code or documentation
+51|Issue #4568 documents that MCP tools won't load when tools parameter is None|CORRECT|Issue #4568 confirms the bug with problematic code: if mcps and self.tools is not None: self.tools.extend(mcps)
+52|The conditional check requires self.tools is not None for MCP tools to load|CORRECT|Issue #4568 line 81 shows the exact conditional: if mcps and self.tools is not None
+53|The default None value for tools silently skips MCP initialization|CORRECT|Issue #4568 confirms that when tools defaults to None, MCP tools are silently not loaded
+54|Async tools are supported natively by defining _run as async def|CORRECT|Documentation shows AsyncCustomTool with async def _run() method as a supported pattern
+55|Async tools can use the @tool decorator on an async function|CORRECT|Documentation shows @tool("fetch_data_async") decorator on async def functions
+56|The framework detects whether a tool is synchronous or asynchronous and dispatches accordingly|CORRECT|tool_usage.py has both sync and async execution paths, with cache handling in both paths (lines 343-352 for sync, 575-584 for async)
+57|CrewAI handles async tool execution correctly in both standard Crew and Flow workflows|UNVERIFIABLE|Documentation confirms async support for tools and Flow workflows separately but does not explicitly verify combined correct behavior

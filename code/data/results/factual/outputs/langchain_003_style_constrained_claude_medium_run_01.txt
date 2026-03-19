@@ -1,0 +1,56 @@
+1|The code in langchain-core models the agent loop with an AgentAction schema|CORRECT|AgentAction is referenced in issue #16263 code showing its use in agent return_stopped_response with type hints
+2|The code in langchain-core models the agent loop with an AgentStep schema|UNVERIFIABLE|No reference to AgentStep found in any documentation or issue in the reference materials
+3|The code in langchain-core models the agent loop with an AgentFinish schema|CORRECT|AgentFinish is referenced in issue #16263 code showing its use in return_stopped_response returning output values
+4|AgentAction represents a request to execute a specific tool with specific input|CORRECT|Issue #16263 shows AgentAction paired with tool execution results in intermediate_steps: List[Tuple[AgentAction, str]]
+5|AgentFinish signals that the agent is done and has a return value|CORRECT|Issue #16263 shows AgentFinish returning output dict like {"output": "Agent stopped due to iteration limit"}
+6|The @tool decorator makes a Python function available to an agent|CORRECT|Multiple issues (#33504, #34029, #34884) show @tool decorator used to create agent-callable tools
+7|LangChain infers the argument schema from type hints via Pydantic for the @tool decorator|CORRECT|Issue #35931 confirms schema is inferred via the @tool decorator; issue #31405 discusses type hint inference
+8|The StructuredTool class handles multi-argument tools where each parameter gets its own schema field|CORRECT|Issue #35796 documents StructuredTool.from_function generating per-parameter JSON schema fields
+9|The LLM generates a JSON payload matching the tool schema and the framework validates and dispatches it|CORRECT|Issue #33504 documents JSON parsing errors in tool calls confirming JSON-based tool call invocation and validation
+10|The old entry point for creating agents was initialize_agent|CORRECT|Issue #29277 is specifically about replacing deprecated initialize_agent usage in documentation
+11|initialize_agent has been deprecated since version 0.1.0|UNVERIFIABLE|Issue #29277 confirms deprecation but does not specify the exact version when deprecation began
+12|initialize_agent is slated for removal in 1.0|UNVERIFIABLE|No documentation confirms the specific version targeted for removal of initialize_agent
+13|The replacement for initialize_agent is create_agent|CORRECT|Issue #35824 states create_agent was new in 1.0; multiple issues show it as the current agent entry point replacing initialize_agent
+14|create_agent lives in langchain.agents.factory|CORRECT|Issue #34818 shows import from langchain.agents.factory import create_agent; issue #33504 confirms module path langchain/agents/factory.py
+15|create_agent builds a compiled LangGraph state graph under the hood|CORRECT|Issue #33504 references CompiledStateGraph in create_agent source code comments
+16|initialize_agent took an AgentType enum|CORRECT|Issue #35393 shows from langchain.agents import initialize_agent, AgentType used together
+17|create_agent takes a model (string or instance), tools, and a middleware list|CORRECT|Multiple issues (#33504, #35011, #33709) show create_agent with model, tools, and middleware parameters
+18|The old AgentExecutor handled everything in one monolithic class|CORRECT|Issue #16263 shows AgentExecutor handling tool execution, early stopping, and iteration limits all in one class
+19|LangChain ships with ModelRetryMiddleware as a built-in middleware|CORRECT|Issue #35752 references ModelRetryMiddleware as an existing middleware pattern alongside other built-in middleware
+20|LangChain ships with ModelFallbackMiddleware as a built-in middleware|CORRECT|Issue #33709 extensively documents ModelFallbackMiddleware usage and its interaction with other middleware
+21|LangChain ships with ToolCallLimitMiddleware as a built-in middleware|CORRECT|Issue #35766 is specifically about enhancing the existing ToolCallLimitMiddleware behavior
+22|LangChain ships with ModelCallLimitMiddleware as a built-in middleware|CORRECT|Issue #35752 references ModelCallLimitMiddleware with file path libs/langchain_v1/langchain/agents/middleware/model_call_limit.py
+23|LangChain ships with PIIMiddleware as a built-in middleware|CORRECT|Issues #35011 and #35647 document PIIMiddleware usage with strategies like block, redact, hash, and mask
+24|LangChain ships with HumanInTheLoopMiddleware as a built-in middleware|UNVERIFIABLE|No reference to HumanInTheLoopMiddleware found in any documentation or issue
+25|LangChain ships with SummarizationMiddleware as a built-in middleware|CORRECT|Issues #35752 and #35558 reference SummarizationMiddleware reading usage_metadata for token-based triggers
+26|LangChain ships with ShellToolMiddleware as a built-in middleware|UNVERIFIABLE|No reference to ShellToolMiddleware found in any documentation or issue
+27|Middleware can hook into the before_model lifecycle point|CORRECT|Multiple issues (#33709, #35766, #35752, #33726) show @before_model hooks in middleware implementations
+28|Middleware can hook into the after_model lifecycle point|CORRECT|Multiple issues (#35954, #35011, #33504) show after_model hooks in middleware implementations
+29|Middleware can hook into the before_agent lifecycle point|CORRECT|Issues #34979 and #34548 reference before_agent hooks for middleware
+30|Middleware can hook into the after_agent lifecycle point|CORRECT|Issues #34979 and #33504 show after_agent hooks with working implementations
+31|Middleware can hook into the wrap_model_call lifecycle point|CORRECT|Issues #34548 and #34358 show wrap_model_call and awrap_model_call usage in middleware
+32|Middleware can hook into the wrap_tool_call lifecycle point|CORRECT|Issues #34029, #36069, and #33504 show wrap_tool_call used for tool inspection and error handling
+33|Issue #35011 demonstrates that streaming currently bypasses middleware|CORRECT|Issue #35011 titled "Streaming bypasses guardrails/middleware" with full reproduction showing PII leaking during stream
+34|Using PIIMiddleware with strategy="block" and streaming mode, raw tokens reach the user before the middleware can intercept them|CORRECT|Issue #35011 reproduction shows email PII fully streamed to user before PIIDetectionError is raised afterward
+35|The middleware architecture runs as a post-processing step which conflicts with token-by-token streaming|CORRECT|Issue #35011 comment states "any middleware system that runs as a post-processing step will have this problem with streaming"
+36|The maintainers have acknowledged this requires an architectural change not just a patch|UNVERIFIABLE|A community contributor stated it requires "a major architectural change" and CC'd maintainer @sydney-runkle but no direct maintainer statement is documented
+37|Issue #33504 documents a problem where the model generates invalid_tool_calls instead of valid tool_calls|CORRECT|Issue #33504 title and description detail this exact problem with reproduction code showing tool_calls=[] and invalid_tool_calls populated
+38|create_agent's routing logic checks only tool_calls and silently exits the loop when invalid_tool_calls are present|CORRECT|Issue #33504 shows routing code: if len(last_ai_message.tool_calls)==0 exits without checking invalid_tool_calls
+39|The agent just stops with no retry and no error message back to the LLM|CORRECT|Issue #33504 reproduction confirms "Model was called 1 time(s)" and "Agent exited after first call"
+40|The workaround is custom middleware that converts invalid_tool_calls into ToolMessage objects with error content|CORRECT|Issue #33504 shows ToolErrorHandlingMiddleware converting invalid_tool_calls to ToolMessage objects with error content
+41|The workaround jumps back to the model node so the LLM can see what went wrong and retry|CORRECT|Issue #33504 shows PatchInvalidToolCallsMiddleware returning jump_to="model" to redirect back to the LLM
+42|Community contributors shared working implementations of PatchInvalidToolCallsMiddleware|CORRECT|User @darklordzw shared a complete PatchInvalidToolCallsMiddleware implementation in issue #33504
+43|One commenter stated "invalid tool call should be handled by framework, not user"|CORRECT|User @sailtonight commented exactly "invalid tool call should be handled by framework, not user." in issue #33504
+44|The early_stopping_method="generate" option was documented but never implemented for newer agent types that inherit from BaseMultiActionAgent|CORRECT|Issue #16263 confirms BaseMultiActionAgent does not implement generate in return_stopped_response; only BaseSingleActionAgent.force works
+45|This is issue #16263 open since January 2024|CORRECT|Issue #16263 state is open, created 2024-01-19
+46|People hit this across versions 0.1 through 0.3|CORRECT|Issue #16263 reports at langchain 0.1.0, 0.1.16, and 0.3.x from multiple users
+47|Issue #4912 was filed in May 2023|CORRECT|Issue #4912 created 2023-05-18
+48|Issue #4912 requested a permission model for tools with long-lived read access, short-lived write access, and out-of-band approval for sensitive operations|CORRECT|Issue #4912 requests "long standing Read permissions but only have short lived Write permissions" and sudo-like out-of-band authorization
+49|Issue #4912 was closed as stale|CORRECT|Dosu bot comment in issue #4912 states "we are marking this issue as stale" and the issue state is closed
+50|The middleware system gives wrap_tool_call hooks to implement authorization|CORRECT|Issues #36069 and #34029 show wrap_tool_call being used for tool call inspection and authorization patterns
+51|LangChain does not ship a built-in permission layer for tools|CORRECT|Issue #4912 was closed without implementation; only community-built solutions like APort Agent Guardrails exist
+52|An adversarial testing report from a Hacker News discussion found a 95% failure rate on a standard LangChain agent|CORRECT|HN post #46587182 reports 57 out of 60 adversarial tests failed (95%) on a standard LangChain agent
+53|The agent was subjected to prompt injection and encoding attacks|CORRECT|HN post describes 22+ mutation types including prompt injection and encoding attacks
+54|The agent decoded malicious Base64 inputs instead of rejecting them|CORRECT|HN post states "The agent would decode malicious Base64 inputs instead of rejecting them"
+55|create_agent is a convenience wrapper around LangGraph's StateGraph|CORRECT|Issue #33504 shows create_agent builds a CompiledStateGraph; multiple issues confirm it wraps LangGraph graph construction
+56|AgentType.ZERO_SHOT_REACT_DESCRIPTION existed as a historical agent type|UNVERIFIABLE|AgentType enum is confirmed in issue #35393 but the specific ZERO_SHOT_REACT_DESCRIPTION value is not referenced in documentation

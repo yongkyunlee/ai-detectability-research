@@ -1,0 +1,57 @@
+1|CrewAI used to split memory into four separate stores: short-term, long-term, entity, and external|CORRECT|memory.mdx states the unified Memory class "replaces separate short-term, long-term, entity, and external memory types"
+2|The current system collapses everything into a single Memory class|CORRECT|memory.mdx describes a single unified Memory class replacing the old types
+3|The unified memory is backed by LanceDB|CORRECT|memory.mdx and unified_memory.py confirm default storage is LanceDB
+4|Memory is stored by default under ./.crewai/memory|CORRECT|memory.mdx states "stored under ./.crewai/memory"
+5|You call remember() to save memories|CORRECT|unified_memory.py defines the remember() method for storing content
+6|You call recall() to retrieve memories|CORRECT|unified_memory.py defines the recall() method for retrieval
+7|The LLM infers scope, categories, and importance at save time|CORRECT|memory.mdx confirms LLM analyzes content on save to infer scope, categories, and importance
+8|Recall results are ranked by a composite score blending semantic similarity, recency decay, and importance|CORRECT|memory.mdx documents the composite scoring formula with these three signals
+9|memory = Memory() gives a working instance with gpt-4o-mini as the analysis LLM|CORRECT|unified_memory.py line 67 shows default llm="gpt-4o-mini"
+10|The default embedder is OpenAI's text-embedding-3-small|CORRECT|memory.mdx provider reference table lists OpenAI text-embedding-3-small as default
+11|Both the LLM and embedder are lazily initialized|CORRECT|unified_memory.py _llm and _embedder properties show lazy initialization pattern
+12|Construction never fails even if API keys aren't configured yet|CORRECT|memory.mdx states "Memory() never fails at construction time, even if API keys aren't set"
+13|Errors surface only when you actually try to save or recall|CORRECT|memory.mdx confirms errors only surface when the LLM is actually called
+14|The composite scoring formula is: composite = semantic_weight * similarity + recency_weight * decay + importance_weight * importance|CORRECT|memory.mdx documents this exact formula
+15|The default weights are 0.5/0.3/0.2 for semantic/recency/importance|CORRECT|unified_memory.py confirms semantic_weight=0.5, recency_weight=0.3, importance_weight=0.2
+16|The default recency half-life is 30 days|CORRECT|unified_memory.py confirms recency_half_life_days=30
+17|Memories are organized into a hierarchical tree like a filesystem with paths like /project/alpha, /agent/researcher, /company/engineering|CORRECT|memory.mdx shows scope hierarchy with these exact example paths
+18|When you recall within a scope, you only search that subtree|CORRECT|memory.mdx states "when you recall within a scope, you only search that branch of the tree"
+19|This scope-based search improves both precision and performance|CORRECT|memory.mdx states scopes "improves both precision and performance"
+20|The docs recommend starting flat and letting structure emerge|CORRECT|memory.mdx best practices state "Start flat, let the LLM organize"
+21|The LLM auto-organizes incoming memories into scopes if you don't specify|CORRECT|memory.mdx describes LLM scope inference when scope is omitted
+22|MemoryScope restricts an agent's view to a single subtree|CORRECT|memory.mdx confirms MemoryScope "restricts all operations to a branch of the tree"
+23|MemorySlice lets you combine multiple branches|CORRECT|memory.mdx describes MemorySlice as "a view across multiple, possibly disjoint scopes"
+24|Slices default to read-only|CORRECT|unified_memory.py slice() method shows read_only=True as default
+25|To get write access through a slice, you must set read_only=False and specify which scope to write to|CORRECT|memory.mdx states "you must specify which scope explicitly" when read_only=False
+26|The _get_context() method concatenates all prior task raw outputs verbatim|CORRECT|crew.py _get_context() calls aggregate_raw_outputs_from_task_outputs() which joins raw outputs with a divider
+27|In a five-task sequential crew, later tasks can receive thousands of tokens of unfiltered prior output|CORRECT|Issue #4661 describes exactly this problem with ~8,000+ tokens for a 5-task crew
+28|Issue #4661 proposes an opt-in context_strategy="summarized" mode|CORRECT|Issue #4661 proposes Crew(context_strategy="summarized") with per-task override
+29|The summarized mode would compress each task's output into a few sentences before passing it downstream|CORRECT|Issue #4661 proposes "a small LLM call (~100 tokens) compresses output into a 2-3 sentence summary"
+30|The context_strategy feature is not merged yet|CORRECT|Issue #4661 state is open with no merged PR
+31|Issues #4319 and #4389 describe a bug where reusing an agent across sequential tasks accumulated message history instead of clearing it|CORRECT|Both issues describe CrewAgentExecutor not resetting self.messages between task executions
+32|Issue #4389 was filed against version 1.9.3|CORRECT|Issue #4389 environment section states "crewAI version 1.9.3"
+33|Task 1 ends with 4 messages; Task 2 starts with 8; Task 3 starts with 12 due to message accumulation|CORRECT|Issue #4319 actual behavior shows exactly this pattern: 4, 8, 12 messages
+34|The accumulation eventually causes ValueError: Invalid response from LLM call - None or empty|CORRECT|Issue #4319 states the bug leads to "crashes with ValueError: Invalid response from LLM call - None or empty"
+35|The experimental AgentExecutor handles this correctly by resetting state at the start of each invocation|CORRECT|Issue #4389 confirms "The experimental AgentExecutor correctly resets all execution state at the beginning of invoke() and invoke_async()"
+36|The production executor did not reset state between task executions|CORRECT|Issues #4319 and #4389 confirm CrewAgentExecutor.invoke() and ainvoke() did not reset self.messages and self.iterations
+37|A fix was proposed and reviewed but the issue was auto-closed by a stale bot before being fully resolved|CORRECT|Issue #4319 shows Vidit-Ostwal reviewing a PR, then github-actions bot marking stale and closing after inactivity
+38|Issue #4822 describes a context loss bug with async_execution=True|CORRECT|Issue #4822 describes ContextVar state loss when async_execution=True
+39|Tasks with async_execution=True run on background threads via threading.Thread()|CORRECT|task.py code confirms threading.Thread() is used for async task execution
+40|threading.Thread() does not inherit contextvars.Context from the spawning thread|CORRECT|Issue #4822 and Python documentation confirm threading.Thread does not propagate contextvars.Context
+41|OpenTelemetry trace context is lost in the async worker threads|CORRECT|Issue #4822 lists OpenTelemetry trace context and baggage as affected
+42|Langfuse session state is lost in the async worker threads|CORRECT|Issue #4822 lists Langfuse session context as affected
+43|The fix for the context loss bug is a one-line change using ctx = contextvars.copy_context() before spawning the thread|CORRECT|Issue #4822 proposed fix adds contextvars.copy_context() and passes ctx.run as target
+44|The failure mode of the context loss is completely silent|CORRECT|Issue #4822 states "silently resets to defaults" with no error raised
+45|CrewAI's own remember_many() implementation uses contextvars.copy_context() when submitting to its background save pool|CORRECT|unified_memory.py _submit_save() line 233 shows ctx = contextvars.copy_context() before pool.submit
+46|The encoding pipeline checks incoming content against existing records for consolidation|CORRECT|memory.mdx describes automatic consolidation checking on save
+47|If cosine similarity exceeds the consolidation_threshold (default 0.85), the LLM decides whether to keep, update, delete, or insert separately|CORRECT|memory.mdx confirms consolidation_threshold=0.85 and LLM actions: keep, update, delete, insert_new
+48|For batch saves via remember_many(), there is an intra-batch dedup step at a 0.98 cosine threshold|CORRECT|encoding_flow.py and types.py confirm batch_dedup_threshold=0.98 for intra-batch deduplication
+49|The intra-batch dedup uses pure vector math without any LLM call|CORRECT|memory.mdx states batch dedup "without any LLM calls (pure vector math)"
+50|remember_many() submits to a single-threaded pool and returns immediately|CORRECT|unified_memory.py shows _save_pool with max_workers=1 and remember_many() returns [] immediately
+51|Every recall() call hits a read barrier via drain_writes() ensuring you never query stale data|CORRECT|unified_memory.py recall() method calls self.drain_writes() at start; docs confirm read barrier
+52|When a crew finishes, kickoff() drains pending saves in a finally block so nothing is lost|CORRECT|crew.py shows drain_writes() called in finally block after task execution
+53|depth="shallow" performs direct vector search without LLM calls|CORRECT|memory.mdx states shallow is "Direct vector search with composite scoring. Fast (~200ms), no LLM calls"
+54|Deep recall mode runs a multi-step RecallFlow with LLM query analysis, parallel multi-scope search, and confidence-based iterative deepening|CORRECT|memory.mdx confirms RecallFlow includes query analysis, scope selection, parallel vector search, and confidence-based routing
+55|Queries under 200 characters skip LLM analysis automatically even in deep mode|CORRECT|memory.mdx and unified_memory.py confirm query_analysis_threshold=200 and queries shorter than this skip LLM analysis
+56|The crewai-soul project stores memories in human-readable markdown files|CORRECT|Reddit post confirms crewai-soul "stores agent identity and memories in readable markdown files"
+57|The crewai-soul project was created because the default memory store feels like a black box when debugging|CORRECT|Reddit post author describes CrewAI's built-in memory as "a black box" as motivation for crewai-soul

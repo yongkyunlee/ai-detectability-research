@@ -63,30 +63,29 @@ The cloned repos provide README, docs, and source code context. Task YAMLs refer
 |---|---|---|
 | `data/context/{project}/issues/` | GitHub issue excerpts (title + body + top comments) | `fetch_github.py` |
 | `data/context/{project}/community/` | Reddit/HN thread excerpts | `fetch_reddit.py` + `fetch_hn.py` |
-| `data/context/{project}/releases/` | Relevant changelog entries | `fetch_github.py` |
 
 Run the fetch scripts for each project (fetches the past week of data):
 
 ```bash
 cd code/
 
-# GitHub issues & releases (requires GITHUB_TOKEN env var)
-uv run python scripts/fetch_github.py --project crewai --since 2026-03-11
-uv run python scripts/fetch_github.py --project duckdb --since 2026-03-11
-uv run python scripts/fetch_github.py --project langchain --since 2026-03-11
+# GitHub issues (requires GITHUB_TOKEN env var)
+uv run python scripts/fetch_github.py --project crewai --since 2026-03-01
+uv run python scripts/fetch_github.py --project duckdb --since 2026-03-01
+uv run python scripts/fetch_github.py --project langchain --since 2026-03-01
 
 # Reddit posts
-uv run python scripts/fetch_reddit.py --project crewai --since 2026-03-11 --fetch-comments
-uv run python scripts/fetch_reddit.py --project duckdb --since 2026-03-11 --fetch-comments
-uv run python scripts/fetch_reddit.py --project langchain --since 2026-03-11 --fetch-comments
+uv run python scripts/fetch_reddit.py --project crewai --since 2026-01-01 --fetch-comments
+uv run python scripts/fetch_reddit.py --project duckdb --since 2026-01-01 --fetch-comments
+uv run python scripts/fetch_reddit.py --project langchain --since 2026-01-01 --fetch-comments
 
 # Hacker News threads
-uv run python scripts/fetch_hn.py --project crewai --since 2026-03-11
-uv run python scripts/fetch_hn.py --project duckdb --since 2026-03-11
-uv run python scripts/fetch_hn.py --project langchain --since 2026-03-11
+uv run python scripts/fetch_hn.py --project crewai --since 2026-01-01
+uv run python scripts/fetch_hn.py --project duckdb --since 2026-01-01
+uv run python scripts/fetch_hn.py --project langchain --since 2026-01-01
 ```
 
-**Preprocessing rules (for issues, community, and releases):**
+**Preprocessing rules (for issues and community):**
 - Scripts automatically strip HTML tags, marketing copy, and canned phrases
 - Kept: factual content — version numbers, commands, config details, error messages, trade-offs
 - Context is used for factual grounding only, not for borrowing phrasing
@@ -153,7 +152,7 @@ The notebook covers:
 |---|---|
 | Task definitions | `data/tasks/{project}/task_*.yaml` |
 | Cloned repos | `data/context/{project}/repo/` |
-| Additional context | `data/context/{project}/{issues,community,releases}/` |
+| Additional context | `data/context/{project}/{issues,community}/` |
 | Human baselines | `data/human_baselines/{project}/` |
 | Generated outputs | `data/generated/c{1-4}_*/` |
 | Detection results | `data/results/detection/detection_results.jsonl` |

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Fetch GitHub issues and releases for a project, saving as markdown.
+"""Fetch GitHub issues for a project, saving as markdown.
 
 Usage:
     python scripts/fetch_github.py --project crewai --since 2026-03-11
     python scripts/fetch_github.py --project duckdb --since 2026-03-11 --before 2026-03-18
 
 Requires GITHUB_TOKEN environment variable.
-Output: data/context/{project}/issues/*.md, data/context/{project}/releases/*.md
+Output: data/context/{project}/issues/*.md
 """
 from __future__ import annotations
 
@@ -158,22 +158,6 @@ def issue_to_markdown(issue: dict, comments: list[dict]) -> str:
     return "\n".join(lines)
 
 
-# -- Release → markdown ----------------------------------------------------
-
-def release_to_markdown(release: dict) -> str:
-    lines = [
-        f"# {release.get('name') or release.get('tag_name', 'Release')}",
-        "",
-        f"**Tag:** {release.get('tag_name', '')} | "
-        f"**Date:** {release.get('created_at', '')[:10]}",
-        "",
-    ]
-    body = _clean_text(release.get("body") or "")
-    if body:
-        lines.append(body)
-    return "\n".join(lines)
-
-
 # -- Fetchers --------------------------------------------------------------
 
 async def fetch_issues(
@@ -215,20 +199,6 @@ async def fetch_issues(
     return results
 
 
-async def fetch_releases(
-    client: httpx.AsyncClient, repo: str,
-    since: str | None, before: str | None,
-) -> list[dict]:
-    releases = await paginate(client, f"{GITHUB_API}/repos/{repo}/releases", label=f"{repo} releases")
-    since_dt = _parse_day(since)
-    before_dt = _parse_day(before)
-    return [
-        r for r in releases
-        if r.get("created_at")
-        and _in_window(_parse_github_dt(r["created_at"]), since_dt, before_dt)
-    ]
-
-
 # -- Main -------------------------------------------------------------------
 
 async def amain(project: str, since: str | None, before: str | None):
@@ -239,15 +209,12 @@ async def amain(project: str, since: str | None, before: str | None):
         return
 
     issues_dir = DATA_DIR / project / "issues"
-    releases_dir = DATA_DIR / project / "releases"
     issues_dir.mkdir(parents=True, exist_ok=True)
-    releases_dir.mkdir(parents=True, exist_ok=True)
 
     async with httpx.AsyncClient(timeout=30) as client:
         for repo in repos:
             print(f"Fetching {repo}...", flush=True)
 
-            # Issues
             issues = await fetch_issues(client, repo, since, before)
             for issue, comments in issues:
                 slug = _slugify(issue["title"])
@@ -256,19 +223,9 @@ async def amain(project: str, since: str | None, before: str | None):
                 (issues_dir / filename).write_text(md)
             print(f"  Saved {len(issues)} issues to {issues_dir}/", flush=True)
 
-            # Releases
-            releases = await fetch_releases(client, repo, since, before)
-            for release in releases:
-                tag = release.get("tag_name", "unknown")
-                safe_tag = re.sub(r"[^\w.-]", "_", tag)
-                filename = f"release-{safe_tag}.md"
-                md = release_to_markdown(release)
-                (releases_dir / filename).write_text(md)
-            print(f"  Saved {len(releases)} releases to {releases_dir}/", flush=True)
-
 
 def main():
-    parser = argparse.ArgumentParser(description="Fetch GitHub issues & releases for a project")
+    parser = argparse.ArgumentParser(description="Fetch GitHub issues for a project")
     parser.add_argument("--project", required=True, help="Project key (crewai, duckdb, langchain)")
     parser.add_argument("--since", help="Only items updated since this date (YYYY-MM-DD)")
     parser.add_argument("--before", help="Only items updated before this date (YYYY-MM-DD)")

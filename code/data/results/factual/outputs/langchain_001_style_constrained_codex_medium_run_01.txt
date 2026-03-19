@@ -1,0 +1,28 @@
+1|langchain is version 1.2.12|CORRECT|langchain_v1/pyproject.toml shows version = "1.2.12"
+2|langchain-core is version 1.2.20|CORRECT|core/pyproject.toml shows version = "1.2.20"
+3|langchain-openai is version 1.1.11|CORRECT|partners/openai/pyproject.toml shows version = "1.1.11"
+4|The main pyproject.toml for langchain sets requires-python = ">=3.10.0,<4.0.0"|CORRECT|langchain_v1/pyproject.toml shows requires-python = ">=3.10.0,<4.0.0"
+5|The install command is "pip install langchain"|CORRECT|README Quickstart section shows "pip install langchain"
+6|The alternative install command is "uv add langchain"|CORRECT|README Quickstart section shows "uv add langchain"
+7|langchain depends on langchain-core, langgraph, and pydantic|CORRECT|langchain_v1/pyproject.toml lists these three as dependencies
+8|Provider packages such as OpenAI live separately from the main langchain package|CORRECT|OpenAI is in libs/partners/openai as a separate package with its own pyproject.toml
+9|The install command for langchain-openai is "pip install -U langchain-openai"|UNVERIFIABLE|Documentation does not show this exact command with -U flag, though it is a standard pip pattern
+10|The environment variable for OpenAI is set with export OPENAI_API_KEY="your-api-key"|UNVERIFIABLE|Not explicitly shown in the repo README, though standard for OpenAI usage
+11|The alternative install for langchain-openai is "uv add langchain-openai"|UNVERIFIABLE|Not explicitly shown in the reference documentation for the OpenAI package
+12|A March 10, 2026 docs issue around langchain-huggingface exists about users following minimal install and discovering extra dependencies at runtime|CORRECT|Issue #35712 created 2026-03-10 is about langchain-huggingface README missing [full] extra causing HuggingFaceEmbeddings to silently fail
+13|The top-level README uses init_chat_model|CORRECT|README Quickstart shows from langchain.chat_models import init_chat_model
+14|The import path for init_chat_model is "from langchain.chat_models import init_chat_model"|CORRECT|README shows exactly this import
+15|The README example uses init_chat_model("openai:gpt-5.4")|CORRECT|README shows model = init_chat_model("openai:gpt-5.4")
+16|The README example uses model.invoke("Hello, world!")|CORRECT|README shows result = model.invoke("Hello, world!")
+17|init_chat_model gives one factory across providers|UNVERIFIABLE|The README shows it used but does not explicitly describe it as a cross-provider factory
+18|Direct imports like "from langchain_openai import ChatOpenAI" expose provider-specific parameters|CORRECT|ChatOpenAI class exists in langchain_openai and exposes parameters like timeout, max_retries, base_url, use_responses_api
+19|ChatOpenAI supports parameters timeout, max_retries, base_url, and use_responses_api|CORRECT|All four parameters are found in langchain_openai/chat_models/base.py
+20|The OpenAI integration tells users to use provider-specific packages for services like OpenRouter or DeepSeek|CORRECT|base.py docstring says to use provider-specific LangChain packages for OpenRouter, vLLM, or DeepSeek
+21|LLMChain is deprecated since 0.1.17|CORRECT|langchain_classic/chains/llm.py shows @deprecated(since="0.1.17")
+22|LLMChain deprecation points users to RunnableSequence, written as prompt | llm|CORRECT|Deprecation decorator shows alternative="RunnableSequence, e.g., `prompt | llm`"
+23|In the tests, LangChain asserts that prompt | model produces a RunnableSequence|CORRECT|Tests in core/tests/unit_tests/runnables/test_runnable.py assert RunnableSequence name for piped constructions
+24|StrOutputParser is imported from langchain_core.output_parsers|CORRECT|langchain_core/output_parsers/__init__.py exports StrOutputParser
+25|ChatPromptTemplate is imported from langchain_core.prompts|CORRECT|langchain_core/prompts/__init__.py exports ChatPromptTemplate
+26|Composed LCEL programs inherently support synchronous, asynchronous, batch, and streaming execution|CORRECT|langchain_core/runnables/base.py states "Any chain constructed this way will automatically have sync, async, batch, and streaming support"
+27|On January 17, 2025, maintainers opened a docs cleanup issue to replace initialize_agent examples with newer patterns|CORRECT|Issue #29277 was created 2025-01-17 to replace initialize_agent with langgraph.prebuilt.create_react_agent
+28|The repo recommends LangGraph for more advanced customization or agent orchestration|CORRECT|README says "If you're looking for more advanced customization or agent orchestration, check out LangGraph"

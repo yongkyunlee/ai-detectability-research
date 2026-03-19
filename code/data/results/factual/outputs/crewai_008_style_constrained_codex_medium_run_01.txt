@@ -1,0 +1,40 @@
+1|CrewAI draws a line between crews, which coordinate agents around tasks, and flows, which coordinate crews and control logic around state|CORRECT|README and docs confirm crews for agent collaboration and flows for orchestration with state management
+2|CrewAI v1.11.0 is dated March 18, 2026 in the project changelog|CORRECT|Changelog shows "<Update label="Mar 18, 2026"> ## v1.11.0"
+3|A Crew runs with process=Process.sequential unless you choose otherwise|CORRECT|Documentation confirms default process is Process.sequential
+4|Tasks execute in order in sequential process|CORRECT|Sequential process documentation confirms tasks execute one after another in defined order
+5|One task's output can become input for the next through the task context field|CORRECT|Task documentation describes the context field for specifying outputs from other tasks as context
+6|You can keep configuration in config/agents.yaml and config/tasks.yaml|CORRECT|Docs show agents_config = 'config/agents.yaml' and tasks_config = 'config/tasks.yaml'
+7|A @CrewBase class collects agents and tasks from YAML config|CORRECT|Documentation describes @CrewBase decorator working with YAML configuration
+8|An open feature request from March 1, 2026 traces the code path that aggregates prior raw outputs|CORRECT|Issue #4661 created 2026-03-01 describes aggregate_raw_outputs_from_task_outputs() concatenating all prior raw outputs
+9|In that report, a five-task crew can push roughly 8,000 or more tokens of prior output into task five|CORRECT|Issue #4661 states "~8,000+ tokens of unfiltered prior output" for a 5-task crew
+10|If you set allow_delegation=True, the agent automatically gets collaboration tools for handing work to coworkers and asking them questions|CORRECT|Collaboration docs confirm two tools: "Delegate work to coworker" and "Ask question to coworker" are automatically provided
+11|The docs say to enable delegation for coordinators and generalists, and often disable it for specialists|CORRECT|Collaboration docs say "Enable delegation for coordinators and generalists" and "Disable for focused specialists"
+12|CrewAI defaults respect_context_window to True on agents|CORRECT|Agent docs confirm "Default is True" for respect_context_window
+13|In hierarchical mode, the crew requires either manager_llm or manager_agent|CORRECT|Docs state "Either manager_agent or manager_llm must be set when using the hierarchical process"
+14|The source code enforces the requirement for manager_llm or manager_agent|CORRECT|Source code in crew.py shows _create_manager_agent() validates and creates manager agent based on these settings
+15|The manager allocates work, reviews outputs, and decides whether the task is actually complete|CORRECT|Docs state manager "oversees task execution, including planning, delegation, and validation" and "reviews outputs, and assesses task completion"
+16|If you provide a custom manager agent, CrewAI forces delegation on|CORRECT|Source code crew.py line 1150: self.manager_agent.allow_delegation = True
+17|CrewAI rejects managers that bring their own tools|CORRECT|Source code crew.py lines 1152-1159 raises Exception("Manager agent should not have tools")
+18|If no custom manager is provided, the framework creates a manager automatically|CORRECT|Source code crew.py lines 1160-1172 create a default manager agent with AgentTools
+19|Setting planning=True sends crew information to an AgentPlanner before each iteration|CORRECT|Planning docs confirm crew data is sent to AgentPlanner before each iteration
+20|The AgentPlanner appends the resulting plan to task descriptions|CORRECT|Docs confirm "Plan added to each task description"
+21|The default planner model is gpt-4o-mini|CORRECT|Planning docs state "crewAI will use gpt-4o-mini as the default LLM for planning"
+22|Turning on planning can mean starting OpenAI calls unless you override planning_llm|CORRECT|Docs state default planning requires "a valid OpenAI API key" and planning_llm can be customized
+23|An open bug report from March 9, 2026 claims some hierarchical setups don't delegate as expected and behave more like sequential execution|CORRECT|Issue #4783 created 2026-03-09 states "Manager agents only execute tasks using their own tools and never delegate... effectively making the hierarchical process behave like a sequential process"
+24|Flows give you @start, @listen, and @router decorators|CORRECT|Flow documentation describes all three decorators
+25|Flows support typed or untyped state|CORRECT|Docs describe structured state (Pydantic BaseModel) and unstructured state (flexible dict)
+26|The template docs describe crews giving autonomy and flows giving precision|CORRECT|README states "Seamlessly combine Crews (autonomy) and Flows (precision)"
+27|Multiple @start() methods can run in parallel|CORRECT|Flow docs confirm multiple start methods execute, often in parallel
+28|@router can branch by result|CORRECT|Docs describe router for conditional routing based on method output
+29|or_() and and_() let you model join behavior|CORRECT|Docs confirm or_() triggers when ANY methods emit and and_() triggers when ALL methods emit
+30|A flow can store result.raw in state|CORRECT|Docs show result.raw usage in crew output context
+31|A flow can call an agent directly with kickoff_async()|CORRECT|Flow docs show analyst.kickoff_async() calling an agent directly within a flow
+32|@persist adds SQLite-backed state persistence and recovery|CORRECT|Docs confirm SQLiteFlowPersistence as default backend for @persist decorator
+33|@human_feedback is available in v1.8.0 and later|CORRECT|Docs state "The @human_feedback decorator requires CrewAI version 1.8.0 or higher"
+34|@human_feedback lets a flow pause for review and resume with explicit feedback history|CORRECT|Docs describe pausing for feedback and accessing self.human_feedback_history
+35|flow.plot("my_flow") generates an HTML visualization|CORRECT|Docs state "The plot() method will generate the HTML file" and show flow.plot("my_flow_plot")
+36|A Hacker News discussion from March 12, 2026 argues agent frameworks have reasoning loops and tool execution while durable workflow engines solve crash recovery at a different level|CORRECT|HN discussion from March 12, 2026 (item 47351352) discusses this exact distinction between agent frameworks and durable workflow engines
+37|CrewAI treats A2A as a first-class delegation mechanism|CORRECT|Docs show A2A configuration as a parameter on Agent with A2AClientConfig and A2AServerConfig
+38|The docs show uv add 'crewai[a2a]' for A2A installation|CORRECT|A2A docs state "Install with: uv add 'crewai[a2a]'"
+39|A2AClientConfig is used for A2A client configuration|CORRECT|Docs describe A2AClientConfig with endpoint, auth, timeout, and other parameters
+40|A2A uses .well-known/agent-card.json endpoints|CORRECT|Docs show endpoint URLs pointing to .well-known/agent-card.json

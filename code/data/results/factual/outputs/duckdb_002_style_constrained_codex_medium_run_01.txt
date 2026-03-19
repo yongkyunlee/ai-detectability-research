@@ -1,0 +1,31 @@
+1|DuckDB allows querying CSV files with the syntax SELECT * FROM 'myfile.csv'|CORRECT|README Data Import section shows exactly this syntax: SELECT * FROM 'myfile.csv'
+2|DuckDB allows querying Parquet files with the syntax SELECT * FROM 'myfile.parquet'|CORRECT|README Data Import section shows exactly this syntax: SELECT * FROM 'myfile.parquet'
+3|sniff_csv() is a valid DuckDB function for inspecting CSV files|CORRECT|test/sql/copy/csv/test_sniff_csv.test extensively tests the sniff_csv function
+4|COPY lineitem FROM 'lineitem_sample.csv' (FORMAT CSV, AUTO_DETECT TRUE) is valid DuckDB syntax|CORRECT|Tests show COPY with AUTO_DETECT TRUE option (test_sample_size.test line 91-92), and FORMAT CSV is a standard COPY option
+5|The project README uses the file-in-FROM style for data import|CORRECT|README shows SELECT * FROM 'myfile.csv' and SELECT * FROM 'myfile.parquet' as data import examples
+6|CSV paths flow through read_csv_auto internally|CORRECT|Issue 21088 EXPLAIN ANALYZE output shows TABLE_SCAN function: READ_CSV_AUTO for a CSV file path query
+7|Parquet paths resolve to parquet_scan internally|UNVERIFIABLE|Documentation does not explicitly state what internal function file-path Parquet queries resolve to; tests use both parquet_scan() and read_parquet() as explicit function calls
+8|The CSV sniffer detects delimiter, quoting, escaping, header presence, date and timestamp formats, and candidate column types|CORRECT|csv_sniffer.hpp shows dialect detection (delimiter, quote, escape candidates), header detection, date/timestamp format detection, and type detection phases
+9|sniff_csv() returns the concrete read_csv(..., auto_detect=false, ...) call DuckDB would use|CORRECT|test_sniff_csv.test shows the Prompt column returns a full read_csv call with auto_detect=false and all detected parameters
+10|In the project tests, lineitem_sample.csv is sniffed into a pipe-delimited read with sixteen typed columns|CORRECT|test_sniff_csv.test shows sniff result with delim='|' and 16 columns (column00 through column15) with types BIGINT, DOUBLE, VARCHAR, DATE
+11|The sniffed lineitem_sample.csv result includes dateformat='%Y-%m-%d'|CORRECT|test_sniff_csv.test line 30 shows dateformat='%Y-%m-%d' in the generated read_csv call
+12|If you call read_csv without auto-detection, you must provide columns, otherwise binding fails|CORRECT|csv_multi_file_info.cpp lines 174-177 show error: "read_csv requires columns to be specified through the 'columns' option"
+13|The binding error tells you to use read_csv_auto or turn AUTO_DETECT=TRUE back on|CORRECT|csv_multi_file_info.cpp line 176-177: "Use read_csv_auto or set read_csv(..., AUTO_DETECT=TRUE)"
+14|In DuckDB's CSV tests for issue_811.csv, SAMPLE_SIZE=1 leaves a sparse numeric column typed as VARCHAR|CORRECT|test_sample_size.test shows with SAMPLE_SIZE=1, TestDouble column is typed as VARCHAR
+15|In DuckDB's CSV tests for issue_811.csv, SAMPLE_SIZE=-1 promotes that same column to DOUBLE|CORRECT|test_sample_size.test shows with SAMPLE_SIZE=-1, TestDouble column is typed as DOUBLE
+16|sample_size=-1 means read the whole thing during sniffing|CORRECT|csv_reader_options.cpp line 242-244: "if (sample_size_option == -1) { // If -1, we basically read the whole thing"
+17|The multi-file reader exposes union_by_name, filename, and hive_partitioning across formats|CORRECT|multi_file_options.hpp shows bool fields: filename, hive_partitioning, and union_by_name in MultiFileOptions struct
+18|Tests show parquet_scan with union_by_name=TRUE merging files whose columns were written in different orders|CORRECT|parquet_union_by_name.test_slow creates lineitem1.parquet with columns (l_orderkey, l_partkey, l_suppkey) and lineitem2.parquet with reversed order (l_partkey, l_suppkey, l_orderkey), then queries with union_by_name=TRUE
+19|The benchmark setup in benchmark/ingestion/load_tpch.sql generates TPC-H data and exports to duckdb_benchmark_data/tpch_csv and duckdb_benchmark_data/tpch_parquet|CORRECT|load_tpch.sql calls dbgen(sf=1) then EXPORT DATABASE to both paths
+20|The benchmark setup in benchmark/large/ingestion/tpch/load_tpch_sf10.sql exists|CORRECT|File exists at benchmark/large/ingestion/tpch/load_tpch_sf10.sql with CALL dbgen(sf=10) and exports to duckdb_benchmark_data/tpch_parquet_sf10 and tpch_csv_sf10
+21|The benchmark creates parallel *_csv and *_parquet views over the exported files|CORRECT|load_tpch.sql creates views like lineitem_csv, lineitem_parquet, customer_csv, customer_parquet etc. for each TPC-H table
+22|COPY lineitem FROM lineitem_sample.csv with DELIMITER '|' is used in tests to load the table|CORRECT|test_lineitem.test line 12: COPY lineitem FROM '{DATA_DIR}/csv/real/lineitem_sample.csv' DELIMITER '|'
+23|COPY lineitem TO lineitem.csv with (DELIMITER ' ', HEADER) writes data back out in tests|CORRECT|test_lineitem.test line 28: COPY lineitem TO '{TEMP_DIR}/lineitem.csv' (DELIMITER ' ', HEADER)
+24|Issue #21088 was created on 2026-02-26|CORRECT|Issue file header shows Created: 2026-02-26
+25|Issue #21088 concerns DuckDB version 1.4.4 6ddac802ff|CORRECT|Issue file shows DuckDB Version: 1.4.4 6ddac802ff
+26|The remote CSV in issue #21088 was https://cmip6-pds.s3.amazonaws.com/pangeo-cmip6.csv|CORRECT|Issue file shows this exact URL in the reproduction steps
+27|The remote CSV object had Content-Length: 83974211|CORRECT|Issue file shows Content-Length: 83974211 in the curl output
+28|duckdb_external_file_cache() stayed empty for the remote CSV|CORRECT|Issue file shows 0 rows returned from duckdb_external_file_cache()
+29|EXPLAIN ANALYZE showed roughly 80.0 MiB of HTTP input for the scan|CORRECT|Issue file shows "in: 80.0 MiB" in the HTTPFS HTTP Stats output
+30|An open 1.5.0 issue reports hive-partitioned Parquet on S3 discovering all files before pruning when recursive globbing is enabled|CORRECT|Issue #21347 (State: open) describes exactly this behavior in DuckDB v1.5.0
+31|The documented workaround for the hive partition pruning issue is SET s3_allow_recursive_globbing = false|CORRECT|Issue #21347 comment by Mytherin: "As a work-around you can use SET s3_allow_recursive_globbing = false;"

@@ -1,0 +1,49 @@
+1|In src/optimizer/optimizer.cpp, DuckDB runs rewrites for CTE inlining|CORRECT|optimizer.cpp includes cte_inlining.hpp and calls CTEInlining at lines 140-141
+2|In src/optimizer/optimizer.cpp, DuckDB runs rewrites for filter pushdown|CORRECT|optimizer.cpp includes filter_pushdown.hpp and calls FilterPushdown at lines 158-161
+3|In src/optimizer/optimizer.cpp, DuckDB runs rewrites for join ordering|CORRECT|optimizer.cpp includes join_order_optimizer.hpp
+4|In src/optimizer/optimizer.cpp, DuckDB runs rewrites for unused-column removal|CORRECT|optimizer.cpp includes remove_unused_columns.hpp and calls RemoveUnusedColumns at line 236
+5|In src/optimizer/optimizer.cpp, DuckDB runs rewrites for column lifetime analysis|CORRECT|optimizer.cpp includes column_lifetime_analyzer.hpp and calls ColumnLifetimeAnalyzer at lines 254-255
+6|The optimizer list in src/common/enums/optimizer_type.cpp contains the name filter_pushdown|CORRECT|optimizer_type.cpp lists FILTER_PUSHDOWN as an optimizer type
+7|The optimizer list in src/common/enums/optimizer_type.cpp contains the name unused_columns|CORRECT|optimizer_type.cpp lists UNUSED_COLUMNS as an optimizer type
+8|The optimizer list in src/common/enums/optimizer_type.cpp contains the name row_group_pruner|CORRECT|optimizer_type.cpp lists ROW_GROUP_PRUNER as an optimizer type
+9|The optimizer list in src/common/enums/optimizer_type.cpp contains the name sampling_pushdown|CORRECT|optimizer_type.cpp lists SAMPLING_PUSHDOWN as an optimizer type
+10|The optimizer list in src/common/enums/optimizer_type.cpp contains the name materialized_cte|CORRECT|optimizer_type.cpp lists MATERIALIZED_CTE as an optimizer type
+11|The optimizer list in src/common/enums/optimizer_type.cpp contains the name top_n_window_elimination|CORRECT|optimizer_type.cpp lists TOP_N_WINDOW_ELIMINATION as an optimizer type
+12|The built-in profiler can emit JSON with operator and scan metrics|CORRECT|Test suite confirms PRAGMA enable_profiling = 'json' and custom profiling settings for operator/scan metrics
+13|The test suite uses the command PRAGMA enable_profiling = 'json'|CORRECT|Multiple test files use exactly this command, e.g. test_default_profiling_settings.test
+14|The test suite uses the command PRAGMA profiling_output = 'profiling_output.json'|INCORRECT|Test suite uses PRAGMA profiling_output = '__TEST_DIR__/profiling_output.json' with a test directory prefix, not bare profiling_output.json
+15|The test suite uses custom profiling settings for OPERATOR_ROWS_SCANNED|CORRECT|test_custom_profiling_rows_scanned.test and other test files configure this metric
+16|The test suite uses custom profiling settings for CUMULATIVE_ROWS_SCANNED|CORRECT|test_custom_profiling_rows_scanned.test and other test files configure this metric
+17|The test suite uses custom profiling settings for TOTAL_BYTES_READ|CORRECT|test_profiling_fs.test and other test files configure this metric
+18|The test suite uses custom profiling settings for optimizer timings|CORRECT|test_custom_profiling_optimizer_settings.test uses CUMULATIVE_OPTIMIZER_TIMING metric
+19|DuckDB issue #20958 is a closed issue from February 2026|CORRECT|Issue #20958 was created 2026-02-14 and state is closed
+20|In issue #20958, a pass-through CTE went from about 0.3 seconds on DuckDB 1.3.2 to 31.64 seconds on 1.4.4|CORRECT|Issue documents 0.3s on 1.3.2 and 31.64s on 1.4.4
+21|The reproducer in issue #20958 built a 50,000,000-row table with 50 columns|CORRECT|Issue describes 50,000,000 rows and 50 columns in wide_table
+22|The reproducer selected only id and value from a WITH base AS (SELECT * FROM wide_table) CTE used twice in a UNION ALL|CORRECT|Issue describes selecting id and value from CTE base used twice via UNION ALL
+23|In DuckDB 1.3.2, the CTE was inlined and only two columns were scanned|CORRECT|Issue confirms CTE inlining and column pruning worked in 1.3.2
+24|In DuckDB 1.4.x, the CTE was materialized with all 50 columns, blocking column pruning|CORRECT|Issue confirms materialization of all 50 columns blocked pruning in 1.4.x
+25|DuckDB issue #21347 was opened on 2026-03-12|CORRECT|Issue #21347 was created on 2026-03-12
+26|Issue #21347 describes a regression in v1.5.0 (Variegata) 3a3967a|CORRECT|Issue reports version v1.5.0 (Variegata) 3a3967a
+27|Issue #21347 is about hive-partitioned Parquet on S3|CORRECT|Issue describes hive-partitioned Parquet files on S3
+28|EXPLAIN ANALYZE showed Scanning Files: 39/39 on v1.4.4|CORRECT|Issue shows v1.4.4 scanned 39/39 files
+29|EXPLAIN ANALYZE showed Scanning Files: 39/122 on v1.5.0|CORRECT|Issue shows v1.5.0 scanned 39/122 files
+30|The documented workaround for issue #21347 was SET s3_allow_recursive_globbing = false|CORRECT|Mytherin provided this workaround in the issue comments
+31|Issue #21348 was opened in March 2026|CORRECT|Issue #21348 was created on 2026-03-12
+32|In issue #21348, the query went from 81 HTTP GET requests and 11.6 seconds on v1.4.4 to 4,214 GET requests and 31.5 seconds on v1.5.0|CORRECT|Issue performance table shows exactly these numbers for v1.4.4 and v1.5.0
+33|The reported cause in issue #21348 was DuckDB's top_n_window_elimination rule|CORRECT|Issue identifies top_n_window_elimination as the responsible optimizer rule
+34|The top_n_window_elimination rule rewrote the plan into an arg_max plus HASH_GROUP_BY and SEMI JOIN pattern|CORRECT|Issue describes plan rewrite using arg_max_nulls_last with HASH_GROUP_BY and HASH_JOIN (SEMI)
+35|The rewritten plan scanned the Parquet data twice|CORRECT|Issue shows two TABLE_SCAN operators in the rewritten plan
+36|The narrow fix for issue #21348 was SET disabled_optimizers='top_n_window_elimination'|CORRECT|Issue documents this as a workaround
+37|The broader workaround for issue #21348 was wrapping the scan in a MATERIALIZED CTE|CORRECT|Issue documents MATERIALIZED CTE as a workaround option
+38|Combining MATERIALIZED with SET s3_allow_recursive_globbing = false brought request count to 82 and wall-clock time to 11.5 seconds|CORRECT|Issue performance table shows 82 GETs and 11.5s for this combination
+39|A community benchmark posted on 2026-01-27 used roughly 20 GB of ZSTD-compressed Parquet|CORRECT|Reddit post dated 2026-01-27 describes ~20GB ZSTD-compressed Parquet dataset
+40|The community benchmark used 57 queries|CORRECT|Benchmark used 42 typical analytics + 15 wide scan queries = 57 total
+41|On local storage, DuckDB's warm median dropped from 881 ms at 8 threads and 16 GB RAM to 284 ms at 32 threads and 64 GB RAM|CORRECT|Benchmark shows DuckDB Local Medium (8 threads, 16GB) at 881ms and XL (32 threads, 64GB) at 284ms warm median
+42|The benchmark showed a 14 to 20 second cold-start penalty for DuckDB plus remote R2 storage|CORRECT|Benchmark reports 14-20 second cold starts (1,679%-2,778% overhead) for DuckDB + R2
+43|The cold start had to fetch Parquet metadata including file footers, schema, and row-group information|UNVERIFIABLE|Benchmark mentions cold start overhead but does not specifically break down metadata into footers, schema, and row-group information
+44|Window-heavy workloads showed 947 ms for local DuckDB XL versus 12,187 ms for DuckDB + R2 XL|CORRECT|Benchmark reports window functions at 947ms local vs 12,187ms DuckDB + R2
+45|In DuckDB 1.4.4, BERNOULLI and SYSTEM sampling did not scale with higher SET threads values|CORRECT|Issue #21086 confirms BERNOULLI and SYSTEM sampling take same time regardless of thread count on v1.4.4
+46|In DuckDB 1.4.4, RESERVOIR sampling did scale with threads|CORRECT|Issue #21086 confirms RESERVOIR is the only sampling method that scales with threads
+47|The reason seeded sampling disabled parallel operation in the streaming sampler|CORRECT|Issue #21086 explains seed is always set, making ParallelOperator() return false and forcing single-threaded execution
+48|DuckDB exposes optimizer names through duckdb_optimizers()|CORRECT|duckdb_optimizers.cpp exists as a table function and has a corresponding test file
+49|DuckDB lets you disable one optimizer rule at a time|CORRECT|optimizer.cpp checks config.options.disabled_optimizers set via OptimizerDisabled method

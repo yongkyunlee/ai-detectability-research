@@ -1,0 +1,68 @@
+1|The command to scaffold a CrewAI project is `crewai create crew <your_project_name>`|CORRECT|Installation docs show `crewai create crew <your_project_name>` as the scaffolding command
+2|The generated project layout includes `crew.py`|CORRECT|Installation docs show crew.py under src/my_project/
+3|The generated project layout includes `config/agents.yaml`|CORRECT|Installation docs show config/agents.yaml under src/my_project/
+4|The generated project layout includes `config/tasks.yaml`|CORRECT|Installation docs show config/tasks.yaml under src/my_project/
+5|The generated project layout includes a `src/my_project/tools/` directory|CORRECT|Installation docs show tools/ directory with custom_tool.py and __init__.py under src/my_project/
+6|The install command for CrewAI tools is `pip install 'crewai[tools]'`|CORRECT|concepts/tools.mdx shows `pip install 'crewai[tools]'` as the install command
+7|SerperDevTool is a prebuilt CrewAI tool|CORRECT|SerperDevTool appears in tools table in concepts/tools.mdx and in multiple code examples
+8|FileReadTool is a prebuilt CrewAI tool|CORRECT|FileReadTool appears in tools table in concepts/tools.mdx
+9|Tools are attached to an Agent with `tools=[...]`|CORRECT|Agent attributes table shows tools parameter as List[BaseTool] in agents.mdx
+10|CrewAI docs advertise 40+ prebuilt tools|CORRECT|tools/overview.mdx title says "40+ tools" and description says "extensive library of 40+ tools"
+11|Prebuilt tools span search, files, databases, scraping, cloud, and code execution categories|CORRECT|tools/overview.mdx lists categories: Search & Research, File & Document, Database & Data, Web Scraping, Cloud & Storage, AI & ML (includes Code Interpreter)
+12|The `@tool` decorator creates a tool from a function|CORRECT|concepts/tools.mdx and base_tool.py source show @tool decorator creating Tool instances from functions
+13|The @tool decorator uses the function's docstring and type annotations to generate an argument schema|CORRECT|base_tool.py source code shows docstring and annotations are required, and schema is generated from function signature
+14|Subclassing BaseTool provides an explicit `args_schema`|CORRECT|BaseTool class in base_tool.py has args_schema field of type PydanticBaseModel
+15|BaseTool provides a `_run()` implementation method|CORRECT|BaseTool has abstract _run() method in base_tool.py line 255-271
+16|BaseTool provides optional async support through `_arun()`|CORRECT|BaseTool has _arun() method at base_tool.py line 240 that raises NotImplementedError by default, can be overridden
+17|BaseTool supports `cache_function` attribute|CORRECT|BaseTool has cache_function field in base_tool.py line 83-86
+18|BaseTool supports `result_as_answer` attribute|CORRECT|BaseTool has result_as_answer field in base_tool.py line 87-90
+19|BaseTool supports `max_usage_count` attribute|CORRECT|BaseTool has max_usage_count field in base_tool.py line 91-94
+20|In BaseTool, CrewAI validates kwargs against Pydantic schemas before execution|CORRECT|BaseTool._validate_kwargs() method in base_tool.py line 156-177 validates against args_schema using model_validate
+21|In BaseTool, CrewAI increments usage counters atomically|CORRECT|BaseTool._claim_usage() method in base_tool.py line 179-196 uses threading.Lock for atomic counter increment
+22|In BaseTool, CrewAI rejects over-limit calls with a clear guard|CORRECT|_claim_usage() returns error message string when current_usage_count >= max_usage_count
+23|The decorator-created tool can carry `result_as_answer=True`|CORRECT|tool() decorator in base_tool.py line 528-530 accepts result_as_answer parameter
+24|The decorator-created tool can carry `max_usage_count`|CORRECT|tool() decorator in base_tool.py line 529-530 accepts max_usage_count parameter
+25|CrewAI lets you set `function_calling_llm` at the crew level|CORRECT|Crew attributes table in crews.mdx shows function_calling_llm parameter
+26|CrewAI lets you set `function_calling_llm` per agent|CORRECT|Agent attributes table in agents.mdx shows function_calling_llm parameter
+27|The crew-level function_calling_llm is used for tool invocation for all agents|CORRECT|crews.mdx states: "the crew will use this LLM to do function calling for tools for all agents in the crew"
+28|Agent-level function_calling_llm overrides the crew's LLM|CORRECT|crews.mdx states: "Each agent can have its own LLM, which overrides the crew's LLM for function calling"
+29|The docs show a pattern using `gpt-4o-mini` for function_calling_llm|CORRECT|agents.mdx line 228 shows function_calling_llm="gpt-4o-mini" in the Long-Running Analysis Agent example
+30|CrewAI emits `ToolUsageStartedEvent` lifecycle events|CORRECT|event-listener.mdx lists ToolUsageStartedEvent under Tool Usage Events
+31|CrewAI emits `ToolUsageFinishedEvent` lifecycle events|CORRECT|event-listener.mdx lists ToolUsageFinishedEvent under Tool Usage Events
+32|CrewAI emits `ToolUsageErrorEvent` lifecycle events|CORRECT|event-listener.mdx lists ToolUsageErrorEvent under Tool Usage Events
+33|`before_tool_call` hooks can mutate inputs in place|CORRECT|tool-hooks.mdx explicitly describes modifying tool_input in-place and shows examples
+34|`before_tool_call` hooks can validate arguments|CORRECT|tool-hooks.mdx shows input validation examples in before hooks
+35|`before_tool_call` hooks can require approval|CORRECT|tool-hooks.mdx shows Human Approval Gate pattern with request_human_input
+36|`before_tool_call` hooks can block execution entirely by returning `False`|CORRECT|tool-hooks.mdx states "Return False to block execution"
+37|`after_tool_call` hooks can sanitize or transform the result before the agent sees it|CORRECT|tool-hooks.mdx shows result sanitization and transformation examples in after hooks
+38|The `ToolCallHookContext` includes the tool name|CORRECT|ToolCallHookContext in tool_hooks.py has tool_name attribute
+39|The `ToolCallHookContext` includes mutable input|CORRECT|ToolCallHookContext has tool_input dict described as "Mutable tool input parameters"
+40|The `ToolCallHookContext` includes the tool instance|CORRECT|ToolCallHookContext has tool attribute of type CrewStructuredTool
+41|The `ToolCallHookContext` includes the agent|CORRECT|ToolCallHookContext has agent attribute
+42|The `ToolCallHookContext` includes the task|CORRECT|ToolCallHookContext has task attribute
+43|The `ToolCallHookContext` includes the crew|CORRECT|ToolCallHookContext has crew attribute
+44|The `ToolCallHookContext` includes the result|CORRECT|ToolCallHookContext has tool_result attribute
+45|Issue #3154 was opened on July 14, 2025|CORRECT|Issue file states Created: 2025-07-14
+46|Issue #3154 was filed against CrewAI version 0.141.0|CORRECT|Issue file states crewAI Version: 0.141.0
+47|Issue #3154 describes an agent producing a Thought-Action-Observation-Final Answer trace without running custom tool code|CORRECT|Issue description states agent "does not actually invoke tools, only simulates tool usage with fabricated output"
+48|Issue #4788 was opened on March 9, 2026|CORRECT|Issue file states Created: 2026-03-09
+49|Issue #4788 was filed against CrewAI version 1.10.1|CORRECT|Issue file states crewAI Version: 1.10.1
+50|Issue #4788 describes native tool calls being discarded when a model returned assistant text alongside tool-call payloads|CORRECT|Issue title and description state "Native tool calls are discarded if LLM returns a text response" alongside tool calls
+51|CrewAI supports MCP directly on agents through the `mcps` field|CORRECT|mcp/overview.mdx shows mcps field on Agent for MCP integration
+52|MCP string form allows pointing an agent at an HTTP endpoint|CORRECT|mcp/overview.mdx shows string-based HTTPS URL references in mcps field
+53|MCP string form allows pointing an agent at a catalog slug|CORRECT|mcp/overview.mdx shows catalog slugs like "snowflake" in mcps field
+54|MCP string form enables automatic tool discovery|CORRECT|mcp/overview.mdx states "MCP tools are now automatically available to your agent"
+55|The structured MCP configuration path includes `MCPServerStdio`|CORRECT|mcp/overview.mdx shows MCPServerStdio for stdio transport
+56|The structured MCP configuration path includes `MCPServerHTTP`|CORRECT|mcp/overview.mdx shows MCPServerHTTP for HTTP transport
+57|The structured MCP configuration path includes `MCPServerSSE`|CORRECT|mcp/overview.mdx shows MCPServerSSE for SSE transport
+58|The MCP security docs warn to only connect to MCP servers you fully trust|CORRECT|mcp/security.mdx states "You should only connect your CrewAI agents to MCP servers that you fully trust"
+59|The MCP security docs call out prompt injection through tool metadata|CORRECT|mcp/security.mdx has section on "Secure Prompt Injection via Tool Metadata"
+60|The MCP security docs call out confused deputy attacks|CORRECT|mcp/security.mdx has section on "Confused Deputy Attacks"
+61|The MCP security docs call out DNS rebinding concerns|CORRECT|mcp/security.mdx has section on "DNS Rebinding Attacks"
+62|The MCP security docs call out the need for strict input validation|CORRECT|mcp/security.mdx has section on "Input Validation and Sanitization" stating it is "Critical"
+63|Security reports in the corpus targeted CodeInterpreterTool|CORRECT|Issue #4516 is titled "Command Injection and Sandbox Escape in CodeInterpreterTool"
+64|v1.11.0rc1 notes a sandbox escape fix|CORRECT|Changelog for v1.11.0rc1 (Mar 15, 2026) lists "Resolve code interpreter sandbox escape issue" under Bug Fixes
+65|v1.11.0rc2 replaces os.system with subprocess.run in unsafe-mode package installation|CORRECT|Changelog for v1.11.0rc2 (Mar 17, 2026) lists "Replace os.system with subprocess.run in unsafe mode pip install" under Bug Fixes
+66|The agent executor converts tools into structured schemas|CORRECT|BaseTool.to_structured_tool() method in base_tool.py converts tools to CrewStructuredTool instances
+67|The agent executor checks cache during tool execution|UNVERIFIABLE|Caching is mentioned as a feature in tools docs but the exact executor flow checking cache is not explicitly documented
+68|The agent executor runs before hooks and after hooks during tool execution|CORRECT|tool-hooks.mdx documents before_tool_call and after_tool_call hooks executed during tool operations

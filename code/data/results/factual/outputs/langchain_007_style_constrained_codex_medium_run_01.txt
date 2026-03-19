@@ -1,0 +1,37 @@
+1|LCEL stands for LangChain Expression Language|CORRECT|This is the standard name used throughout the LangChain documentation and codebase
+2|The key abstraction in LCEL is the Runnable|CORRECT|base.py defines Runnable as the core ABC class that all LCEL components implement
+3|In langchain_core, a runnable carries a standard execution contract including invoke, ainvoke, batch, abatch, stream, and astream|CORRECT|The Runnable class in base.py defines all six methods: invoke, ainvoke, batch, abatch, stream, and astream
+4|From the repo README, the path in is uv add langchain|CORRECT|README quickstart shows both pip install langchain and uv add langchain
+5|Composition is defined in langchain_core/runnables/base.py|CORRECT|base.py (6262 lines) contains RunnableSequence, RunnableParallel, RunnableLambda, and coerce_to_runnable
+6|RunnableSequence models a straight-through pipeline|CORRECT|RunnableSequence in base.py processes steps sequentially with first, middle, and last properties
+7|RunnableParallel models fan-out|CORRECT|RunnableParallel runs branches concurrently using ThreadPoolExecutor (sync) or asyncio.gather (async)
+8|The prompt | model | parser form is a concrete sequence object|CORRECT|The pipe operator __or__ creates a RunnableSequence via coerce_to_runnable
+9|A RunnableSequence has inferred input and output schemas|CORRECT|RunnableSequence infers schemas from its first and last steps
+10|A callable becomes a RunnableLambda through coercion|CORRECT|coerce_to_runnable in base.py converts callables to RunnableLambda
+11|A dict literal becomes a RunnableParallel through coercion|CORRECT|coerce_to_runnable in base.py converts dict to RunnableParallel
+12|A RunnableSequence batches by invoking the batch method on each component in order|CORRECT|RunnableSequence.batch processes all inputs through each step sequentially, calling batch on each step
+13|A RunnableParallel runs branches concurrently on the same input|CORRECT|RunnableParallel.invoke uses ThreadPoolExecutor and ainvoke uses asyncio.gather
+14|If every step supports streaming transforms, the whole sequence can stream end to end|CORRECT|RunnableSequence.stream uses transform chaining through each step
+15|RunnablePassthrough and .assign() are used to preserve intermediate values and add derived fields|CORRECT|passthrough.py defines RunnablePassthrough and RunnableAssign for this purpose
+16|The examples in passthrough.py show the pattern with a computed field called total_chars|CORRECT|passthrough.py line 127 shows total_chars=lambda inputs: len(inputs["llm1"] + inputs["llm2"])
+17|Every runnable can be wrapped with .with_config(...)|CORRECT|with_config is defined on the Runnable base class, creating a RunnableBinding
+18|Tests show that names, tags, and metadata propagate through nested sequences|CORRECT|test_runnable_events_v2.py and test_runnable.py contain tests verifying tags, metadata, and run_name propagation via with_config
+19|astream_events accepts a version parameter with value v2|CORRECT|astream_events in base.py accepts version parameter with "v1" or "v2", default "v2"
+20|astream_events emits structured lifecycle events for prompts, models, and chains|CORRECT|StreamEvent schema in schema.py defines structured events with event, run_id, tags, metadata, data fields
+21|Sequences and parallels expose get_graph()|CORRECT|get_graph() is defined on the Runnable base class and overridden in RunnableSequence and RunnableParallel
+22|The graph tests exercise draw_ascii() and Mermaid output|CORRECT|test_graph.py contains tests calling both draw_ascii() and draw_mermaid() on graph objects
+23|An open issue from February 19, 2026 describes an interaction between .bind(tools=...) and .with_structured_output(...) in langchain-openai|CORRECT|Issue #35320 was created 2026-02-19 and describes exactly this interaction in langchain-openai
+24|In the reported environment for the bind/structured_output issue, langchain_core was 1.2.8|CORRECT|Issue #35320 lists langchain_core 1.2.8 in the environment
+25|In the reported environment for the bind/structured_output issue, langchain_openai was 1.1.7|CORRECT|Issue #35320 lists langchain_openai 1.1.7 in the environment
+26|Structured output created a new runnable sequence whose bindings overwrote previously attached tool configuration|CORRECT|Issue #35320 root cause: with_structured_output() creates a new RunnableSequence with its own .bind() that does not merge with previously bound kwargs
+27|Tools disappeared silently from the request due to the bind/structured_output interaction|CORRECT|Issue #35320 states no error or warning is raised; the model hallucinated instead of using tools
+28|A February 2026 issue reported that RunnableRetry.batch and abatch could misassemble results when some inputs succeeded on retry and others still failed|CORRECT|Issue #35475 from 2026-02-28 describes corrupted outputs from RunnableLambda.with_retry().batch() with return_exceptions=True
+29|A separate issue showed abatch_as_completed continuing background work after an exception|CORRECT|Issue #35419 from 2026-02-24 describes abatch_as_completed not canceling pending tasks on exception
+30|The abatch_as_completed repro printed CHARGED: a and CHARGED: b after the caller had already failed on a simulated 429 rate limit|CORRECT|Issue #35419 shows a repro with RuntimeError("429 rate limit") and actual output printing CHARGED: a and CHARGED: b
+31|A Hacker News post from March 18, 2026 described the pattern where the prototype feels done after a few chained calls then production traffic reveals the real work|CORRECT|HN post 47426670 from 2026-03-18 states the prototype worked great chaining a few calls then real traffic showed spending more time on surrounding concerns
+32|The March 18, 2026 HN post mentioned retries and failover as production challenges|CORRECT|The post explicitly mentions retries and failover when a provider went down
+33|The March 18, 2026 HN post described latency drift as a production challenge|CORRECT|The post describes figuring out why latency quietly doubled over a week which is latency drift
+34|The March 18, 2026 HN post described output normalization as a production challenge|CORRECT|The post describes parsing responses that were slightly different between models which is output normalization
+35|A Hacker News post from February 14, 2026 described a third-party tool wrapping OpenAI and Anthropic batch APIs around an existing chain shape|CORRECT|HN post 47014708 from 2026-02-14 describes langasync which wraps both batch APIs behind LangChain's Runnable interface
+36|The February 14, 2026 HN post described trading seconds for up to 24 hours of latency in exchange for 50% token pricing|CORRECT|The post states 50% of the standard token price and results come back within 24 hours instead of seconds
+37|The LangChain README points advanced customization and agent orchestration toward LangGraph|CORRECT|README states if you're looking for more advanced customization or agent orchestration check out LangGraph

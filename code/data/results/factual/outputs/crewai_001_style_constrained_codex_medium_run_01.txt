@@ -1,0 +1,41 @@
+1|CrewAI repository source reports version 1.11.0|CORRECT|__init__.py shows __version__ = "1.11.0"
+2|CrewAI package metadata requires Python >=3.10, <3.14|CORRECT|pyproject.toml shows requires-python = ">=3.10, <3.14"
+3|The official installation docs center uv|CORRECT|Installation docs state "CrewAI uses the uv as its dependency management and package handling tool"
+4|The repository README still shows uv pip install crewai|CORRECT|README shows "uv pip install crewai" as the install command
+5|The uv install command is curl -LsSf https://astral.sh/uv/install.sh followed by sh|CORRECT|Installation docs show exactly this command
+6|uv tool install crewai installs the crewai CLI|CORRECT|Installation docs show "uv tool install crewai" as the CLI install step
+7|uv tool list verifies the crewai installation|CORRECT|Installation docs show "uv tool list" to verify installation
+8|crewai-tools==1.11.0 is an optional extra in CrewAI's package metadata|CORRECT|pyproject.toml shows tools = ["crewai-tools==1.11.0"] under optional-dependencies
+9|Issue reports from early 2026 describe conflicts with Google ADK around OpenTelemetry packages|CORRECT|Issue #4474 (created 2026-02-13) describes OpenTelemetry version conflicts between crewai and google-adk
+10|A February 20, 2026 installation breakage for CrewAI 1.9.3 was tied to tokenizers==0.20.3|CORRECT|Issue #4550 (created 2026-02-20) describes exactly this breakage with tokenizers 0.20.3 and crewai 1.9.3
+11|The command to create a crew is crewai create crew latest-ai-development|CORRECT|README and quickstart show this exact command
+12|The command uses latest-ai-development but the generated Python package directory is latest_ai_development (hyphen-to-underscore)|CORRECT|Quickstart shows crewai create crew latest-ai-development followed by cd latest_ai_development; create_crew.py converts hyphens to underscores
+13|The docs show the expected core structure includes pyproject.toml, .env, src/<project>/main.py, src/<project>/crew.py, tools/, config/agents.yaml, and config/tasks.yaml|CORRECT|Installation docs and README show this exact project structure
+14|The scaffold generator also creates a knowledge/ directory|CORRECT|Installation docs show knowledge/ in the structure and create_crew.py creates it explicitly
+15|The scaffold generator also creates a tests/ directory|CORRECT|create_crew.py line 140 creates (folder_path / "tests").mkdir(exist_ok=True)
+16|The scaffold creates a starter knowledge/user_preference.txt|CORRECT|Templates directory contains knowledge/user_preference.txt and create_crew.py copies it as a root template file
+17|agents.yaml defines the role, goal, and backstory for each agent|CORRECT|Template agents.yaml shows role, goal, and backstory fields for each agent
+18|tasks.yaml defines the work, expected output, and which agent owns it|CORRECT|Template tasks.yaml shows description, expected_output, and agent fields
+19|crew.py turns those definitions into Agent, Task, and Crew objects|CORRECT|Template crew.py imports and instantiates Agent, Crew, Process, Task from crewai
+20|main.py is the entry point that feeds runtime inputs into the crew|CORRECT|Template main.py defines run() which creates inputs dict and calls crew().kickoff(inputs=inputs)
+21|@CrewBase loads config/agents.yaml and config/tasks.yaml relative to the class file|CORRECT|crew_base.py defaults to "config/agents.yaml" and "config/tasks.yaml" and loads them via _load_config
+22|The @agent, @task, and @crew decorators wire the configuration to code|CORRECT|Template crew.py uses these decorators imported from crewai.project
+23|Naming consistency is required: if YAML defines research_task, the Python method should also be research_task|CORRECT|Quickstart docs state "The names you use in your YAML files should match the method names in your Python code"
+24|The generated agents.yaml defines a researcher and a reporting_analyst|CORRECT|Template agents.yaml defines exactly researcher and reporting_analyst
+25|The generated tasks.yaml defines research_task and reporting_task|CORRECT|Template tasks.yaml defines exactly research_task and reporting_task
+26|The generated crew.py runs them with Process.sequential|CORRECT|Template crew.py shows process=Process.sequential
+27|Some doc examples hard-code "the current year is 2025" into the task description|CORRECT|Quickstart tasks.yaml example contains "the current year is 2025" hard-coded in the description
+28|The template main.py passes both topic and current_year as inputs|CORRECT|Template main.py shows inputs = {'topic': 'AI LLMs', 'current_year': str(datetime.now().year)}
+29|The template tasks.yaml interpolates {current_year} dynamically using datetime.now().year|CORRECT|Template tasks.yaml uses {current_year} placeholder and template main.py provides the value via datetime.now().year
+30|The docs show adding SerperDevTool() to the researcher agent for live web search|CORRECT|Quickstart crew.py example shows tools=[SerperDevTool()] for the researcher agent
+31|Using SerperDevTool requires SERPER_API_KEY in .env|CORRECT|Quickstart docs state a Serper.dev API key SERPER_API_KEY is needed
+32|The README frames Crews as the autonomy layer and Flows as the precision layer|CORRECT|README states "Crews: Optimize for autonomy and collaborative intelligence" and "Flows: Enable granular, event-driven control"
+33|crewai install locks and installs project dependencies|CORRECT|Installation docs show crewai install before running the crew
+34|crewai run runs the project|CORRECT|Installation docs and quickstart show crewai run to execute the crew
+35|The docs point to uv add <package-name> for extra project dependencies|CORRECT|Installation docs show "uv add <package-name>" for additional packages
+36|The CLI docs expose crewai test as a follow-on command|CORRECT|CLI docs section 7 documents the crewai test command
+37|The CLI docs expose crewai replay as a follow-on command|CORRECT|CLI docs section 4 documents the crewai replay command
+38|The CLI docs expose crewai reset-memories as a follow-on command|CORRECT|CLI docs section 6 documents the crewai reset-memories command
+39|The generated main.py includes helper entry points for train, replay, and test|CORRECT|Template main.py defines train(), replay(), and test() functions
+40|The shipped template writes the final artifact to report.md at the project root|CORRECT|Template crew.py shows output_file='report.md'
+41|Some newer guide examples route the result to output/report.md|CORRECT|Quickstart crew.py code shows output_file='output/report.md'

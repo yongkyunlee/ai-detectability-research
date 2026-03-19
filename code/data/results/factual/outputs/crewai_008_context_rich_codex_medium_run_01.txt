@@ -1,0 +1,39 @@
+1|CrewAI's base-level primitives are Task, Agent, Crew, and Process|CORRECT|Source code confirms these as core classes: task.py, agent/core.py, crew.py, process.py
+2|The default process is sequential|CORRECT|crew.py field: Process = Field(default=Process.sequential)
+3|In sequential mode, each task must name an agent|CORRECT|Sequential process docs state each task must have an agent assigned; code raises error at execution if no agent
+4|Downstream tasks can consume explicit upstream outputs through Task.context|CORRECT|task.py defines context field: list[Task] whose outputs are used as context
+5|If context is left unspecified, tasks receive the accumulated raw outputs of earlier tasks|CORRECT|_get_context in crew.py: if task.context is NOT_SPECIFIED, calls aggregate_raw_outputs_from_task_outputs(task_outputs)
+6|The implementation aggregates raw upstream outputs, not compact summaries|CORRECT|formatter.py aggregate_raw_outputs_from_task_outputs joins output.raw with dividers
+7|Issue #4661 asked for an opt-in summarized context strategy to reduce prompt bloat and inter-task contamination|CORRECT|Issue #4661 title: "Add opt in context_strategy=summarized to reduce inter task context pollution"
+8|Issue #4661 discussions occurred by March 2026|CORRECT|Issue #4661 created 2026-03-01
+9|When allow_delegation=True, the framework injects collaboration tools automatically|CORRECT|_prepare_tools in crew.py checks allow_delegation and calls _add_delegation_tools or _update_manager_tools
+10|Collaboration tools are added dynamically when an agent is allowed to delegate and there are other agents available in the crew|CORRECT|_add_delegation_tools checks len(self.agents) > 1 and len(agents_for_delegation) > 0
+11|Process.hierarchical requires either a manager_llm or a manager_agent|CORRECT|check_manager_llm validator raises error if neither is provided
+12|The code validates that a custom manager should not also appear in the agents list|CORRECT|check_manager_llm raises PydanticCustomError "manager_agent_in_agents" if manager_agent is in agents list
+13|The code rejects managers that carry their own tools|CORRECT|_create_manager_agent raises Exception("Manager agent should not have tools") and clears tools
+14|The manager is not treated as a normal worker in hierarchical mode|CORRECT|_get_agent_to_use always returns self.manager_agent in hierarchical mode, regardless of task.agent
+15|planning=True runs a planner before each crew iteration|CORRECT|_handle_crew_planning is called during prepare_kickoff when crew.planning is True; docs confirm planning runs before each iteration
+16|Planning appends a plan to task descriptions|CORRECT|_handle_crew_planning: task.description += plan_map[task_number]
+17|Issue #4783 is an open bug report from March 9, 2026|CORRECT|Issue #4783 state: open, created: 2026-03-09
+18|Issue #4783 reports hierarchical crews collapsing into manager-does-everything behavior instead of true delegation|CORRECT|Issue description: "Manager agents only execute tasks using their own tools and never delegate to other agents"
+19|async_execution=True enables task-level parallelism|CORRECT|task.py async_execution field; execute_async spawns a thread; docs confirm parallel processing
+20|Async tasks run in parallel until a synchronous task forces a join|CORRECT|_execute_tasks code: when sync task encountered, pending async futures/tasks are processed first
+21|A crew can end with at most one trailing async task|CORRECT|validate_end_with_at_most_one_async_task validator in crew.py
+22|Conditional tasks cannot be async|CORRECT|Crew validator (lines 502-514) prevents ConditionalTask from having async_execution
+23|Async tasks cannot freely depend on other unresolved async outputs|CORRECT|Async tasks receive only [last_sync_output] as context, not outputs from other pending async tasks
+24|kickoff_for_each() copies the crew for each input item, then runs each copy separately|CORRECT|Source code iterates over inputs, copies crew, and calls kickoff for each
+25|kickoff_for_each_async() exists as a batch replication method|CORRECT|crew.py defines kickoff_for_each_async using run_for_each_async
+26|Issue #4822 was closed in March 2026|CORRECT|Issue #4822 state: closed, created: 2026-03-12, updated: 2026-03-13
+27|Issue #4822 documented async_execution=True losing ContextVar state|CORRECT|Issue title: "async_execution=True loses ContextVar state"
+28|The ContextVar loss was because work was launched in raw threads without preserving context|CORRECT|Issue root cause: "threading.Thread() does not inherit contextvars.Context from the spawning thread"
+29|The docs recommend native akickoff() for high-concurrency workloads|CORRECT|Crews docs: akickoff() and akickoff_for_each() recommended for high-concurrency as they use native async
+30|Flows provide @start, @listen, or_, and_, and @router|CORRECT|Flows docs confirm all five decorators/functions
+31|Multiple starts can fire in a Flow|CORRECT|Flows docs: can declare multiple unconditional starts
+32|Flow state can be untyped or Pydantic-backed|CORRECT|Flow class: Generic[T] where T is dict[str, Any] or BaseModel subclass
+33|Flow methods can call full crews as subroutines|CORRECT|Flows documentation shows crews being called from within flow methods
+34|Flow methods can host lightweight agents directly|UNVERIFIABLE|No explicit documentation found showing standalone agents used directly inside flow methods without a crew
+35|The docs show human approval loops through @human_feedback|CORRECT|human-feedback-in-flows docs describe @human_feedback decorator that pauses execution for human review
+36|@human_feedback includes pause-and-resume workflows|CORRECT|Docs describe pausing execution for human review and async/non-blocking feedback via custom HumanFeedbackProvider
+37|The code injects remember/recall tools when crew or agent memory is enabled|CORRECT|_prepare_tools calls _add_memory_tools when resolved_memory is not None; creates RecallMemoryTool and RememberTool
+38|In hierarchical mode, managers receive delegation tools even when a task already names an agent|CORRECT|_update_manager_tools: if task.agent exists, still calls _inject_delegation_tools with that agent as target
+39|Planning pairs well with hierarchical mode|UNVERIFIABLE|Docs describe planning as a general crew feature but do not specifically discuss its interaction with hierarchical mode

@@ -1,0 +1,50 @@
+1|DuckDB describes itself as a high-performance analytical database|CORRECT|README describes DuckDB as "a high-performance analytical database system"
+2|You can query a file directly with SELECT * FROM 'myfile.parquet'|UNVERIFIABLE|README mentions native Parquet support but does not show this exact syntax
+3|The repo contains test/sql/aggregate/qualify/test_qualify.test|CORRECT|File exists at that exact path in the repo
+4|test_qualify.test uses QUALIFY heavily|CORRECT|The test file contains numerous QUALIFY clause tests across 219 lines
+5|The QUALIFY test includes the query SELECT * FROM qt QUALIFY row_number() OVER (PARTITION BY b ORDER BY c) = 1|CORRECT|This exact query appears at line 22 of test_qualify.test
+6|The same test file uses aliases in QUALIFY|CORRECT|Line 28-30 shows QUALIFY row_num = 1 using a column alias
+7|The same test file uses shared WINDOW clauses|CORRECT|Line 62 shows WINDOW w AS (ORDER BY mark) with QUALIFY row_number() OVER w
+8|The same test file uses first_value() and last_value()|CORRECT|Lines 68 and 75 show first_value(mark) and last_value(mark) in QUALIFY tests
+9|In issue #21198, a report about combined count(distinct) filters turned out to be expected behavior|CORRECT|Issue #21198 is labeled "expected behavior" and was closed as such
+10|The windowed counts are computed before the QUALIFY predicate is applied|CORRECT|hawkfish's explanation in issue #21198 confirms this semantic
+11|Filtering rows via QUALIFY afterward can shrink the set that survives each partition|CORRECT|hawkfish's detailed data tables in issue #21198 demonstrate this effect
+12|A global rank() OVER (ORDER BY mark DESC) = 4 returns two rows in the test|CORRECT|Lines 49-52 of test_qualify.test show two result rows: Lily/english/70 and Isabella/Science/70
+13|The two rows returned have the same mark value|CORRECT|Both rows have mark=70; marks in desc order are 90,89,80,70,70,65,60,55,50 so rank 4 has a tie
+14|The QUALIFY tests use a moving average over power generation data|CORRECT|Lines 81-122 create a power table (plant, date, mwh) and compute avg(mwh) over a range frame
+15|The power generation moving average uses a frame of RANGE BETWEEN INTERVAL 3 DAYS PRECEDING AND INTERVAL 3 DAYS FOLLOWING|CORRECT|Line 118 shows exactly this frame specification
+16|test/sql/window/test_window_distinct.test covers COUNT(DISTINCT ...) OVER (...)|CORRECT|The test file includes windowed COUNT(DISTINCT) aggregate tests
+17|test_window_distinct.test includes both ROWS and RANGE frames|CORRECT|Agent confirmed the test covers both ROWS and RANGE frames
+18|test_window_distinct.test includes nested types|CORRECT|Agent confirmed the test covers STRUCT and LIST nested types
+19|Issue #21330 involved a user expecting lag(ts) to respect a RANGE frame of 15 minutes|CORRECT|Issue describes RANGE BETWEEN INTERVAL 15 MINUTES PRECEDING AND CURRENT ROW with lag()
+20|The user expected lag to return NULL outside the RANGE bound|CORRECT|Issue reporter expected ts_lag to be NULL since delta between rows exceeds the range
+21|DuckDB returned the same result as Postgres for the lag with RANGE issue|CORRECT|szarnyasg confirmed PostgreSQL produces the same result
+22|Issue #21330 was closed as expected behavior|CORRECT|Issue state is closed and hawkfish explained lag does not use window framing
+23|lag does not use window framing|CORRECT|hawkfish's explanation via Discord in issue #21330 confirms this
+24|test/sql/window/test_streaming_window.test asserts EXPLAIN produces a STREAMING_WINDOW physical operator|CORRECT|The test uses <REGEX>:.*STREAMING_WINDOW.* assertions on EXPLAIN output
+25|STREAMING_WINDOW is produced for row_number() OVER ()|CORRECT|Lines 49-52 of test_streaming_window.test confirm this
+26|STREAMING_WINDOW is produced for lag|CORRECT|Lines 101-106 confirm STREAMING_WINDOW for LAG
+27|STREAMING_WINDOW is produced for lead|CORRECT|Lines 145-172 confirm STREAMING_WINDOW for LEAD
+28|STREAMING_WINDOW is produced for running aggregates with ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW|CORRECT|Lines 189-194 confirm STREAMING_WINDOW for COUNT(*) OVER(ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+29|benchmark/micro/window/window_rownumber_orderbys.benchmark exists in the repo|CORRECT|File exists at that exact path
+30|The window_rownumber_orderbys benchmark builds a 10,000,000-row table|CORRECT|Line 10 uses range(10_000_000) to generate 10 million rows
+31|The window_rownumber_orderbys benchmark exercises row_number with partitioning, ordering, and a RANGE frame|CORRECT|Benchmark uses PARTITION BY customer_id, ORDER BY date, and RANGE BETWEEN CURRENT ROW AND INTERVAL 1 WEEK FOLLOWING
+32|benchmark/micro/optimizer/topn_window_elimination.benchmark exists in the repo|CORRECT|File exists at that exact path
+33|The topn_window_elimination benchmark compares lateral top-N patterns with row_number() QUALIFY rn <= 1 and rn <= 3|CORRECT|Benchmark includes LATERAL LIMIT 1/3 and row_number() QUALIFY rn <= 1/rn <= 3 patterns
+34|DuckDB 1.5.0 was released on March 9, 2026|CORRECT|HN post dated 2026-03-09 links to duckdb.org/2026/03/09/announcing-duckdb-150
+35|DuckDB 1.5.0 added a top_n_window_elimination optimizer rule|CORRECT|Issue #21348 confirms this behavior is new in v1.5.0 vs v1.4.4; source file exists
+36|The top_n_window_elimination rule is implemented in src/optimizer/topn_window_elimination.cpp|CORRECT|File exists at that exact path (1101 lines)
+37|The optimizer rewrites patterns like QUALIFY row_number() OVER (...) = 1 into a Top-N style plan|CORRECT|Source file description confirms it converts row_number() QUALIFY patterns into grouped aggregate operations
+38|Issue #21348 shows the query went from about 81 HTTP GET requests in v1.4.4 to 4,214 in v1.5.0|CORRECT|Issue performance table shows exactly 81 GETs in v1.4.4 and 4214 GETs in v1.5.0
+39|In issue #21348, wall-clock time rose from 11.6s to 31.5s|CORRECT|Issue performance table shows 11.6s in v1.4.4 and 31.5s in v1.5.0
+40|The issue involved hive-partitioned Parquet files in S3|CORRECT|Issue title and description reference hive-partitioned Parquet in S3
+41|The plan shifted from a single scan plus WINDOW to aggregate and join operators that scanned remote data twice|CORRECT|Issue describes rewrite to arg_max + HASH_GROUP_BY -> SEMI JOIN scanning files twice
+42|Issue #21431 reports an out-of-memory failure for QUALIFY rn <= 50|CORRECT|Issue describes OOM when using QUALIFY rn <= 50 with ROW_NUMBER()
+43|The rewrite used arg_min_max_n(..., 50) and preallocated slots aggressively|CORRECT|Mytherin's explanation confirms arg_min_max_n(..., 50) pre-allocates all 50 slots
+44|The real maximum rank was only 3 in issue #21431|CORRECT|Issue states MAX(rn) is only 3 despite 50 slots being allocated
+45|The optimizer can be disabled with SET disabled_optimizers='top_n_window_elimination'|CORRECT|Both issues #21348 and #21431 confirm this workaround
+46|A MATERIALIZED CTE and SET s3_allow_recursive_globbing = false could restore a saner access pattern for remote scans|CORRECT|Issue #21348 shows this workaround restored 82 GETs/11.5s performance
+47|A January 27, 2026 community benchmark used roughly 20 GB of Parquet data|CORRECT|Reddit post dated 2026-01-27 describes ~20GB of financial time-series Parquet data
+48|The community benchmark ran 57 queries|CORRECT|Reddit post states 57 queries total (42 analytics + 15 wide scans)
+49|The DuckDB Local XL median for window functions was 947 ms in the community benchmark|CORRECT|Performance by Query Type table shows DuckDB Local (XL) Window Functions = 947 ms
+50|DuckDB plus remote R2 storage median for window functions was 12,187 ms in the community benchmark|CORRECT|Performance by Query Type table shows DuckDB + R2 (XL) Window Functions = 12,187 ms

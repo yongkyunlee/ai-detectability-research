@@ -1,0 +1,39 @@
+1|DuckDB 1.5.0 was released on March 9, 2026|CORRECT|HN announcement dated 2026-03-09 links to duckdb.org/2026/03/09/announcing-duckdb-150
+2|The Python example file is located at examples/python/duckdb-python.py|CORRECT|File exists at that exact path in the repository
+3|duckdb.connect() with no arguments opens an in-memory database|CORRECT|Example comment on line 5 says "connect to an in-memory temporary database" and line 6 shows conn = duckdb.connect()
+4|The example creates a table with CREATE TABLE test_table (i INTEGER, j STRING)|CORRECT|Example line 12 shows exactly this SQL statement
+5|The example uses placeholders for parameterized inserts with INSERT INTO test_table VALUES (?, ?) and [2, "two"]|CORRECT|Example line 18 shows conn.execute("INSERT INTO test_table VALUES (?, ?)", [2, 'two'])
+6|The example uses executemany to insert multiple rows with [[3, "three"], [4, "four"]]|CORRECT|Example line 21 shows conn.executemany with exactly those values
+7|cursor() exists for DB-API compatibility and is described as "fully redundant"|CORRECT|Example line 8 says "PEP 249" (the DB-API spec) and "fully redundant"
+8|The regression script sets connection-level options like SET threads=...|CORRECT|regression_test_python.py contains multiple instances of self.con.execute(f"SET threads={threads}")
+9|CSV files can be queried directly with SELECT * FROM 'myfile.csv'|CORRECT|README line 33 shows exactly this SQL statement
+10|Parquet files can be queried directly with SELECT * FROM 'myfile.parquet'|CORRECT|README line 34 shows exactly this SQL statement
+11|The example registers a pandas DataFrame as a view with con.register("test_df", test_df)|CORRECT|Example line 37 shows conn.register("test_df", test_df) with comment "make this data frame available as a view in duckdb"
+12|The example shows con.from_df(test_df) which returns a relation|CORRECT|Example line 44 shows rel = conn.from_df(test_df) in the relation API section
+13|The example shows duckdb.df(test_df) as a shorthand that returns a relation|CORRECT|Example line 48 shows rel = duckdb.df(test_df) described as "alternative shorthand"
+14|In Issue #3057, a maintainer suggested CREATE TABLE items AS SELECT * FROM df without explicit register()|INCORRECT|The suggestion came from Alex-Monahan, a community member, not a maintainer; the exact suggestion used "my_dataframe" not "df"
+15|Issue #3057 showed a DataFrame with columns foo and bar being inserted into a table defined as (bar INTEGER, foo INTEGER)|CORRECT|Issue shows df = pd.DataFrame(dict(foo=[1,2,3], bar=[7,8,9])) and CREATE TABLE items(bar INTEGER, foo INTEGER)
+16|INSERT INTO items SELECT * FROM items_view loaded values by position, not by matching column names|CORRECT|Issue discussion confirms values were loaded positionally, causing column confusion
+17|The column confusion bug occurred on DuckDB 0.3.1|CORRECT|Issue #3057 environment section states DuckDB Version: 0.3.1
+18|Relations are described as "lazily evaluated chains of relational operators"|CORRECT|Example line 41 comment uses exactly this phrase
+19|Relations support filter, project, order, limit, and join operations|CORRECT|Example lines 85-103 demonstrate all five operations on relations
+20|rel.filter("i > 1").project("i + 1, j").order("j").limit(2) is shown as a chained relation example|CORRECT|Example line 103 shows exactly this chain: rel.filter('i > 1').project('i + 1, j').order('j').limit(2)
+21|The example exposes fetchall() as a result conversion option|CORRECT|Example line 149 shows res.fetchall()
+22|The example exposes fetchone() as a result conversion option|CORRECT|Example line 148 shows res.fetchone()
+23|The example exposes fetchdf() as a result conversion option|CORRECT|Example line 24 shows .fetchdf()
+24|The example exposes fetchnumpy() as a result conversion option|CORRECT|Example line 27 shows .fetchnumpy()
+25|The example exposes relation .df() as a result conversion option|CORRECT|Example line 155 shows rel.df() described as "shorthand for to_df()"
+26|The example exposes relation .to_df() as a result conversion option|CORRECT|Example line 152 shows rel.to_df()
+27|The example exposes Arrow output through .arrow()|INCORRECT|The .arrow() method does not appear anywhere in the examples/python/duckdb-python.py file
+28|The Python regression benchmark compares native tuple fetching, pandas DataFrame conversion, and Arrow conversion on TPC-H data|CORRECT|regression_test_python.py test_tpch function defines fetch_native, fetch_pandas, and fetch_arrow collectors for lineitem loading
+29|The regression benchmark tests at 2,048, 50,000, and 2,500,000 rows on TPC-H data|INCORRECT|Those row counts (2048, 50000, 2500000) are from SelectAndCallBenchmark testing repeat_row, not from the TPC-H benchmark
+30|There is an Arrow dictionary benchmark that generates 10,000,000 values|CORRECT|regression_test_python.py line 358 sets DATASET_SIZE = 10000000
+31|A February 28, 2026 issue reported a crash in DuckDB 1.3.0|CORRECT|Issue #21126 created 2026-02-28 with DuckDB Version 1.3.0
+32|The crash occurred when two Python threads created cursors from the same connection|CORRECT|Issue #21126 describes THREAD_COUNT = 2 threads each calling conn.cursor() from the same connection
+33|The crash involved repeated execution of INSERT ... ON CONFLICT DO UPDATE|CORRECT|Issue #21126 reproducer uses "insert into t values ... on conflict(id) do update set id = excluded.id"
+34|Maintainers said they could no longer reproduce the crash on 1.4.3 LTS and 1.5.0-dev|CORRECT|Maintainer szarnyasg commented "newer versions (e.g. v1.4.3 LTS, v1.5.0-dev) no longer reproduce the issue"
+35|DuckDB is excellent for single-node, read-heavy analytical work|CORRECT|Reddit post confirms "DuckDB is blazing fast for single-node, read-heavy workloads"
+36|DuckDB is weaker for high-concurrency read/write patterns|CORRECT|Reddit post confirms concurrency limitations for parallel reads/writes due to MVCC model
+37|The install command is pip install duckdb --upgrade|CORRECT|Maintainer comment in issue #21126 shows "pip install duckdb --upgrade"
+38|DuckDB is an embedded analytical database|CORRECT|README describes it as "high-performance analytical database system" and community discussions confirm embedded nature
+39|DuckDB is described as having a rich SQL dialect in the README|CORRECT|README line 18 states "DuckDB provides a rich SQL dialect with support far beyond basic SQL"

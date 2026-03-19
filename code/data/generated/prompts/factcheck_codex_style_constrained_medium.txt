@@ -1,0 +1,479 @@
+================================================================================
+  [1/12]  Task: crewai_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_001_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/crewai_001_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [2/12]  Task: crewai_004  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_004_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/crewai_004_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [3/12]  Task: crewai_006  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_006_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/crewai_006_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [4/12]  Task: crewai_008  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/crewai_008_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/crewai
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/crewai_008_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [5/12]  Task: duckdb_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_001_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/duckdb_001_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [6/12]  Task: duckdb_002  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_002_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/duckdb_002_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [7/12]  Task: duckdb_004  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_004_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/duckdb_004_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [8/12]  Task: duckdb_007  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/duckdb_007_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/duckdb
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/duckdb_007_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [9/12]  Task: langchain_001  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_001_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/langchain_001_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [10/12]  Task: langchain_002  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_002_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/langchain_002_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [11/12]  Task: langchain_003  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_003_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/langchain_003_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+
+
+================================================================================
+  [12/12]  Task: langchain_007  |  Run: run_01  |  Words: 800-1000
+================================================================================
+
+You are a fact-checking assistant. Your task is to extract factual claims from a blog post and verify each claim against reference documentation.
+
+1. Read the blog post from /Users/yongkyunlee/ai-detectability-research/code/data/generated/style_constrained/langchain_007_codex_medium_run_01.md
+2. Read the reference documentation from /Users/yongkyunlee/ai-detectability-research/code/data/context/langchain
+
+## Step 1: Extract Claims
+Extract every atomic factual claim from the blog post. A factual claim is a statement that can be verified as true or false against documentation (version numbers, commands, file names, configuration details, behavioral descriptions, compatibility statements). Exclude opinions, subjective assessments, and hedged statements.
+
+## Step 2: Verify Claims
+For each extracted claim, check the reference documentation and determine if the claim is CORRECT, INCORRECT, or UNVERIFIABLE.
+- CORRECT: The documentation explicitly supports this claim
+- INCORRECT: The documentation explicitly contradicts this claim
+- UNVERIFIABLE: The documentation does not contain enough information
+
+## Output Format
+Output ONLY lines in this exact pipe-delimited format, one claim per line:
+
+CLAIM_ID|CLAIM_TEXT|VERDICT|EVIDENCE
+
+Where:
+- CLAIM_ID is a sequential number starting from 1
+- CLAIM_TEXT is the atomic factual claim
+- VERDICT is exactly one of: CORRECT, INCORRECT, UNVERIFIABLE
+- EVIDENCE is a brief explanation referencing the documentation
+
+Example output:
+1|The install command for CrewAI is "pip install crewai"|CORRECT|Documentation shows pip install crewai as the install command
+2|CrewAI requires Python 3.10 or newer|CORRECT|README states Python >=3.10 is required
+3|CrewAI supports GPT-5 out of the box|UNVERIFIABLE|No mention of GPT-5 support in the documentation
+
+Do not include any other text, headers, or commentary. Output ONLY the pipe-delimited lines.
+
+Save the output to /Users/yongkyunlee/ai-detectability-research/code/data/results/factual/outputs/langchain_007_style_constrained_codex_medium_run_01.txt
+Write only the pipe-delimited claim lines to the file, nothing else.
+

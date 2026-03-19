@@ -1,0 +1,39 @@
+1|LangChain now centers on a maintained `langchain` package|CORRECT|CLAUDE.md shows libs/langchain_v1 is the actively maintained `langchain` package; README quickstart uses `pip install langchain`
+2|LangChain has shared primitives in `langchain-core`|CORRECT|CLAUDE.md states "Core layer (langchain-core): Base abstractions, interfaces, and protocols"
+3|LangChain has provider-specific integrations such as `langchain-openai`|CORRECT|libs/partners/openai/pyproject.toml defines the package name as "langchain-openai"
+4|LangChain has provider-specific integrations such as `langchain-anthropic`|CORRECT|libs/partners/anthropic/pyproject.toml defines the package name as "langchain-anthropic"
+5|The base package install command is `pip install langchain`|CORRECT|README quickstart shows `pip install langchain`
+6|The uv equivalent install command is `uv add langchain`|CORRECT|README quickstart shows `uv add langchain` as alternative
+7|Provider integrations must be installed separately from the base package|CORRECT|init_chat_model docs state "Requires the integration package for the chosen model provider to be installed" and gives pip install examples
+8|The OpenAI provider install command is `pip install langchain-openai`|CORRECT|init_chat_model docs show `pip install langchain-openai` for OpenAI provider
+9|The Anthropic provider install command is `pip install langchain-anthropic`|CORRECT|Partners directory contains langchain-anthropic package
+10|LangChain exposes one common interface across many backends through `init_chat_model`|CORRECT|init_chat_model docstring states "Initialize a chat model from any supported provider using a unified interface"
+11|The OpenAI integration reads `OPENAI_API_KEY` by default|CORRECT|OpenAI chat_models/base.py uses `secret_from_env("OPENAI_API_KEY", default=None)` for api_key
+12|The Anthropic integration reads `ANTHROPIC_API_KEY`|CORRECT|Anthropic chat_models.py uses `secret_from_env("ANTHROPIC_API_KEY", default="")` for api_key
+13|The import path for init_chat_model is `from langchain.chat_models import init_chat_model`|CORRECT|README quickstart shows this exact import; langchain_v1/langchain/chat_models/__init__.py exports init_chat_model
+14|The quickstart pattern uses `init_chat_model("openai:gpt-5.4")`|CORRECT|README quickstart shows exactly `model = init_chat_model("openai:gpt-5.4")`
+15|`invoke()` is the method to call on a model|CORRECT|README quickstart shows `model.invoke("Hello, world!")`; Runnable base class defines abstract `invoke` method
+16|`invoke()` returns a message object|CORRECT|AIMessage class is the return type from chat model invoke; BaseMessage has content attribute
+17|Printing `result.content` is the way to get readable text from the result|CORRECT|BaseMessage defines `content: str | list[str | dict]` field as "The contents of the message"
+18|`init_chat_model` is the main chat-model entry point in the maintained package|CORRECT|langchain_v1/langchain/chat_models/__init__.py exports init_chat_model as one of only two exports
+19|A provider prefix such as `openai:gpt-5.4` makes the backend explicit|CORRECT|init_chat_model docs: "The model name, optionally prefixed with provider (e.g., 'openai:gpt-4o')"
+20|LangChain can infer some providers automatically from model names|CORRECT|init_chat_model docs list inference rules: "gpt-..." -> openai, "claude..." -> anthropic, etc.
+21|The docs recommend exact provider model IDs over loose aliases when reliability matters|CORRECT|init_chat_model docs: "Prefer exact model IDs from provider docs over aliases for reliable behavior"
+22|Chains are built by connecting components with the `|` operator|CORRECT|Runnable.__or__ method composes runnables: "Compose this Runnable with another object to create a RunnableSequence"
+23|The `|` operator creates a `RunnableSequence` under the hood|CORRECT|__or__ implementation returns `RunnableSequence(self, coerce_to_runnable(other))`
+24|`RunnableSequence` is the main composition primitive in the core library|CORRECT|RunnableSequence docstring: "RunnableSequence is the most important composition operator in LangChain as it is used in virtually every chain"
+25|`StrOutputParser` is imported from `langchain_core.output_parsers`|CORRECT|langchain_core/output_parsers/__init__.py exports StrOutputParser
+26|`ChatPromptTemplate` is imported from `langchain_core.prompts`|CORRECT|langchain_core/prompts/chat.py defines ChatPromptTemplate; prompts/__init__.py exports it
+27|`ChatPromptTemplate.from_messages()` accepts a list of message tuples|CORRECT|chat.py shows from_messages method accepting `Sequence[MessageLikeRepresentation]` including tuples like ("system", "..."), ("human", "...")
+28|`ChatPromptTemplate` formats structured chat messages from input variables|CORRECT|ChatPromptTemplate.from_messages examples show template variables like {topic} being filled at runtime
+29|`StrOutputParser()` converts the model's message object into plain text|CORRECT|StrOutputParser docstring: "Converts model outputs (such as AIMessage or AIMessageChunk objects) into plain text strings"
+30|Without the parser, a chain returns an AI message|CORRECT|Chat models return AIMessage objects from invoke(); StrOutputParser is needed to extract string
+31|With the parser, a chain returns a string|CORRECT|StrOutputParser.parse returns str; docstring confirms it extracts "plain text strings"
+32|`LLMChain` is explicitly deprecated in the codebase|CORRECT|langchain_classic/chains/llm.py has @deprecated decorator on LLMChain class since version "0.1.17"
+33|`LLMChain` is deprecated in favor of runnable composition such as `prompt | llm`|CORRECT|@deprecated decorator specifies alternative="RunnableSequence, e.g., `prompt | llm`"
+34|A `RunnableSequence` supports async execution|CORRECT|RunnableSequence docstring: "Any RunnableSequence automatically supports sync, async, batch"
+35|A `RunnableSequence` supports batching|CORRECT|RunnableSequence docstring: "Any RunnableSequence automatically supports sync, async, batch"
+36|A `RunnableSequence` supports streaming-aware composition|CORRECT|RunnableSequence docstring: "A RunnableSequence preserves the streaming properties of its components"
+37|The repo's issue tracker shows repeated documentation fixes around deprecated functions and moved imports|UNVERIFIABLE|Issues reference deprecations (e.g., issue-29277 about replacing initialize_agent) but the specific claim about "repeated" documentation fixes is not quantifiably verified
+38|Community discussions reflect beginners finding tutorials with older patterns and hitting import errors|UNVERIFIABLE|Reddit posts discuss LangChain relevance and frustration but the specific claim about import errors from outdated tutorials is not directly documented in the reference materials
+39|LangChain is described as a framework for building agents and LLM-powered applications|CORRECT|README states "LangChain is a framework for building agents and LLM-powered applications"

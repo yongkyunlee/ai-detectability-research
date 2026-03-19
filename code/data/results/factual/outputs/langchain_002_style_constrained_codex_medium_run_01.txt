@@ -1,0 +1,49 @@
+1|VectorStore is defined in langchain-core|CORRECT|VectorStore class is in langchain_core.vectorstores.base
+2|A vector store stores embedded data and runs vector search|CORRECT|VectorStore class in langchain_core provides similarity_search, max_marginal_relevance_search, and other search methods
+3|A retriever only has to return Document objects for a text query|CORRECT|BaseRetriever has RetrieverInput = str and RetrieverOutput = list[Document]
+4|The handoff from vector store to retriever is usually vector_store.as_retriever(...)|CORRECT|VectorStore.as_retriever() method is defined in langchain_core/vectorstores/base.py
+5|as_retriever() wraps a store in the standard BaseRetriever interface|CORRECT|as_retriever() returns a VectorStoreRetriever which inherits from BaseRetriever
+6|VectorStore.as_retriever supports three search modes out of the box|CORRECT|Docstring lists similarity, mmr, and similarity_score_threshold as the three search types
+7|Plain similarity is one of the search modes|CORRECT|search_type="similarity" is the default mode documented in as_retriever
+8|Maximal marginal relevance is available with search_type="mmr"|CORRECT|search_type="mmr" is documented in the as_retriever docstring
+9|Thresholded retrieval is available with search_type="similarity_score_threshold"|CORRECT|search_type="similarity_score_threshold" is documented in the as_retriever docstring
+10|create_retrieval_chain wires a retriever to a document-combining runnable|CORRECT|create_retrieval_chain takes a retriever and combine_docs_chain (a Runnable) as parameters
+11|create_stuff_documents_chain formats retrieved documents into a single prompt variable|CORRECT|The function formats documents and assigns them to a prompt variable via document_variable_name
+12|The default prompt variable for create_stuff_documents_chain is usually context|CORRECT|DOCUMENTS_KEY = "context" is the default document_variable_name
+13|The older RetrievalQA path still exists in langchain-classic|CORRECT|RetrievalQA is in langchain_classic/chains/retrieval_qa/base.py
+14|RetrievalQA is marked as deprecated in favor of create_retrieval_chain|CORRECT|@deprecated decorator message says "Use the create_retrieval_chain constructor instead"
+15|Both langchain-chroma and langchain-qdrant are version 1.1.0|CORRECT|Both pyproject.toml files show version = "1.1.0"
+16|Both langchain-chroma and langchain-qdrant are published as separate integration packages|CORRECT|They are in libs/partners/ as independent packages with their own pyproject.toml
+17|The docs show pip install -qU chromadb langchain-chroma as the Chroma install command|CORRECT|This exact command appears in the Chroma vectorstores.py docstring
+18|Chroma supports a collection name parameter|CORRECT|Chroma.__init__ has collection_name parameter
+19|Chroma supports an embedding function parameter|CORRECT|Chroma.__init__ has embedding_function parameter
+20|Chroma supports metadata filters|CORRECT|Chroma similarity_search supports where and where_document filter parameters
+21|Chroma supports similarity search|CORRECT|Chroma has similarity_search() method
+22|Chroma supports score search|CORRECT|Chroma has similarity_search_with_score() method
+23|Chroma supports MMR (maximal marginal relevance) search|CORRECT|Chroma has max_marginal_relevance_search() method
+24|QdrantVectorStore class exposes RetrievalMode.DENSE|CORRECT|RetrievalMode enum has DENSE = "dense" in langchain_qdrant/qdrant.py
+25|QdrantVectorStore class exposes RetrievalMode.SPARSE|CORRECT|RetrievalMode enum has SPARSE = "sparse" in langchain_qdrant/qdrant.py
+26|QdrantVectorStore class exposes RetrievalMode.HYBRID|CORRECT|RetrievalMode enum has HYBRID = "hybrid" in langchain_qdrant/qdrant.py
+27|The Qdrant package includes FastEmbedSparse|CORRECT|FastEmbedSparse class exists in langchain_qdrant/fastembed_sparse.py and is exported from __init__.py
+28|The Qdrant package has an optional fastembed dependency|CORRECT|pyproject.toml [project.optional-dependencies] includes fastembed with version constraint >=0.3.3,<1.0.0
+29|A documentation fix was needed because Qdrant filtering worked with from qdrant_client import models not the older qdrant_client.http import|CORRECT|Issue #28012 reports exactly this wrong import and was fixed by PR #28286
+30|ParentDocumentRetriever docstring describes the tension between small chunks producing better embeddings and larger chunks preserving context|CORRECT|Docstring says small documents have more accurate embeddings but long documents retain context
+31|ParentDocumentRetriever resolves the tension by indexing child chunks while returning parent documents from a docstore|CORRECT|Docstring says it splits and stores small chunks, then fetches parent documents during retrieval
+32|MultiVectorRetriever returns parent documents after searching over embedded children|CORRECT|Docstring says it performs search over embedded child chunks then fetches corresponding parent documents from docstore
+33|MultiQueryRetriever uses an LLM to generate three alternate versions of the user question|CORRECT|Default prompt template says "generate 3 different versions of the given user question"
+34|MultiQueryRetriever unions the retrieved results|CORRECT|Class docstring says "Return the unique union of all retrieved docs"
+35|ContextualCompressionRetriever runs a base retriever first and compresses the results afterward|CORRECT|Source code shows it invokes base_retriever then applies base_compressor to compress results
+36|create_history_aware_retriever only rewrites the query when chat_history exists|CORRECT|Docstring says if no chat_history input is passed directly to retriever; if chat_history exists prompt and LLM generate a search query
+37|A January 12, 2026 Reddit post discussed getting started with RAG|CORRECT|Reddit post dated 2026-01-12 titled "Where to start with RAG and LangChain in 2026"
+38|The Reddit post described the ecosystem as overwhelming because of all the moving parts|CORRECT|Title says "Feeling a bit overwhelmed" and body says "how many moving parts there are"
+39|The Reddit post mentioned the amount of deprecated syntax in tutorials|CORRECT|Post says "A lot of tutorials I find use deprecated LangChain syntax"
+40|An October 6, 2025 issue reported ModuleNotFoundError: No module named 'langchain.retrievers'|CORRECT|Issue #33292 created 2025-10-06 reports exactly this error
+41|The import error occurred when trying to import ContextualCompressionRetriever|CORRECT|Issue shows import attempts for ContextualCompressionRetriever from langchain.retrievers and langchain_core.retrievers
+42|The answer was to import it from langchain_classic.retrievers|CORRECT|Comment by Narendra2811 says "correct import is from langchain_classic.retrievers import ContextualCompressionRetriever"
+43|A documentation issue showed create_retriever_tool had moved to langchain_core.tools|CORRECT|Issue #16317 where ManishKanaparthi provides correct import: from langchain_core.tools import create_retriever_tool
+44|A Chroma issue showed document counts climbing from 6 to 12, 18, 24, 30, and 36 across iterations|CORRECT|Issue #28774 comment by keenborder786 shows output 6, 12, 18, 24, 30, 36
+45|The caller expected a fresh in-memory store each time in the Chroma issue|CORRECT|Issue reporter expected ephemeral in-memory behavior with persist_directory=None
+46|LangChain's langchain-tests package includes VectorStoreIntegrationTests|CORRECT|Package name is langchain-tests per pyproject.toml; VectorStoreIntegrationTests class exists in integration_tests/vectorstores.py
+47|VectorStoreIntegrationTests checks empty-store initialization|CORRECT|test_vectorstore_is_empty and test_vectorstore_still_empty methods verify empty store state
+48|VectorStoreIntegrationTests checks add/delete correctness|CORRECT|test_add_documents, test_deleting_documents, test_deleting_bulk_documents methods exist
+49|VectorStoreIntegrationTests checks stable document IDs|CORRECT|test_add_documents_with_ids_is_idempotent, test_get_by_ids, and test_add_documents_by_id_with_mutation verify ID stability

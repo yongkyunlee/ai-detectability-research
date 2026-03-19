@@ -1,0 +1,45 @@
+1|DuckDB positions itself as an embedded analytical database|CORRECT|README describes DuckDB as "high-performance analytical database system" and examples show in-process embedded usage; community comments confirm "embed analytics in your app"
+2|You open a connection inside your Python process to use DuckDB|CORRECT|Python example (duckdb-python.py) shows conn = duckdb.connect() running in-process
+3|DuckDB can query local files with SQL|CORRECT|README shows SELECT * FROM 'myfile.csv' and 'myfile.parquet' in FROM clause
+4|DuckDB can query in-memory objects with SQL|CORRECT|Python example registers a pandas DataFrame and queries it with SQL (line 37-38)
+5|DuckDB can fetch results back into Python-native data structures|CORRECT|Python example shows fetchdf(), fetchnumpy(), fetchone(), fetchall() methods
+6|The Python client provides a SQL execution API built around connect(), execute(), and fetch methods|CORRECT|Python example demonstrates all three: duckdb.connect(), conn.execute(), and multiple fetch methods
+7|The Python client provides a relation API that lets you build lazy query pipelines before materializing results|CORRECT|Python example line 41: "relations are lazily evaluated chains of relational operators"
+8|duckdb.connect() with no path argument opens a temporary in-memory database|CORRECT|Python example line 5-6: "connect to an in-memory temporary database" followed by conn = duckdb.connect()
+9|If you pass a database file path to connect(), DuckDB stores tables on disk|UNVERIFIABLE|The provided documentation and examples do not explicitly demonstrate persistent on-disk database creation via file path argument
+10|Parameter binding using placeholders is supported in the Python client|CORRECT|Python example line 17-18: "we can use placeholders for parameters" with conn.execute("INSERT INTO test_table VALUES (?, ?)", [2, 'two'])
+11|executemany() is available when you already have rows in Python form|CORRECT|Python example line 20-21: "we can provide multiple sets of parameters to executemany()"
+12|fetchdf() returns a Pandas DataFrame|CORRECT|Python example line 23-24: "fetch as pandas data frame" using conn.execute(...).fetchdf()
+13|fetchnumpy() returns NumPy-friendly arrays|CORRECT|Python example line 26-27: "fetch as list of masked numpy arrays" using fetchnumpy()
+14|fetchone() returns row-oriented results|CORRECT|Python example line 148 shows res.fetchone() returning individual rows
+15|fetchall() returns row-oriented results|CORRECT|Python example line 149 shows res.fetchall() returning all rows
+16|DataFrames can be exposed to DuckDB via explicit registration using con.register()|CORRECT|Python example line 37: conn.register("test_df", test_df) followed by SQL query on it
+17|DuckDB can discover a DataFrame from Python scope and query it directly with SELECT * FROM df_name|CORRECT|Issue #3057 comments show con.execute("CREATE TABLE items AS SELECT * FROM df") reaching into local variables
+18|INSERT INTO target SELECT * FROM some_dataframe_view can silently misalign data when destination table column order differs from DataFrame column order|CORRECT|Issue #3057 demonstrates this exact bug: columns are silently swapped when orders differ
+19|The safe pattern to avoid column misalignment is to list columns explicitly|CORRECT|Issue #3057 comment by l1t1 shows INSERT INTO items (foo,bar) SELECT foo,bar FROM items_view as the fix
+20|Creating the table directly from the DataFrame with CREATE TABLE ... AS SELECT * FROM df avoids column misalignment|CORRECT|Issue #3057 comment by Alex-Monahan recommends "CREATE TABLE items as SELECT * FROM my_dataframe"
+21|The Python example describes relations as lazily evaluated chains of relational operators|CORRECT|Python example line 41: "relation API, programmatic querying. relations are lazily evaluated chains of relational operators"
+22|Relations can be created from a DataFrame using con.from_df()|CORRECT|Python example line 44: rel = conn.from_df(test_df)
+23|Relations can be created from a CSV file|CORRECT|Python example line 60: rel = duckdb.from_csv_auto(temp_file_name)
+24|Relations can be created from an existing DuckDB table|CORRECT|Python example line 64: rel = conn.table("test_table")
+25|The relation API supports the project operation|CORRECT|Python example line 88: rel.project('i, j')
+26|The relation API supports the filter operation|CORRECT|Python example line 85: rel.filter('i > 1')
+27|The relation API supports the order operation|CORRECT|Python example line 94: rel.order('j')
+28|The relation API supports the limit operation|CORRECT|Python example line 97: rel.limit(2)
+29|The relation API supports the aggregate operation|CORRECT|Python example line 106: rel.aggregate("sum(i)")
+30|The relation API supports the distinct operation|CORRECT|Python example line 115: rel.distinct()
+31|The relation API supports the union operation|CORRECT|Python example line 119: rel.union(rel)
+32|The relation API supports the join operation|CORRECT|Python example line 123: rel.join(rel2, 'i')
+33|Relations are lazy and computation happens when you materialize the result with df()|CORRECT|Python example line 154-155: "df() is shorthand for to_df() on relations" and relations described as lazily evaluated
+34|Relations can be materialized with fetchall()|CORRECT|Python example line 149: res.fetchall() after res = rel.execute()
+35|Relations can be materialized with arrow()|UNVERIFIABLE|The arrow() method is not shown in the Python example or other provided documentation
+36|Relations can be materialized with execute()|CORRECT|Python example line 145: res = rel.execute()
+37|CSV and Parquet files can be queried directly in the FROM clause|CORRECT|README lines 30-35: "For CSV files and Parquet files, data import is as simple as referencing the file in the FROM clause"
+38|The repository examples use from_csv_auto|CORRECT|Python example line 60: rel = duckdb.from_csv_auto(temp_file_name)
+39|Community discussions point to the SQL over files workflow as a major strength for medium-sized analysis and validation tasks that would otherwise strain Pandas memory|CORRECT|Reddit post discusses "Moving from pandas to DuckDB for validating large CSV/Parquet files" noting "larger CSVs are killing memory"; HN comments praise "SQL on CSV and json/jsonl files"
+40|DuckDB is optimized for analytics, not for acting like a networked OLTP database|CORRECT|README describes "high-performance analytical database"; Reddit post confirms "blazing fast for single-node, read-heavy workloads" with concurrency limitations for writes
+41|DuckDB shines on single-node, read-heavy analytical work|CORRECT|Reddit post states "DuckDB is blazing fast for single-node, read-heavy workloads"
+42|DuckDB is a weaker fit for high-concurrency read/write workloads|CORRECT|Reddit post title: "Looking for DuckDB alternatives for high-concurrency read/write workloads" confirms this limitation
+43|A bug report showed a crash on DuckDB 1.3.0 when two Python threads created cursors from the same connection and issued conflicting upserts|CORRECT|Issue #21126 reports exactly this: segfault with 2 cursors, multithreaded INSERT ON CONFLICT DO UPDATE on version 1.3.0
+44|Maintainers noted that newer versions no longer reproduced the crash problem|CORRECT|Issue #21126 comment by szarnyasg: "I can indeed reproduce this on v1.3.0, but newer versions (e.g. v1.4.3 LTS, v1.5.0-dev) no longer reproduce the issue"
+45|The docs recommend using conn.cursor() to create thread-local handles for multiple threads|CORRECT|Issue #21126 references: "The multiple threads guide says each thread should use conn.cursor() to create a thread-local connection"

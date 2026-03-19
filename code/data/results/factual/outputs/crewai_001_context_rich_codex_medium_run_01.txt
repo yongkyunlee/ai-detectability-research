@@ -1,0 +1,51 @@
+1|CrewAI is a Python framework for coordinating multiple AI agents around shared tasks|CORRECT|README describes CrewAI as a "Fast and Flexible Multi-Agent Automation Framework" and a "lean, lightning-fast Python framework"
+2|In CrewAI's vocabulary, a crew is the agent team plus tasks and execution rules|CORRECT|Crews docs state "A crew in crewAI represents a collaborative group of agents working together to achieve a set of tasks. Each crew defines the strategy for task execution, agent collaboration, and the overall workflow"
+3|A flow is the event-driven orchestration layer for larger systems|CORRECT|Introduction docs describe Flows as "structured, event-driven workflows" and "The backbone of your AI application"
+4|CrewAI's docs assume uv is available first|CORRECT|Installation docs say "CrewAI uses the uv as its dependency management and package handling tool" and step 1 is installing uv
+5|The CLI install command is "uv tool install crewai"|CORRECT|Installation docs show "uv tool install crewai" as the install command
+6|You can confirm the installation with "uv tool list"|CORRECT|Installation docs show "uv tool list" as the verification step
+7|Supported Python version is >=3.10,<3.14|CORRECT|pyproject.toml states requires-python = ">=3.10,<3.14" and installation docs confirm "Python >=3.10 and <3.14"
+8|uv handles project setup, dependency sync, and execution|CORRECT|crewai install runs "uv sync" and crewai run runs "uv run run_crew" per CLI source code
+9|The documented starter command is "crewai create crew latest-ai-development"|CORRECT|Both quickstart and README show this exact command
+10|CrewAI normalizes the project name into a valid Python module name with hyphens becoming underscores|CORRECT|Quickstart shows creating "latest-ai-development" then "cd latest_ai_development"
+11|The CLI prompts for a provider, model, and API key during project creation|CORRECT|CLI docs state "the CLI will show you a list of available LLM providers to choose from, followed by model selection" and "you will be prompted for API keys"
+12|The CLI writes provider/model/API key values into .env|UNVERIFIABLE|CLI docs describe prompting for keys but do not explicitly state they are written to .env
+13|The --skip_provider flag allows creating a scaffold without interactive provider setup|UNVERIFIABLE|No mention of --skip_provider found anywhere in the reference documentation
+14|The generated project structure includes a knowledge/ directory|CORRECT|Installation docs show knowledge/ in the project structure
+15|The generated project structure includes pyproject.toml, README.md, and .env|CORRECT|Installation docs show these files in the project structure
+16|The generated project contains src/my_project/ with main.py and crew.py|CORRECT|Installation docs show these files in the project structure
+17|The generated project contains tools/custom_tool.py|CORRECT|Installation docs show custom_tool.py in the tools/ directory
+18|The generated project contains config/agents.yaml and config/tasks.yaml|CORRECT|Installation docs show these files in the config/ directory
+19|agents.yaml defines the agents with their properties|CORRECT|Quickstart and README show agent definitions in agents.yaml
+20|The default template creates a researcher and a reporting_analyst agent|CORRECT|Quickstart and README both show researcher and reporting_analyst as default agents
+21|Each default agent has a role, goal, and backstory|CORRECT|The agents.yaml template shows role, goal, and backstory for each agent
+22|tasks.yaml defines tasks including description, expected output, and which agent owns each task|CORRECT|Quickstart tasks.yaml shows description, expected_output, and agent fields
+23|crew.py uses @CrewBase, @agent, @task, and @crew decorators|CORRECT|Quickstart and crews docs show these exact decorators from crewai.project
+24|The template crew is configured with Process.sequential|CORRECT|README and quickstart crew.py both show process=Process.sequential
+25|The template crew is configured with verbose=True|CORRECT|README and quickstart crew.py both show verbose=True
+26|main.py defines the inputs passed into crew().kickoff()|CORRECT|README main.py shows LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)
+27|CrewAI interpolates input variables into YAML files at runtime|CORRECT|Quickstart states "Any variable interpolated in your agents.yaml and tasks.yaml files like {topic} will be replaced by the value of the variable in the main.py file"
+28|If YAML contains {topic}, then inputs={"topic": "AI Agents"} fills that value at runtime|CORRECT|Quickstart shows this exact pattern with {topic} in YAML and 'topic': 'AI Agents' in inputs
+29|The reporting task in the starter template writes to report.md|CORRECT|README tasks.yaml shows output_file: report.md for the reporting_task
+30|The scaffold provides tools/custom_tool.py showing the expected tool pattern|CORRECT|Installation docs show custom_tool.py in the generated project structure
+31|Custom tools are created by subclassing BaseTool|CORRECT|Tools docs show "class MyCustomTool(BaseTool)" pattern
+32|Custom tools define a Pydantic input schema|CORRECT|Tools docs show MyToolInput(BaseModel) as args_schema for custom tools
+33|Custom tools implement _run() method|CORRECT|Tools docs show "def _run(self, argument: str) -> str" in the BaseTool subclass
+34|The command "crewai install" is used to install project dependencies|CORRECT|Installation docs and quickstart show "crewai install" as the dependency installation step
+35|The command "crewai run" is used to run the project|CORRECT|Installation docs and quickstart show "crewai run" as the execution command
+36|crewai install syncs the environment with uv|CORRECT|install_crew.py source shows it runs "uv sync"
+37|crewai run executes the project through uv run|CORRECT|run_crew.py source shows it runs "uv run run_crew"
+38|The generated pyproject.toml pins crewai[tools] to a specific version|UNVERIFIABLE|No example of generated pyproject.toml content in the reference documentation
+39|CrewAI supports hierarchical execution|CORRECT|Processes docs describe "Hierarchical: Organizes tasks in a managerial hierarchy"
+40|Hierarchical mode requires a manager model or manager agent|CORRECT|Processes docs state "A manager language model (manager_llm) or a custom manager agent (manager_agent) must be specified"
+41|The issue tracker shows broken transitive versions like tokenizers as install friction|CORRECT|Issues #4550 and #4268 document tokenizers version compatibility problems
+42|The issue tracker shows conflicts around openai when mixing CrewAI with OpenLit|CORRECT|Issue #4270 documents conflicting openai versions when using OpenLit
+43|There is an open issue about stale model choices in crewai create|CORRECT|Issue #4317 reports "seeing really old models when creating project via crewai create crew"
+44|You can set llm: directly in YAML to override the model|CORRECT|Quickstart agents.yaml example shows "llm: provider/model-id" as a configurable field
+45|You can configure an LLM object in code for model selection|CORRECT|Agent attributes table shows llm parameter accepts Union[str, LLM, Any]
+46|Community discussions describe a failure mode where people fix the visible symptom instead of the failing layer|CORRECT|Reddit post r/crewai/1rubfz2 describes this exact pattern of wrong-layer debugging
+47|A bad final answer may come from task routing, missing tool output, or polluted context from an earlier step|CORRECT|Reddit post lists "manager routes task to wrong agent", "tool failure surfaces as reasoning failure", and "memory injects bad context into later steps"
+48|output_log_file is available as a crew configuration option for debugging|CORRECT|Crews docs show output_log_file attribute that saves logs as txt or json
+49|The CLI has a replay command for replaying from a specific task|CORRECT|CLI docs show "crewai replay -t <task_id>" command
+50|The CLI has a task-output command for viewing task outputs|INCORRECT|The actual CLI command is "crewai log-tasks-outputs", not "task-output"
+51|CrewAI supports custom tools, callbacks, memory, and logging|CORRECT|Crews docs show step_callback, task_callback, memory, and output_log_file attributes

@@ -1,0 +1,56 @@
+1|The old initialize_agent path is in langchain_classic/agents/initialize.py|CORRECT|The file langchain_classic/agents/initialize.py exists and contains the initialize_agent function
+2|initialize_agent was deprecated in 0.1.0|CORRECT|The @deprecated decorator on initialize_agent shows "0.1.0" as the deprecation version
+3|initialize_agent has removal set for 1.0|CORRECT|The @deprecated decorator shows removal="1.0"
+4|The recommended replacement for initialize_agent is create_agent|INCORRECT|The deprecation message references AGENT_DEPRECATION_WARNING which points to langgraph's create_react_agent, not create_agent specifically; however create_agent in langchain_v1 is the current approach per factory.py
+5|pip install langchain is the install command|CORRECT|README shows pip install langchain as the quickstart command
+6|The README shows model strings like openai:gpt-5.4|CORRECT|README quickstart shows init_chat_model("openai:gpt-5.4")
+7|LangChain agents now sit on top of LangGraph|CORRECT|The factory.py imports langgraph's StateGraph, ToolNode, and other langgraph primitives to build the agent graph
+8|The high-level API inherits durable execution, streaming, persistence, and human-in-the-loop hooks from LangGraph|UNVERIFIABLE|While the code uses LangGraph primitives, the documentation does not explicitly list all these inherited capabilities together
+9|create_agent is located in langchain/agents/factory.py|CORRECT|The function create_agent is defined in libs/langchain_v1/langchain/agents/factory.py
+10|create_agent compiles a graph with a model node and a tool node when tools exist|CORRECT|factory.py uses StateGraph and adds model and tool nodes to build the agent graph
+11|The agent sends message history to the model, executes any returned tool_calls, appends ToolMessage objects, and repeats until the model stops asking for tools|CORRECT|This matches the agent loop pattern in factory.py where the graph alternates between model and tool nodes
+12|The @tool decorator is in langchain_core.tools.convert|CORRECT|The tool function/decorator is defined in langchain_core/tools/convert.py
+13|The @tool decorator will infer argument schemas from Python type hints|CORRECT|The tool decorator has infer_schema=True by default and uses StructuredTool.from_function which infers schemas from type hints
+14|The @tool decorator optionally parses Google-style docstrings with parse_docstring=True|CORRECT|The tool decorator accepts parse_docstring parameter, documented as parsing Google Style function docstrings
+15|The @tool decorator supports response modes like "content" or "content_and_artifact"|CORRECT|The response_format parameter accepts Literal["content", "content_and_artifact"] as shown in convert.py
+16|StructuredTool exists for multi-input cases|CORRECT|StructuredTool is imported from langchain_core.tools.structured in convert.py and used for multi-argument tools
+17|return_direct=True changes loop behavior by letting a tool short-circuit the rest of the agent cycle|CORRECT|The tool decorator accepts return_direct parameter documented as "Whether to return directly from the tool rather than continuing the agent loop"
+18|LangChain has a ToolRuntime concept|CORRECT|ToolRuntime is exported from langchain.tools and imported from langgraph.prebuilt
+19|Tools can receive the current state through ToolRuntime|CORRECT|The shell_tool.py shows ToolRuntime[None, ShellToolState] being used to access runtime.state
+20|Tools can receive the tool_call_id through ToolRuntime|CORRECT|The shell_tool.py shows runtime.tool_call_id being accessed
+21|Tools can receive execution config through ToolRuntime|UNVERIFIABLE|The reference documentation does not explicitly show config access through ToolRuntime in the available code
+22|Tools can receive runtime context through ToolRuntime|UNVERIFIABLE|Not explicitly demonstrated in the available reference files
+23|Tools can receive a persistent store through ToolRuntime|UNVERIFIABLE|InjectedStore is exported alongside ToolRuntime but direct store access through ToolRuntime is not shown in the available code
+24|Tools can receive a stream writer through ToolRuntime|UNVERIFIABLE|Not demonstrated in the available reference files
+25|LangChain lets you extend AgentState with custom fields|CORRECT|Multiple middleware classes (ToolCallLimitState, PlanningState, ShellToolState) extend AgentState with custom fields
+26|Custom fields can be exposed inside tools through ToolRuntime|CORRECT|ShellToolMiddleware's shell_tool uses ToolRuntime to access state including custom shell_session_resources field
+27|LangChain gives you hooks before and after model calls|CORRECT|AgentMiddleware defines before_model and after_model methods
+28|LangChain gives you wrappers around model and tool execution|CORRECT|AgentMiddleware defines wrap_model_call and wrap_tool_call methods
+29|There is middleware for retries on model failures|CORRECT|model_retry.py exists in the middleware directory
+30|There is middleware for retries on tool failures|CORRECT|tool_retry.py exists in the middleware directory
+31|There are hard limits on tool calls via middleware|CORRECT|tool_call_limit.py implements ToolCallLimitMiddleware
+32|ToolCallLimitMiddleware supports per-run and per-thread limits|CORRECT|ToolCallLimitMiddleware.__init__ accepts thread_limit and run_limit parameters
+33|ToolCallLimitMiddleware lets you decide whether to continue, raise, or end execution|CORRECT|exit_behavior parameter accepts "continue", "error", or "end"
+34|SummarizationMiddleware can trigger on message count|CORRECT|Trigger supports ("messages", int) as a ContextSize type
+35|SummarizationMiddleware can trigger on token count|CORRECT|Trigger supports ("tokens", int) as a ContextSize type
+36|SummarizationMiddleware can trigger on a fraction of the model's context window|CORRECT|Trigger supports ("fraction", float) as a ContextSize type
+37|SummarizationMiddleware default retention behavior keeps the most recent 20 messages|CORRECT|The keep parameter defaults to ("messages", _DEFAULT_MESSAGES_TO_KEEP) where _DEFAULT_MESSAGES_TO_KEEP = 20
+38|TodoListMiddleware adds a write_todos tool|CORRECT|TodoListMiddleware creates a write_todos tool in its __init__ method
+39|TodoListMiddleware limits write_todos to one call per model turn|CORRECT|The after_model method checks for multiple write_todos calls and returns error messages if more than one is detected
+40|The reason for limiting to one call per turn is so parallel updates don't create ambiguity|CORRECT|The docstring states "the write_todos tool replaces the entire todo list with each call, making multiple parallel calls would create ambiguity about which update should take precedence"
+41|ShellToolMiddleware can run with HostExecutionPolicy|CORRECT|HostExecutionPolicy is imported and used as default in ShellToolMiddleware
+42|ShellToolMiddleware can run with CodexSandboxExecutionPolicy|CORRECT|CodexSandboxExecutionPolicy is imported from langchain.agents.middleware._execution
+43|ShellToolMiddleware can run with DockerExecutionPolicy|CORRECT|DockerExecutionPolicy is imported from langchain.agents.middleware._execution
+44|The docs warn that post-execution redaction doesn't prevent exfiltration if you run on the host|CORRECT|The docstring contains a warning: "Redaction rules are applied post execution and do not prevent exfiltration of secrets or sensitive data when using HostExecutionPolicy"
+45|Issue #35514 reports streamed tool calls being executed with empty {} arguments because SSE fragments arrived before the full JSON payload was complete|CORRECT|Issue #35514 describes exactly this: empty args {} from SSE fragmentation
+46|Issue #35514 was opened on March 2, 2026|CORRECT|Issue metadata shows Created: 2026-03-02
+47|The reported environment for issue #35514 was langchain 1.2.10|CORRECT|System info shows langchain: 1.2.10
+48|The reported environment for issue #35514 was langchain_core 1.2.14|CORRECT|System info shows langchain_core: 1.2.14
+49|The reported environment for issue #35514 was langgraph 1.0.9|CORRECT|System info shows langgraph: 1.0.9
+50|The workaround for issue #35514 was streaming=False|CORRECT|The issue states "Setting streaming=False on ChatOpenAI reliably resolves the issue"
+51|Issue #33504 shows invalid_tool_calls from malformed JSON causing create_agent to stop the loop|CORRECT|Issue #33504 describes create_agent exiting after invalid_tool_calls without creating feedback ToolMessages
+52|Issue #33504 shows the parsing failure is not turned into feedback the model could correct|CORRECT|The issue confirms the agent exits after first call without creating ToolMessage for the invalid tool call
+53|Issue #35990 points out that JSON that parses successfully isn't always a valid tool argument object|CORRECT|Issue #35990 describes that json.loads can return non-dict types (arrays, strings, numbers, booleans, null) that should be treated as invalid
+54|Arrays, strings, numbers, booleans, and null still need to be rejected as tool arguments|CORRECT|Issue #35990 and its PR #36052 confirm that arrays, strings, numbers, booleans, and null should be routed to invalid_tool_calls
+55|Issue #35721 calls out recursive tool calling without a cycle guard|CORRECT|Issue #35721 is titled "Security: Recursive tool calling without cycle guard"
+56|LangGraph gives you deterministic branches and heavier customization compared to LangChain agents|UNVERIFIABLE|The documentation does not explicitly compare these features between LangChain agents and LangGraph in the available reference

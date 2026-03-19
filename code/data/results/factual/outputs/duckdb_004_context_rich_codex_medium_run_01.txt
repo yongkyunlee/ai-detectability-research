@@ -1,0 +1,42 @@
+1|DuckDB's execution engine is vectorized|CORRECT|Source code confirms vectorized execution via DataChunk and Vector types in src/include/duckdb/common/types/data_chunk.hpp
+2|The optimizer applies filter pushdown|CORRECT|FilterPushdown optimizer exists in src/optimizer/filter_pushdown.cpp
+3|The optimizer applies join reordering|CORRECT|JoinOrderOptimizer exists in src/optimizer/join_order/join_order_optimizer.cpp
+4|The optimizer applies limit pushdown|CORRECT|LimitPushdown optimizer exists in src/optimizer/limit_pushdown.cpp
+5|The optimizer applies row-group pruning|CORRECT|RowGroupPruner exists in src/optimizer/row_group_pruner.cpp
+6|The optimizer applies TopN conversion|CORRECT|TopN optimizer exists in src/optimizer/topn_optimizer.cpp converting ORDER BY + LIMIT to LogicalTopN
+7|The optimizer applies late materialization|CORRECT|LateMaterialization optimizer exists in src/optimizer/late_materialization.cpp
+8|The optimizer applies statistics propagation|CORRECT|StatisticsPropagator exists in src/optimizer/statistics_propagator.cpp
+9|Projection pushdown makes scans only read referenced columns|CORRECT|LogicalGet has projection_ids field (logical_get.hpp line 42) enabling column selection at scan time
+10|Core table scans advertise projection pushdown|CORRECT|LogicalGet has projection_ids field and RemoveUnusedColumns optimizer manages projection selection
+11|Core table scans advertise filter pushdown|CORRECT|LogicalGet has table_filters (TableFilterSet) and dynamic_filters fields (logical_get.hpp lines 44, 60)
+12|Core table scans advertise filter pruning|UNVERIFIABLE|No specific "filter pruning" flag found in source; related functionality exists via file filters in extra_info but not as a named capability
+13|Core table scans advertise sampling pushdown|CORRECT|SamplingPushdown optimizer exists in src/optimizer/sampling_pushdown.cpp passing sample options to table functions
+14|Core table scans advertise late materialization|CORRECT|Late materialization is supported for DuckDB table scans through function.late_materialization flag
+15|Parquet scans expose the same broad shape of capabilities as core table scans|CORRECT|EXPLAIN ANALYZE outputs in issues show Parquet scans with Projections, Filters, File Filters, and Scanning Files annotations matching core scan capabilities
+16|A regression report showed a simple pass-through CTE over a 50-column table referenced twice turned from a narrow scan into a materialized 50-column scan|CORRECT|Issue #20958 shows exactly this: a SELECT * CTE over 50 columns referenced twice, materialized with all 50 columns
+17|The CTE regression made the query roughly 100x slower|CORRECT|Issue #20958 reports 0.3s vs 31.64s (about 100x) between DuckDB 1.3.2 and 1.4.4
+18|A CTE materialization barrier can block column pruning even when the final query only needs two columns|CORRECT|Issue #20958 shows the query selecting only id and value (2 columns) but the CTE forced scanning all 50 columns
+19|If DuckDB sees ORDER BY ... LIMIT, it can replace a full sort with a LogicalTopN plan|CORRECT|topn_optimizer.cpp creates LogicalTopN (line 164) when it detects LIMIT over ORDER BY pattern
+20|The TopN implementation decides not to apply the rewrite when the limit is large relative to estimated cardinality|CORRECT|topn_optimizer.cpp lines 50-54: checks if limit > child_card * 0.007 AND limit > 5000, returns false if both true
+21|A complete sort can be cheaper than TopN beyond a certain threshold|CORRECT|topn_optimizer.cpp line 50 comment: "if the limit is > 0.7% of the child cardinality, sorting the whole table is faster"
+22|The read_parquet function accepts a hive_partitioning parameter|CORRECT|Issue #21312 line 14 and issue #21347 examples show hive_partitioning = true as a parameter
+23|If the partition filter is hidden behind a scalar macro or a subquery result, DuckDB may lose the chance to treat it as a file filter|CORRECT|Issue #21312 demonstrates macro-based filter preventing file pruning, scanning 309M rows instead of pruning
+24|One reported case scanned more than 309 million rows because a macro-produced list was evaluated too late|CORRECT|Issue #21312 shows TABLE_SCAN reading 309,170,896 rows due to macro-based filter not being pushed down
+25|Materializing the list first restored pruning|CORRECT|Issue #21312 shows that using SET VARIABLE and getvariable() restored file-level pruning (Scanning Files: 12/28)
+26|DuckDB currently avoids pushing down filters built from expressions that can throw errors|CORRECT|Issue #19277: Mytherin confirms "DuckDB cannot currently push functions that can return errors into scans"
+27|A filter like sqrt(column_0) < 0.001 may force a much wider read than expected on Parquet|CORRECT|Issue #19277 reproduces this exact filter showing all 800,000 rows and all columns read (8.55s)
+28|sqrt can fail for negative values|CORRECT|Issue #19277: Mytherin states sqrt returns error for negative numbers: "cannot take square root of a negative number"
+29|QUALIFY ROW_NUMBER() OVER (...) = 1 caused a rewrite into an aggregate-plus-semi-join plan|CORRECT|Issue #21348 confirms v1.5.0 rewrites ROW_NUMBER() = 1 into arg_max + HASH_GROUP_BY -> SEMI JOIN plan
+30|The rewritten plan scanned S3-hosted Parquet twice: once to identify winning rows and again to fetch full row payload|CORRECT|Issue #21348 describes two TABLE_SCANs joined by HASH_JOIN (SEMI), one lightweight and one full-column scan
+31|The double scan on a wide schema led to more than 4,200 GET requests instead of about 80|CORRECT|Issue #21348 table shows v1.4.4 had 81 GET requests vs v1.5.0 with 4,214 GET requests
+32|In one 1.5.0 regression, DuckDB discovered all files under an S3 glob and only pruned afterward|CORRECT|Issue #21347 reports v1.5.0 discovers all 122 files matching glob then prunes to 39, vs v1.4.4 only discovering 39
+33|EXPLAIN ANALYZE reported Scanning Files: 39/122 instead of 39/39|CORRECT|Issue #21347 shows v1.5.0: "Scanning Files: 39/122" vs v1.4.4: "Scanning Files: 39/39"
+34|The temporary workaround for the hive partition regression was to disable recursive globbing|CORRECT|Issue #21347: Mytherin suggests SET s3_allow_recursive_globbing = false as workaround
+35|DuckDB exposes profiling directly in the engine|CORRECT|Multiple issues demonstrate EXPLAIN ANALYZE providing detailed operator timing, projections, filters, and file scan information
+36|EXPLAIN ANALYZE can be used to inspect operator timing|CORRECT|Issues #19277, #21348, #21347 all show EXPLAIN ANALYZE output with per-operator timing information
+37|PRAGMA enable_profiling enables richer profiler output|UNVERIFIABLE|Not mentioned in the provided reference documentation
+38|The plan annotations include Projections, Filters, File Filters, Scanning Files, and Total Files Read|CORRECT|Issue #21312 and #19277 EXPLAIN ANALYZE outputs show all five annotations: Projections, Filters, File Filters, Scanning Files, Total Files Read
+39|DuckDB can use ART indexes for selective lookups|CORRECT|art.cpp implements ARTIndexScanState with point lookups (single predicate) and range scans (two predicates)
+40|The current table-scan logic only supports limited index-scan shapes|CORRECT|table_scan.cpp line 673: "We currently only support scanning one ART with one filter"
+41|The code explicitly notes missing support for compound ART scans|CORRECT|table_scan.cpp line 558: "FIXME: No support for index scans on compound ARTs"
+42|The code explicitly notes missing support for multi-filter intersection|CORRECT|table_scan.cpp lines 673-678 describe needing to find+scan ARTs for multiple filters and return intersecting row IDs as a FIXME

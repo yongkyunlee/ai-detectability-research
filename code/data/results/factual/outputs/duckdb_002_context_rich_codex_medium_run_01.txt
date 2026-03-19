@@ -1,0 +1,41 @@
+1|DuckDB allows querying CSV files directly with SELECT * FROM 'events.csv' without a prior load command|CORRECT|Test files and source code confirm direct file querying is supported for CSV
+2|DuckDB allows querying Parquet files directly with SELECT * FROM 'events.parquet' without a prior load command|CORRECT|Test files confirm direct Parquet file querying
+3|You can persist external files with CREATE TABLE AS SELECT|CORRECT|Standard DuckDB syntax confirmed in tests (e.g., CREATE TABLE events AS SELECT * FROM 'events.parquet')
+4|You can persist external files with COPY ... FROM|CORRECT|COPY ... FROM is standard DuckDB import syntax supported for CSV and Parquet
+5|When you reference a .csv file directly, DuckDB routes that through its CSV reader with autodetection enabled|CORRECT|auto_detect defaults to true in csv_reader_options.hpp
+6|The CSV sniffer detects the delimiter|CORRECT|sniff_csv test output shows delimiter column in results
+7|The CSV sniffer detects quote and escape characters|CORRECT|sniff_csv test output shows quote and escape columns
+8|The CSV sniffer detects newline style|CORRECT|sniff_csv test output shows new_line column
+9|The CSV sniffer detects the comment character|CORRECT|sniff_csv test output shows comment column
+10|The CSV sniffer detects whether the file has a header|CORRECT|sniff_csv test output shows header column (0 or 1)
+11|The CSV sniffer detects the likely type of each column|CORRECT|sniff_csv test output shows columns array with name and type pairs
+12|The CSV sniffer tries to identify date and timestamp formats|CORRECT|sniff_csv test output shows dateformat and timestampformat columns
+13|sniff_csv() returns the detected settings and builds a ready-to-run read_csv(..., auto_detect=false, ...) statement with explicit options and explicit column types|CORRECT|The Prompt column in sniff_csv output contains a complete FROM read_csv() statement with auto_detect=false and explicit parameters
+14|A tiny sample_size causes a numeric column to be classified as VARCHAR while a larger sample or sample_size=-1 finds the intended DOUBLE|UNVERIFIABLE|Tests show sample_size affects type detection but the specific VARCHAR-to-DOUBLE pattern is not confirmed; the sniff_csv test shows sample_size=1 detecting BIGINT and larger samples detecting VARCHAR for the same file
+15|sample_size=-1 is a valid option for read_csv that scans the entire file|CORRECT|Multiple test files use sample_size=-1 including test_sniff_csv.test and test_csv_error_message_type.test
+16|read_csv supports auto_detect=false with explicit delim, header, and columns parameters|CORRECT|sniff_csv Prompt output and multiple test files confirm this syntax
+17|The CSV reader supports all_varchar to parse without type commitment|CORRECT|all_varchar parameter confirmed in test file 21248.test and bug_10283.test_slow
+18|The CSV reader supports strict_mode=false for non-standard quoting and escaping|CORRECT|Source code in string_value_scanner.cpp and csv_state_machine_cache.cpp shows strict_mode=false enables unquoted escapes and more lenient quote/escape handling
+19|The CSV reader supports ignore_errors=true to skip bad rows|CORRECT|ignore_errors parameter confirmed in csv_reader_options.hpp and multiple test files
+20|The CSV reader supports null_padding=true for ragged rows|CORRECT|null_padding parameter confirmed in csv_null_padding.test
+21|The CSV reader supports reject-table options for preserving failures for inspection|CORRECT|store_rejects, rejects_table, and rejects_scan parameters confirmed in csv_rejects_read.test
+22|DuckDB supports scanning globs as a single relation with SELECT * FROM 'logs_*.csv'|CORRECT|Glob pattern CSV reads confirmed in read_csv_glob.test and parallel test files
+23|In default mode DuckDB anchors on the first file's schema and expects the rest to be compatible|CORRECT|Default multi-file CSV reading without union_by_name uses positional column alignment from first file
+24|union_by_name=true aligns files by header names instead of column position|CORRECT|Confirmed in parallel_csv_union_by_name.test and csv_dtypes_union_by_name.test
+25|union_by_name=true widens types where needed|CORRECT|csv_dtypes_union_by_name.test shows INTEGER columns widened to BIGINT when files have different types for same column
+26|union_by_name=true fills missing columns with NULL|CORRECT|Test files confirm missing columns are filled with NULL when using union_by_name
+27|files_to_sniff is a control for schema discovery when reading multiple files|CORRECT|test_glob_type.test confirms files_to_sniff parameter controlling how many files are sniffed
+28|Setting files_to_sniff to -1 sniffs all files|CORRECT|test_glob_type.test confirms files_to_sniff=-1 means sniff all files
+29|filename=true exposes the source file path as a virtual column for CSV reads|CORRECT|parallel_csv_hive_partitioning.test confirms filename parameter
+30|hive_partitioning=true turns path segments into typed columns on hive-style layouts|CORRECT|parallel_csv_hive_partitioning.test shows hive-style directory structure parsed into columns
+31|DuckDB can read Parquet through read_parquet function|CORRECT|read_parquet function confirmed in multiple Parquet test files
+32|DuckDB can read Parquet through parquet_scan function|CORRECT|parquet_scan function confirmed in multiple test files
+33|Column names and physical types come from Parquet metadata so there is no dialect sniffing|CORRECT|Parquet format inherently stores schema metadata; no CSV-style dialect detection needed
+34|DuckDB supports multi-file Parquet imports with glob scanning|CORRECT|Parquet glob scanning confirmed in test files
+35|union_by_name=true works for Parquet files when schemas evolve across partitions|CORRECT|union_by_name_pushdown.test confirms union_by_name for Parquet reads
+36|The filename virtual column exposes the source path for Parquet reads|CORRECT|test_filename_column.test confirms filename column for Parquet
+37|file_index identifies which file in a multi-file Parquet scan produced each row|CORRECT|multi_file_reader.cpp defines COLUMN_IDENTIFIER_FILE_INDEX as a virtual column of type UBIGINT
+38|DuckDB supports projection pushdown on Parquet files|CORRECT|Parquet pushdown tests confirm column pruning (only reading selected columns)
+39|DuckDB supports filter pushdown on ordinary predicates for Parquet files|CORRECT|parquet_or_pushdown.test and pushdown_in_to_parquet.test confirm filter pushdown
+40|DuckDB will not push down filters built from expressions that can raise errors such as sqrt(column_0)|CORRECT|Issue #19277 confirms DuckDB cannot push functions that can return errors into scans; sqrt example is the exact reproducer
+41|Issue discussions around hive-partitioned Parquet on S3 show that pruning can be sensitive to globbing behavior and partition predicates|CORRECT|Issues #21347 and #21385 document S3 hive partition pruning sensitivity to globbing behavior in v1.5.0

@@ -1,0 +1,48 @@
+1|CrewAI version 1.11.0 exists as a current version of the framework|CORRECT|Repository shows version 1.11.0 in devtools, crewai-tools, and crewai-files __init__.py
+2|The unified Memory API is a single class replacing separate short-term, long-term, entity, and external memory types|CORRECT|Documentation states "a single Memory class that replaces separate short-term, long-term, entity, and external memory types with one intelligent API"
+3|Memory defaults to LanceDB-backed storage|CORRECT|unified_memory.py line 70-71 shows storage default is "lancedb"; docs confirm LanceDB as default
+4|Memory lazy-initializes its model and embedder|CORRECT|Docs state "The LLM is initialized lazily -- it's only created when first needed"; code shows _llm and _embedder as lazy properties
+5|Memory exposes remember(), remember_many(), recall(), forget(), scope(), and slice() methods|CORRECT|All six methods are documented in memory.mdx and visible in the Memory class source code
+6|With memory=True, a crew builds a default Memory() instance and passes the crew embedder through automatically|CORRECT|Docs line 104: "When memory=True, the crew creates a default Memory() and passes the crew's embedder configuration through automatically"
+7|You can pass a configured Memory object instead of memory=True|CORRECT|Docs show "Option 2: Custom memory" with Memory(...) passed to Crew constructor
+8|Memory is stored under ./.crewai/memory by default|CORRECT|Documentation line 760 states "stored under ./.crewai/memory"
+9|The storage path can be overridden by setting CREWAI_STORAGE_DIR|CORRECT|lancedb_storage.py line 67 checks os.environ.get("CREWAI_STORAGE_DIR"); docs confirm on line 760
+10|The default embedder matches OpenAI's text-embedding-3-small|CORRECT|unified_memory.py _default_embedder uses OpenAI provider; docs Provider Reference table lists text-embedding-3-small as default
+11|The LanceDB backend assumes a 1536-dimensional vector by default|CORRECT|lancedb_storage.py line 26: DEFAULT_VECTOR_DIM = 1536 with comment "matches OpenAI text-embedding-3-small"
+12|The LanceDB backend can infer dimension from the existing table|CORRECT|lancedb_storage.py lines 97-98 show _infer_dim_from_table called on existing tables
+13|The default LLM for analysis is gpt-4o-mini|CORRECT|unified_memory.py line 67: llm field default="gpt-4o-mini"
+14|The ranking formula blends semantic similarity, recency decay, and record importance into one composite score|CORRECT|Docs line 341: "composite = semantic_weight * similarity + recency_weight * decay + importance_weight * importance"
+15|The default weight for semantic relevance is 0.5|CORRECT|unified_memory.py line 83: semantic_weight default=0.5
+16|The default weight for recency is 0.3|CORRECT|unified_memory.py line 79: recency_weight default=0.3
+17|The default weight for importance is 0.2|CORRECT|unified_memory.py line 87: importance_weight default=0.2
+18|The default recency half-life is 30 days|CORRECT|unified_memory.py line 91: recency_half_life_days default=30
+19|CrewAI organizes memory as a hierarchy of paths like /project/alpha, /agent/researcher, or /customer/acme-corp|CORRECT|Docs show scope examples including /project/alpha, /agent/researcher, and /customer/acme-corp
+20|A scoped memory view restricts reads and writes to one branch|CORRECT|Docs line 218: "A MemoryScope restricts all operations to a branch of the tree"
+21|A slice can merge several branches into one read surface|CORRECT|Docs line 297: "A MemorySlice is a view across multiple, possibly disjoint scopes"
+22|A slice can be read-only|CORRECT|Docs line 306 describes "Read-Only Slices" pattern with read_only=True
+23|remember_many() is non-blocking and saves in a background thread|CORRECT|Docs line 410: "remember_many() is non-blocking -- it submits the encoding pipeline to a background thread and returns immediately"
+24|recall() acts as a read barrier and drains pending writes before it searches|CORRECT|Docs line 422: "Every recall() call automatically calls drain_writes() before searching"
+25|Flows get self.remember(), self.recall(), and self.extract_memories() out of the box|CORRECT|flows.mdx line 980-988 documents all three methods as built-in to every Flow
+26|Memory persists across runs in Flows|CORRECT|flows.mdx line 1047: "memory persists across runs (backed by LanceDB on disk)"
+27|Since version 0.103.0, crewai run is the recommended way to execute flows from the CLI|CORRECT|flows.mdx line 1053: "Starting from version 0.103.0, you can run flows using the crewai run command" and line 1067: "crewai run command is now the preferred method"
+28|depth="shallow" is vector search plus composite scoring with no LLM call|CORRECT|Docs line 487: "depth='shallow' -- Direct vector search with composite scoring. Fast (~200ms), no LLM calls"
+29|Shallow recall takes roughly 200 ms|CORRECT|Docs line 487: "Fast (~200ms)"
+30|depth="deep" runs a RecallFlow that analyzes the query, suggests scopes, performs parallel searches, and can explore again when confidence is low|CORRECT|Docs line 488: "Runs a multi-step RecallFlow: query analysis, scope selection, parallel vector search, confidence-based routing, and optional recursive exploration when confidence is low"
+31|The default query_analysis_threshold is 200 characters|CORRECT|unified_memory.py line 122-124: query_analysis_threshold default=200; docs line 490 confirms
+32|Short queries under query_analysis_threshold skip LLM analysis entirely even in deep mode|CORRECT|Docs line 490: "Queries shorter than query_analysis_threshold (default 200 characters) skip the LLM query analysis entirely, even in deep mode"
+33|Skipping LLM analysis for short queries saves about 1 to 3 seconds per recall|CORRECT|Docs line 490: "This saves ~1-3s per recall for typical short queries"
+34|Agents default respect_context_window=True|CORRECT|agents.mdx line 61 and 173 confirm default is True; agent/core.py shows default=True
+35|The compaction path in agent_utils.py summarizes non-system messages|CORRECT|agent_utils.py line 931: "non_system_messages = [m for m in messages if m.get('role') != 'system']" — these are what get summarized
+36|The compaction path preserves system messages|CORRECT|agent_utils.py line 930: "system_messages = [m for m in messages if m.get('role') == 'system']" — extracted and preserved
+37|The compaction rebuilds the conversation as a structured summary when the model limit is exceeded|CORRECT|agent_utils.py line 909: "Uses structured context compaction" and the function summarizes and rebuilds messages in-place
+38|A closed issue from February 5, 2026 documented that Anthropic context-limit errors were not recognized for automatic summarization|CORRECT|Issue #4381 created 2026-02-05, state: closed, documents Anthropic context window errors not being detected
+39|The context window error detector in crewai/utilities/exceptions/context_window_exceeding_exception.py only matched OpenAI-style patterns|CORRECT|Issue #4381 shows CONTEXT_LIMIT_ERRORS list with only OpenAI-style patterns like "maximum context length", "context length exceeded"
+40|The example Anthropic error was "prompt is too long: 210094 tokens > 200000 maximum"|CORRECT|Issue #4381 line 10: exact error string matches
+41|An issue opened on February 6, 2026 showed task-state bleed when CrewAgentExecutor reused messages and iteration counters between sequential tasks|CORRECT|Issue #4389 created 2026-02-06 describes CrewAgentExecutor not resetting self.messages and self.iterations between tasks
+42|The task-state bleed issue was filed against CrewAI version 1.9.3|CORRECT|Issue #4389 lists crewAI Version: 1.9.3
+43|A March 1, 2026 feature request describes inter-task context in Crew._get_context() aggregating prior task outputs verbatim through aggregate_raw_outputs_from_task_outputs()|CORRECT|Issue #4661 created 2026-03-01 describes _get_context() using aggregate_raw_outputs_from_task_outputs() in formatter.py:26
+44|A March 6, 2026 Reddit post described CrewAI's built-in memory as a black box|CORRECT|reddit-1rmts2l dated 2026-03-06 says "frustrated that CrewAI's built-in memory is a black box"
+45|The Reddit post promoted a markdown-based alternative with files like SOUL.md and MEMORY.md|CORRECT|reddit-1rmts2l describes crewai-soul with "SOUL.md — Agent identity" and "MEMORY.md — Timestamped memory log"
+46|A Hacker News thread from March 6, 2026 argued that the simplest persistence often wins and explicit text can outperform fancy retrieval|CORRECT|hn-47281538 dated 2026-03-06, comment states "The simplest persistence wins" and "agents reason better when context is explicit text, not retrieved embeddings"
+47|The similarity formula for composite scoring uses 1 / (1 + distance) for the semantic component|UNVERIFIABLE|Docs line 345 says similarity = 1 / (1 + distance) but the types.py code uses cosine similarity directly; the two formulations may differ
+48|The recency decay formula is 0.5^(age_days / half_life_days)|CORRECT|Docs line 346 and types.py both specify decay = 0.5^(age_days / half_life_days)

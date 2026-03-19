@@ -1,0 +1,59 @@
+1|LangChain's agent is backed by LangGraph underneath|CORRECT|AGENTS.md shows langchain_v1 depends on langgraph; create_agent() in factory.py imports from langgraph and builds a LangGraph StateGraph
+2|LangGraph provides durability, streaming, persistence, and interruption semantics|UNVERIFIABLE|LangGraph is an external package; the reference documentation does not contain LangGraph's own feature documentation to verify all four capabilities
+3|create_agent() exists in the v1 codebase|CORRECT|create_agent() is defined in libs/langchain_v1/langchain/agents/factory.py and exported from agents/__init__.py
+4|create_agent() builds a compiled state graph rather than a thin convenience wrapper|CORRECT|factory.py creates a StateGraph, adds nodes for model and tools, wires edges, and returns graph.compile() producing a CompiledStateGraph
+5|The model receives the current message history plus an optional system prompt|CORRECT|create_agent() accepts a system_prompt parameter; the model node receives state containing message history
+6|The model returns an AIMessage|CORRECT|factory.py imports AIMessage from langchain_core.messages and checks last_ai_message.tool_calls in routing logic
+7|If the AIMessage contains tool_calls, the graph routes execution into a tool node|CORRECT|_make_model_to_tools_edge in factory.py checks last_ai_message.tool_calls and returns Send("tools", ...) objects to route to the tools node
+8|Tool results are converted into ToolMessage objects and appended to state|CORRECT|ToolMessage is used extensively in factory.py for structured output handling and middleware; ToolNode converts execution results to ToolMessage
+9|The loop continues until the model stops asking for tools or another stop condition changes the control flow|CORRECT|The routing edge returns END when no tool_calls are present; additional stop conditions like ToolCallLimitMiddleware can also end the loop
+10|The simplest path for creating tools is the @tool decorator applied to a typed Python function|CORRECT|The @tool decorator is defined in langchain_core/tools and is the standard way to create tools as shown in issue #34029 examples and test files
+11|LangChain infers the tool schema from the function signature|CORRECT|Issue #31405 and test files confirm LangChain generates schemas from function signatures; issue #35931 shows schema inference from function params including ToolRuntime
+12|LangChain can pull descriptions from docstrings|CORRECT|Issue #31405 shows @tool(parse_docstring=True) extracting descriptions from docstrings; example code demonstrates Args section parsing
+13|LangChain can pull descriptions from Annotated metadata|CORRECT|The codebase uses Annotated types for field descriptions in tool parameter schemas through Pydantic integration
+14|When a tool is invoked as a real ToolCall, it should return content that can be packaged into a valid ToolMessage|CORRECT|The standard test suite in libs/standard-tests enforces this contract; ToolMessage construction from tool results is shown throughout factory.py
+15|In v1, tools can receive a ToolRuntime object|CORRECT|ToolRuntime is imported from langgraph.prebuilt and re-exported via langchain.tools; issue #34029 and #35931 show usage with @tool decorator
+16|ToolRuntime gives access to the current agent state|CORRECT|Test file test_injected_runtime_create_agent.py accesses runtime.state; constructor in test_tools.py shows state field
+17|ToolRuntime gives access to the active tool call id|CORRECT|Test file test_injected_runtime_create_agent.py accesses runtime.tool_call_id; constructor shows tool_call_id field
+18|ToolRuntime gives access to the runnable config|CORRECT|Test file test_injected_runtime_create_agent.py accesses runtime.config; constructor shows config field
+19|ToolRuntime gives access to optional runtime context|CORRECT|Test file test_injected_runtime_create_agent.py accesses runtime.context; constructor shows context={} field
+20|ToolRuntime gives access to an optional persistent store|CORRECT|Test file test_injected_runtime_create_agent.py accesses runtime.store; constructor shows store=None field
+21|ToolRuntime gives access to a stream writer for custom output|CORRECT|Test file test_injected_runtime_create_agent.py accesses runtime.stream_writer; constructor shows stream_writer=lambda _: None field
+22|A state-aware tool can inspect message history before acting|CORRECT|Tests show tools accessing runtime.state which contains the messages list including full message history
+23|Multiple tools can access runtime information within the same run|CORRECT|Tests show multiple tools receiving ToolRuntime within a single agent run
+24|Tool calls may execute in parallel|CORRECT|factory.py dispatches multiple tool_calls as separate Send objects to the tools node, enabling parallel execution
+25|LangChain's middleware layer can intercept model calls and tool calls|CORRECT|Middleware classes in agents/middleware/ implement before_model and after_model hooks as well as tool call interception
+26|Middleware can modify requests, inject prompts, accumulate state updates, and short-circuit failures into recoverable responses|CORRECT|ContextEditingMiddleware modifies requests; SummarizationMiddleware injects prompts; middleware produces Commands with state updates; ToolCallLimitMiddleware short-circuits with error ToolMessages
+27|LangChain ships middleware for retries|CORRECT|ModelRetryMiddleware and ToolRetryMiddleware are exported from agents/middleware/__init__.py
+28|LangChain ships middleware for model fallback|CORRECT|ModelFallbackMiddleware is exported from agents/middleware/__init__.py
+29|LangChain ships middleware for tool-call limits|CORRECT|ToolCallLimitMiddleware is exported from agents/middleware/__init__.py
+30|LangChain ships middleware for summarization|CORRECT|SummarizationMiddleware is exported from agents/middleware/__init__.py
+31|LangChain ships middleware for context editing|CORRECT|ContextEditingMiddleware is exported from agents/middleware/__init__.py
+32|LangChain ships middleware for human approval|CORRECT|HumanInTheLoopMiddleware is exported from agents/middleware/__init__.py
+33|LangChain ships middleware for file search|CORRECT|FilesystemFileSearchMiddleware is exported from agents/middleware/__init__.py
+34|LangChain ships middleware for shell execution|CORRECT|ShellToolMiddleware is exported from agents/middleware/__init__.py
+35|LangChain ships middleware for PII handling|CORRECT|PIIMiddleware is exported from agents/middleware/__init__.py
+36|LangChain ships middleware for LLM-based tool selection|CORRECT|LLMToolSelectorMiddleware is exported from agents/middleware/__init__.py
+37|ShellToolMiddleware exposes a persistent shell session to the agent|CORRECT|shell_tool.py defines ShellToolMiddleware with persistent session management scoped to the agent run
+38|The shell session is scoped to a workspace root|CORRECT|ShellToolMiddleware accepts workspace root configuration for scoping shell execution
+39|ShellToolMiddleware is backed by execution policies including host, Docker, or Codex-style sandboxing|CORRECT|HostExecutionPolicy, DockerExecutionPolicy, and CodexSandboxExecutionPolicy are defined in _execution.py and exported from middleware
+40|The ShellToolMiddleware implementation tracks timeouts, output truncation, session lifecycle, and termination behavior|CORRECT|shell_tool.py handles timeout configuration, output truncation, session lifecycle management, and termination behavior
+41|Integration tests verify that shell state can persist across tool calls|UNVERIFIABLE|The reference documentation does not include the specific integration test files for shell middleware to confirm this claim
+42|Command failures are surfaced back to the agent|CORRECT|Shell middleware returns command failure information as tool messages back to the agent for recovery
+43|FilesystemFileSearchMiddleware injects glob_search and grep_search tools|CORRECT|file_search.py creates glob_search tool at line 134 and grep_search tool at line 177, both set on self.tools
+44|The file search tools are rooted at a specific path|CORRECT|FilesystemFileSearchMiddleware accepts a root path parameter and scopes searches to that path
+45|FilesystemFileSearchMiddleware includes path traversal checks|CORRECT|file_search.py implements path traversal validation to prevent directory escape
+46|FilesystemFileSearchMiddleware uses ripgrep-backed search when available|CORRECT|grep_search in file_search.py uses ripgrep with a Python regex fallback when ripgrep is not available
+47|HumanInTheLoopMiddleware can be configured per tool|CORRECT|human_in_the_loop.py allows per-tool configuration of human review requirements
+48|HumanInTheLoopMiddleware supports approve, edit, or reject decisions|CORRECT|DecisionType is defined as Literal["approve", "edit", "reject"] in human_in_the_loop.py; _process_decision handles all three
+49|ToolCallLimitMiddleware can enforce limits per run or per thread|CORRECT|tool_call_limit.py accepts run_limit and thread_limit parameters with separate tracking via run_tool_call_count and thread_tool_call_count
+50|ToolCallLimitMiddleware can either continue with an error message, raise an exception, or terminate execution|CORRECT|ExitBehavior is Literal["continue", "error", "end"]; continue returns error ToolMessages, error raises ToolCallLimitExceededError, end stops execution
+51|One issue reports a tool invocation failing because a positional argument named config was not passed through correctly|CORRECT|Issue #34029 reports tool calls failing when a parameter named config collides with LangChain's internal config injection
+52|Another issue documents streamed tool calls being executed with empty {} arguments because SSE fragments arrived before the full JSON payload|CORRECT|Issue #35514 reports streaming tool calls executed with empty args due to SSE fragmentation of tool call JSON
+53|Another issue describes malformed tool calls causing valid calls in the same batch to be silently dropped|CORRECT|Issue #35782 reports that one malformed tool call causes all tool calls in the batch to be silently dropped
+54|There is a security report calling out recursive tool calling without a cycle guard|CORRECT|Issue #35721 reports recursive tool calling without cycle guard as a medium severity security vulnerability
+55|create_agent() can automatically choose between provider-native structured output and tool-based strategies depending on model capabilities|CORRECT|factory.py contains structured output handling logic that selects between strategies; ProviderStrategy class exists for explicit provider-native selection
+56|In one Anthropic-related bug, forcing tool-based structured output conflicted with thinking mode|CORRECT|Issue #35539 reports create_agent hardcoding tool_choice="any" which Anthropic rejects with "Thinking may not be enabled when tool_choice forces tool use"
+57|The practical fix was to use a provider strategy explicitly|CORRECT|Issue #35539 maintainer comment recommends using ProviderStrategy(Result) for Anthropic with thinking mode enabled
+58|A recurring community checklist for production-ready agents includes persistent state, real tool use with recovery, model interchangeability, extensibility, service-style execution, and strong security controls|CORRECT|HN discussion hn-46998170 lists these six criteria: persistent memory, real tool use with error recovery, multi-model support, extensibility, daemon/service execution, security boundaries
+59|Another community discussion focuses on adversarial testing failures|CORRECT|HN discussion hn-46587182 reports a 95% failure rate on adversarial inputs when testing a LangChain agent with chaos engineering

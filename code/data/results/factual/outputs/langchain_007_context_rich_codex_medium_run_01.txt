@@ -1,0 +1,38 @@
+1|LCEL stands for LangChain Expression Language|CORRECT|This is the standard abbreviation used throughout the LangChain codebase and documentation
+2|The most important type in the codebase is RunnableSequence|CORRECT|RunnableSequence docstring in base.py:2820 states "RunnableSequence is the most important composition operator in LangChain as it is used in virtually every chain"
+3|RunnableSequence represents a linear pipeline where the output of one step becomes the input to the next|CORRECT|base.py:2818 docstring: "Sequence of Runnable objects, where the output of one is the input of the next"
+4|The | operator is syntax sugar for building a RunnableSequence|CORRECT|The __or__ method at base.py:637 creates RunnableSequence(self, coerce_to_runnable(other))
+5|PromptTemplate can be imported from langchain_core.prompts|CORRECT|PromptTemplate is exported in langchain_core/prompts/__init__.py
+6|StrOutputParser can be imported from langchain_core.output_parsers|CORRECT|StrOutputParser is exported in langchain_core/output_parsers/__init__.py
+7|ChatOpenAI can be imported from langchain_openai|CORRECT|ChatOpenAI is exported in langchain_openai/__init__.py
+8|PromptTemplate has a from_template class method|CORRECT|from_template is defined as a @classmethod in prompts/prompt.py:257
+9|The second major primitive is RunnableParallel|CORRECT|base.py:160 states "The main composition primitives are RunnableSequence and RunnableParallel"
+10|RunnableParallel can be created by passing a dict literal inside a sequence|CORRECT|RunnableParallel docstring in base.py:3565-3619 confirms it can be instantiated by using a dict literal within a sequence
+11|LangChain coerces a dict into a parallel runnable automatically|CORRECT|coerce_to_runnable() at base.py:6194 converts dicts: "if isinstance(thing, dict): return cast(..., RunnableParallel(thing))"
+12|RunnablePassthrough can be imported from langchain_core.runnables|CORRECT|RunnablePassthrough is exported in langchain_core/runnables/__init__.py
+13|LangChain converts plain callables into RunnableLambda|CORRECT|coerce_to_runnable() at base.py:6192: "if callable(thing): return RunnableLambda(cast(...))"
+14|LangChain converts generator-style functions into runnable forms|CORRECT|coerce_to_runnable() at base.py:6190: "if is_async_generator(thing) or inspect.isgeneratorfunction(thing): return RunnableGenerator(thing)"
+15|RunnablePassthrough.assign lets you keep the current dict while attaching new computed fields|CORRECT|RunnablePassthrough.assign is defined in passthrough.py:207 and used throughout the codebase to add fields while preserving existing dict entries
+16|The assign pattern appears in retrieval helpers where LangChain adds retrieved documents under context|CORRECT|chains/retrieval.py:65-67 shows RunnablePassthrough.assign(context=retrieval_docs...).assign(answer=combine_docs_chain)
+17|LangChain adds the final answer after the document-combining step runs|CORRECT|chains/retrieval.py:67 chains .assign(answer=combine_docs_chain) after the context assignment
+18|RunnableBranch exists for conditional routing|CORRECT|RunnableBranch is defined in branch.py:42 as a class extending RunnableSerializable
+19|A history-aware retriever uses branching to skip query rewriting when there is no prior chat history|CORRECT|history_aware_retriever.py:58-67 uses RunnableBranch with lambda x: not x.get("chat_history", False) to skip rewriting when no history
+20|A history-aware retriever inserts a prompt-plus-model rewriting step when there is chat history|CORRECT|history_aware_retriever.py:66 shows the default branch: prompt | llm | StrOutputParser() | retriever
+21|RunnableWithMessageHistory exists as a wrapper|CORRECT|RunnableWithMessageHistory is defined in history.py:38 as a class extending RunnableBindingBase
+22|Message history is added through config rather than being hardcoded into each chain|CORRECT|history.py:50-59 confirms it must be called with config containing session_id: with_history.invoke(..., config={"configurable": {"session_id": "bar"}})
+23|LLMChain now points developers toward runnable sequences instead|CORRECT|chains/llm.py:40-43 shows @deprecated decorator with alternative="RunnableSequence, e.g., prompt | llm"
+24|A prompt, a model, a parser, or a branch can all be invoked synchronously, asynchronously, in batches, and as a stream|CORRECT|Runnable base class at base.py:125-132 defines invoke/ainvoke, batch/abatch, stream/astream and line 157 states "Any chain constructed this way will automatically have sync, async, batch, and streaming support"
+25|The base Runnable implementation exposes retry policies|CORRECT|with_retry method is defined at base.py:1860 on the Runnable base class
+26|The base Runnable exposes configuration hooks|CORRECT|with_config and configurable field mechanisms are part of the Runnable base class
+27|The base Runnable exposes schema inspection|CORRECT|base.py:148-149 confirms "Runnables expose schematic information about their input, output and config via the input_schema property, the output_schema property and config_schema method"
+28|Sequences and assignments infer input and output schemas|CORRECT|RunnableSequence implements get_input_schema and get_output_schema; base.py:370-449 defines schema inference methods
+29|Tests show nested run traces with names like RunnableSequence and RunnableParallel|UNVERIFIABLE|Tracing infrastructure exists and run_name is used throughout, but specific test output patterns are not directly shown in the reference documentation
+30|Higher-level constructors often attach run_name metadata to important stages such as retrieval or document formatting|CORRECT|chains/retrieval.py uses .with_config(run_name="retrieve_documents") and .with_config(run_name="retrieval_chain"); stuff.py uses run_name="stuff_documents_chain"
+31|RunnableSequence preserves streaming only if every component supports the transformation contract for streaming|CORRECT|base.py:2836-2843 states "A RunnableSequence preserves the streaming properties of its components... If any component does not implement transform then the streaming will only begin after this component is run"
+32|A plain RunnableLambda does not implement streaming transform by default|CORRECT|base.py:2845-2848 explicitly warns "RunnableLambdas do not support transform by default!"
+33|One lambda in the middle of a chain can delay output until that blocking step finishes|CORRECT|base.py:2841-2843 confirms "If any component of the sequence does not implement transform then the streaming will only begin after this component is run"
+34|Recent runnable issues include memory retention from cached bound methods inside a sequence|CORRECT|Issue #30667 documents a memory leak when using object member methods in a RunnableSequence
+35|Recent issues include misaligned outputs in retry-aware batch execution|CORRECT|Issue #35475 titled "RunnableRetry.batch/abatch can return corrupted outputs when some items succeed on retry and others still fail"
+36|Recent issues include unresolved event-ordering problems in runnable callback tests|UNVERIFIABLE|Issues reference callback-related problems (e.g., issue #32020, #36072) but none specifically describe event-ordering problems in runnable callback tests
+37|Many developers describe abstraction soup when simple applications are forced into overly layered pipelines|CORRECT|HN discussion hn-47132187 includes: "the 'abstraction soup' makes debugging a nightmare in production"
+38|Teams with complex requirements still value LangChain's abstractions for model interchangeability, tracing, and composition|CORRECT|Community discussions (reddit-1r9u4uj, hn-47426670) show teams valuing LangChain for these specific capabilities despite criticism

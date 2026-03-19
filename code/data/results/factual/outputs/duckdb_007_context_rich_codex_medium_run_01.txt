@@ -1,0 +1,55 @@
+1|DuckDB is positioned as a high-performance analytical database|CORRECT|README.md states "DuckDB is a high-performance analytical database system"
+2|DuckDB supports a broad SQL dialect|CORRECT|README.md states "DuckDB provides a rich SQL dialect with support far beyond basic SQL"
+3|DuckDB supports ranking window functions|CORRECT|Source code internal_window_functions[] lists rank, dense_rank, row_number, percent_rank
+4|DuckDB supports running aggregates as window functions|CORRECT|Physical streaming window code handles WINDOW_AGGREGATE with UNBOUNDED_PRECEDING to CURRENT_ROW_ROWS
+5|DuckDB supports frame clauses in window functions|CORRECT|WindowBoundary enum defines multiple frame boundary types including EXPR_PRECEDING_RANGE, EXPR_FOLLOWING_RANGE, CURRENT_ROW_ROWS, etc.
+6|DuckDB supports the QUALIFY clause|CORRECT|Test file test_qualify.test and QualifyBinder source code confirm QUALIFY support
+7|DuckDB supports named windows through the WINDOW clause|CORRECT|Test test_qualify.test line 62 shows "SELECT * FROM exam WINDOW w AS (ORDER BY mark) QUALIFY row_number() OVER w >= 1"
+8|DuckDB supports filtered aggregates in window functions|CORRECT|PhysicalStreamingWindow source code handles wexpr.filter_expr for streaming aggregates
+9|DuckDB supports row_number window function|CORRECT|internal_window_functions[] includes {"row_number", ExpressionType::WINDOW_ROW_NUMBER}
+10|DuckDB supports rank window function|CORRECT|internal_window_functions[] includes {"rank", ExpressionType::WINDOW_RANK}
+11|DuckDB supports dense_rank window function|CORRECT|internal_window_functions[] includes {"dense_rank", ExpressionType::WINDOW_RANK_DENSE}
+12|DuckDB supports percent_rank window function|CORRECT|internal_window_functions[] includes {"percent_rank", ExpressionType::WINDOW_PERCENT_RANK}
+13|DuckDB supports cume_dist window function|CORRECT|internal_window_functions[] includes {"cume_dist", ExpressionType::WINDOW_CUME_DIST}
+14|DuckDB supports first_value window function|CORRECT|internal_window_functions[] includes {"first_value", ExpressionType::WINDOW_FIRST_VALUE}
+15|DuckDB supports last_value window function|CORRECT|internal_window_functions[] includes {"last_value", ExpressionType::WINDOW_LAST_VALUE}
+16|DuckDB supports lag window function|CORRECT|internal_window_functions[] includes {"lag", ExpressionType::WINDOW_LAG}
+17|DuckDB supports lead window function|CORRECT|internal_window_functions[] includes {"lead", ExpressionType::WINDOW_LEAD}
+18|The SQL example shows sum(salary) OVER (PARTITION BY depname ORDER BY empno) as a running departmental payroll total|CORRECT|This is valid DuckDB window function syntax consistent with the test suite patterns
+19|QUALIFY must be attached to a query that uses a window function either in the select list or in the QUALIFY predicate itself|CORRECT|Test test_qualify.test line 203-207 shows error "at least one window function must appear in the SELECT" when QUALIFY has no window function
+20|QUALIFY can reference projection aliases|CORRECT|Test test_qualify.test line 28 shows "QUALIFY row_num = 1" where row_num is defined as alias in SELECT
+21|A named WINDOW clause must appear before QUALIFY, not after it|CORRECT|Test test_qualify.test lines 198-201 show syntax error when QUALIFY appears before WINDOW clause
+22|DuckDB's binder rejects nested window calls|CORRECT|bind_window_expression.cpp line 166: "window function calls cannot be nested" when inside_window is true
+23|DuckDB does not support correlated columns inside window functions|CORRECT|bind_window_expression.cpp line 169: "correlated columns in window functions not supported" when depth > 0
+24|RANGE frames are limited to a single ORDER BY expression|CORRECT|bind_window_expression.cpp line 177: "RANGE frames must have only one ORDER BY expression"
+25|The implementation rewrites range boundaries for time types|CORRECT|bind_window_expression.cpp lines 202-208 show time types converted to timestamp to avoid wrapping for RANGE frames
+26|In the physical planner, window expressions are grouped when they share equivalent partitions and a compatible ordering prefix|CORRECT|plan_window.cpp uses PartitionsAreEquivalent() and GetSharedOrders() to group window expressions
+27|Identical expressions can reuse work through CSE elimination|CORRECT|plan_window.cpp lines 74-87 implement CSE elimination for duplicate window expressions
+28|Several windows over the same grain can move through the same planned operator|CORRECT|plan_window.cpp groups matching window expressions into single PhysicalWindow operators
+29|DuckDB distinguishes between blocking and streaming windows|CORRECT|plan_window.cpp separates streaming_windows and blocking_windows, using PhysicalStreamingWindow and PhysicalWindow respectively
+30|The general PhysicalWindow operator uses a multi-stage pipeline with sorting and materialization|CORRECT|physical_window.cpp implements stages: SORT -> MATERIALIZE -> MASK -> SINK -> FINALIZE -> GETDATA -> DONE
+31|There is a PhysicalStreamingWindow path for simpler cases|CORRECT|physical_streaming_window.cpp implements IsStreamingFunction() for eligible window functions
+32|row_number() OVER () can stream|CORRECT|IsStreamingFunction returns true for WINDOW_ROW_NUMBER when no partitions/orders
+33|rank() OVER () can stream|CORRECT|IsStreamingFunction returns true for WINDOW_RANK when no partitions/orders
+34|dense_rank() OVER () can stream|CORRECT|IsStreamingFunction returns true for WINDOW_RANK_DENSE when no partitions/orders
+35|Some lead and lag calls can stream under the right conditions|CORRECT|IsStreamingFunction handles WINDOW_LEAD and WINDOW_LAG with constant offset constraints
+36|Running aggregates over ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW can stream|CORRECT|IsStreamingFunction returns true for WINDOW_AGGREGATE when start==UNBOUNDED_PRECEDING and end==CURRENT_ROW_ROWS with no destructor
+37|DuckDB runs a top_n_window_elimination pass in the optimizer|CORRECT|optimizer.cpp line 309: RunOptimizer(OptimizerType::TOP_N_WINDOW_ELIMINATION, ...)
+38|The top_n_window_elimination pass runs after statistics propagation|CORRECT|optimizer.cpp shows STATISTICS_PROPAGATION at line 302 followed by TOP_N_WINDOW_ELIMINATION at line 309
+39|The optimizer rewrites row_number() patterns into aggregate-based plans using min, max, arg_min, or arg_max variants|CORRECT|topn_window_elimination.cpp line 245-246 builds function names from "arg_" prefix and "min"/"max" based on order type
+40|The optimizer only handles ROW_NUMBER window functions|CORRECT|topn_window_elimination.cpp line 564 checks window.expressions[0]->type != ExpressionType::WINDOW_ROW_NUMBER
+41|The blog states the optimizer tests confirm that after rewriting, the logical plan should no longer contain the original FILTER over a WINDOW node|CORRECT|test/optimizer/topn_window_elimination.test_slow verifies no FILTER+WINDOW in optimized plans
+42|An open issue from March 12, 2026 reports that QUALIFY row_number() OVER (...) = 1 on hive-partitioned Parquet in S3 triggered a plan that scanned remote files twice|CORRECT|Issue #21348 created 2026-03-12 describes exactly this: top_n_window_elimination causes double scan and ~50x more S3 requests
+43|The issue reports that the double scan multiplied HTTP requests dramatically on a wide schema|CORRECT|Issue #21348 shows GET requests went from 81 to 4,214 on a ~90 column schema
+44|Another open issue from March 17, 2026 shows the same optimizer causing out-of-memory failures when rn <= 50 was rewritten|CORRECT|Issue #21431 created 2026-03-17 describes OOM with TopN Window Elimination when QUALIFY rn <= 50
+45|The OOM issue was caused by arg_min_max_n strategy that allocated far more state than the actual result cardinality required|CORRECT|Issue #21431: Mytherin identified arg_min_max_n pre-allocates all 50 slots per group even when max rn is only 3
+46|A March 12, 2026 issue around lag() with a RANGE frame was closed as expected behavior|CORRECT|Issue #21330 created 2026-03-12 about lag() ignoring RANGE frame was closed as expected behavior
+47|The key point is that lag is defined by row offset semantics, not by the frame|CORRECT|Issue #21330 confirms lag does not use window framing, same as PostgreSQL behavior
+48|Community users consistently praise DuckDB for embedded analytics and fast local file processing|CORRECT|HN comments in hn-46645176 praise DuckDB for analytics embedding, local file processing; Reddit benchmarks confirm fast local performance
+49|Community users note that remote storage changes the cost model|CORRECT|Reddit benchmark (reddit-1qon39x) shows window functions on DuckDB+R2 at 12,187ms vs 947ms local, stating "Window functions hurt DuckDB + R2 badly"
+50|One benchmark in the community found window-heavy queries especially sensitive to remote object storage because they may require additional passes|CORRECT|Reddit benchmark (reddit-1qon39x) shows window functions at 947ms local vs 12,187ms remote, noting "requires multiple passes over remote data"
+51|The blog's SQL example for QUALIFY uses rank() OVER (PARTITION BY student ORDER BY mark DESC) = 2|CORRECT|This exact query pattern appears in test_qualify.test line 55 and produces correct results
+52|The top_n_window_elimination optimizer requires exactly 1 ORDER BY expression|CORRECT|topn_window_elimination.cpp line 569: "window_expr.orders.size() != 1" returns false if not exactly 1
+53|The implementation rewrites range boundaries for descending order|UNVERIFIABLE|The bind_window_expression.cpp shows time type conversion but no explicit descending-order-specific range boundary rewriting is visible in the provided code
+54|DuckDB supports value functions (first_value, last_value, lag, lead) as window functions|CORRECT|internal_window_functions[] includes first_value, last_value, lag, lead; window_value_function.cpp implements them
+55|percent_rank() OVER () can stream in the streaming window path|CORRECT|IsStreamingFunction returns true for WINDOW_PERCENT_RANK when no partitions/orders

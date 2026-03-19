@@ -235,6 +235,8 @@ def extract_features(
     task_id: str,
     condition: str,
     run_id: str,
+    model: str = "",
+    word_target: str = "",
 ) -> LinguisticFeatures:
     """Compute all ten linguistic features for a document.
 
@@ -259,6 +261,8 @@ def extract_features(
         task_id=task_id,
         condition=condition,
         run_id=run_id,
+        model=model,
+        word_target=word_target,
         sent_len_mean=sent_len_mean,
         sent_len_std=sent_len_std,
         vocab_diversity=compute_vocab_diversity(text),

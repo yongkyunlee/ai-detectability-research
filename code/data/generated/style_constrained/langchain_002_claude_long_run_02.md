@@ -12,13 +12,13 @@ LangChain's retrieval stack is split across two abstract classes that live in `l
 
 The bridge between them is `VectorStoreRetriever`, and you create one by calling `as_retriever()` on any vector store instance. This is the pattern you'll use 90% of the time:
 
-```python
+
 retriever = vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={"k": 5, "fetch_k": 50}
 )
 docs = retriever.invoke("How does authentication work?")
-```
+
 
 That single method call gives you a fully compliant `Runnable` that you can compose into chains. And the `search_type` parameter is where things get interesting.
 

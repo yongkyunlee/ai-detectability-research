@@ -20,15 +20,15 @@ CrewAI requires Python 3.10 or newer (up through 3.13). The project recommends U
 
 The minimal install gets you the core framework:
 
-```shell
+
 pip install crewai
-```
+
 
 If you want the built-in tool suite — web search, file readers, RAG tools, code interpreter, and more — install the extras:
 
-```shell
+
 pip install 'crewai[tools]'
-```
+
 
 One dependency that occasionally trips people up is `tiktoken`, which requires a Rust compiler to build from source. If you hit a wheel-building error during installation, either install Rust (via `rustup`) or force a pre-built binary with `pip install tiktoken --prefer-binary`.
 
@@ -38,13 +38,13 @@ You will also need at least one LLM API key. OpenAI is the default, so having an
 
 CrewAI ships with a command-line interface that generates a project skeleton for you. This is the recommended way to start, because it establishes the YAML-based configuration pattern that keeps agent and task definitions cleanly separated from your Python logic.
 
-```shell
+
 crewai create crew my_research_crew
-```
+
 
 This produces a directory structure like:
 
-```
+
 my_research_crew/
 ├── pyproject.toml
 ├── .env
@@ -60,7 +60,7 @@ my_research_crew/
         └── tools/
             ├── __init__.py
             └── custom_tool.py
-```
+
 
 The CLI also prompts you to choose an LLM provider and model during project creation, and it will ask for your API key. These get stored in the `.env` file at the project root.
 
@@ -72,7 +72,7 @@ Let's walk through a concrete example. Say you want a system that researches a g
 
 Start by editing `agents.yaml`:
 
-```yaml
+
 researcher:
   role: >
     {topic} Senior Data Researcher
@@ -92,13 +92,13 @@ reporting_analyst:
     You're a meticulous analyst with a keen eye for detail. You're known for
     your ability to turn complex data into clear and concise reports, making
     it easy for others to understand and act on the information you provide.
-```
+
 
 Notice the `{topic}` placeholders. These get filled in at runtime when you call `kickoff(inputs={'topic': 'AI Agents'})`, which means you can reuse the same crew definition across different subjects without changing any configuration.
 
 Next, configure `tasks.yaml`:
 
-```yaml
+
 research_task:
   description: >
     Conduct a thorough research about {topic}.
@@ -118,13 +118,13 @@ reporting_task:
     of information. Formatted as markdown.
   agent: reporting_analyst
   output_file: report.md
-```
+
 
 The `output_file` attribute on the reporting task tells CrewAI to write the final result to disk automatically — useful when you want a persistent artifact at the end of a run.
 
 Now wire it all together in `crew.py`:
 
-```python
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
@@ -169,25 +169,25 @@ class MyResearchCrew():
             process=Process.sequential,
             verbose=True,
         )
-```
+
 
 The `@CrewBase` decorator and the `@agent`, `@task`, `@crew` annotations handle a lot of boilerplate. They automatically collect all decorated agents and tasks so you can just reference `self.agents` and `self.tasks` without manually building lists. The YAML method names must match the Python method names — `researcher` in YAML corresponds to `def researcher(self)` in code.
 
 Finally, `main.py` triggers execution:
 
-```python
+
 from my_research_crew.crew import MyResearchCrew
 
 def run():
     inputs = {'topic': 'AI Agents'}
     MyResearchCrew().crew().kickoff(inputs=inputs)
-```
+
 
 Before running, make sure your `.env` file has the necessary keys — at minimum `OPENAI_API_KEY`, and `SERPER_API_KEY` if you are using the web search tool. Then from the project root:
 
-```shell
+
 crewai run
-```
+
 
 You should see verbose output in the terminal showing each agent reasoning through its task, and a `report.md` file will appear with the final write-up.
 

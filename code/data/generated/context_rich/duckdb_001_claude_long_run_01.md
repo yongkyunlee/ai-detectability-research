@@ -12,9 +12,9 @@ Under the hood, DuckDB uses a columnar storage format and a vectorized execution
 
 Getting started takes one line:
 
-```bash
+
 pip install duckdb
-```
+
 
 The package is self-contained. There are no system-level dependencies, no compiled extensions to chase down, and no database server to provision. It supports Python 3.7 and above, though 3.9 or later is recommended for the best experience with type hints and modern language features.
 
@@ -22,7 +22,7 @@ The package is self-contained. There are no system-level dependencies, no compil
 
 DuckDB exposes a connection object that serves as the entry point to everything. You can run it entirely in memory or back it with a file for persistence between sessions.
 
-```python
+
 import duckdb
 
 # In-memory database — disappears when the process exits
@@ -30,18 +30,18 @@ conn = duckdb.connect()
 
 # Persistent database — state survives restarts
 conn = duckdb.connect("my_analysis.duckdb")
-```
+
 
 From there, the interface follows Python's DB-API 2.0 conventions closely enough to feel familiar:
 
-```python
+
 conn.execute("CREATE TABLE readings (sensor_id INTEGER, ts TIMESTAMP, value DOUBLE)")
 conn.execute("INSERT INTO readings VALUES (1, '2024-01-15 08:30:00', 23.4)")
 conn.execute("INSERT INTO readings VALUES (1, '2024-01-15 09:00:00', 24.1)")
 
 results = conn.execute("SELECT sensor_id, AVG(value) FROM readings GROUP BY sensor_id").fetchall()
 print(results)
-```
+
 
 The `fetchall()` method returns plain Python tuples, but that is rarely the most convenient format for analytical work. DuckDB provides `fetchdf()` to hand you a Pandas DataFrame directly and `fetchnumpy()` to return NumPy masked arrays with proper NULL handling.
 
@@ -53,21 +53,21 @@ The Python client actually supports three distinct programming styles, and under
 
 **The Relational API** offers a chainable, lazy interface for building queries programmatically:
 
-```python
+
 rel = conn.from_csv_auto("sensor_data.csv")
 result = rel.filter("value > 20").aggregate("sensor_id, AVG(value) AS avg_val").execute().fetchdf()
-```
+
 
 Operations like `filter()`, `project()`, and `aggregate()` build up a query plan without executing it. Execution happens only when you call `execute()` or a terminal method like `fetchdf()`. This deferred evaluation lets DuckDB optimize the full query before touching any data.
 
 **Module-level shorthand functions** skip the explicit connection for quick one-off operations:
 
-```python
+
 import duckdb
 
 # Query a Pandas DataFrame with SQL, no connection needed
 result = duckdb.query("SELECT * FROM my_df WHERE score > 90")
-```
+
 
 These functions use a shared default connection behind the scenes. They are convenient for notebooks and exploratory analysis, but the explicit connection approach scales better for production code.
 
@@ -75,7 +75,7 @@ These functions use a shared default connection behind the scenes. They are conv
 
 One of DuckDB's strongest features is its ability to query Pandas DataFrames as if they were database tables. There is no data copying involved — DuckDB reads the DataFrame's underlying memory buffers directly.
 
-```python
+
 import pandas as pd
 import duckdb
 
@@ -91,15 +91,15 @@ result = duckdb.query("""
     GROUP BY region, product
     ORDER BY total DESC
 """).fetchdf()
-```
+
 
 Notice that DuckDB picks up the variable name `sales` automatically and makes it available as a table reference in the SQL query. For more control, you can register DataFrames explicitly:
 
-```python
+
 conn = duckdb.connect()
 conn.register("monthly_sales", sales)
 conn.execute("SELECT * FROM monthly_sales WHERE revenue > 100").fetchdf()
-```
+
 
 This integration works with Polars as well, supporting both eager and lazy evaluation modes. If your pipeline already uses Polars for its performance advantages, DuckDB slots in without friction.
 
@@ -107,7 +107,7 @@ This integration works with Polars as well, supporting both eager and lazy evalu
 
 DuckDB reads common file formats without importing data into tables first. This alone eliminates a surprising amount of boilerplate in data pipelines.
 
-```python
+
 # Read a single CSV
 conn.execute("SELECT * FROM 'measurements.csv' WHERE site = 'A'").fetchdf()
 
@@ -116,7 +116,7 @@ conn.execute("SELECT * FROM 'data/year=2024/*.parquet'").fetchdf()
 
 # Query JSON lines
 conn.execute("SELECT * FROM read_json_auto('events.jsonl')").fetchdf()
-```
+
 
 Glob patterns are particularly powerful. If you have hundreds of CSV files following a naming convention, a single query can treat them as one logical table. DuckDB infers schemas automatically, handles header detection, and manages type coercion across files with minor format differences.
 
@@ -130,14 +130,14 @@ DuckDB implements a rich SQL dialect that goes well beyond basic SELECT statemen
 
 **Window functions** work as expected and perform well even on large result sets:
 
-```python
+
 conn.execute("""
     SELECT sensor_id, ts, value,
            AVG(value) OVER (PARTITION BY sensor_id ORDER BY ts
                             ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) as rolling_avg
     FROM readings
 """).fetchdf()
-```
+
 
 **Common Table Expressions** chain naturally for multi-step transformations, and DuckDB handles deeply nested CTEs without the performance cliff you might see in other embedded databases.
 

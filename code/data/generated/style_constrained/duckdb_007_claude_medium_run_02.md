@@ -14,21 +14,21 @@ DuckDB supports `QUALIFY`, a filtering clause that runs after window function ev
 
 Instead of this:
 
-```sql
+
 SELECT * FROM (
     SELECT *, ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY cnt DESC) AS rn
     FROM counts
 ) sub
 WHERE rn = 1
-```
+
 
 You write this:
 
-```sql
+
 SELECT *
 FROM counts
 QUALIFY ROW_NUMBER() OVER (PARTITION BY group_id ORDER BY cnt DESC) = 1
-```
+
 
 Shorter. Clearer. One less level of nesting. We've adopted it as the default pattern for deduplication and top-N-per-group queries on our team. It works with named windows too, so you can define a window once and reference it in both your SELECT and QUALIFY clauses.
 

@@ -6,9 +6,9 @@ Data pipelines live or die by how easily they ingest files. DuckDB has become a 
 
 The simplest way to query a CSV in DuckDB is also the most direct:
 
-```sql
+
 SELECT * FROM read_csv('sales_data.csv');
-```
+
 
 Behind this one-liner, DuckDB runs an automatic sniffer that examines a sample of rows to detect the delimiter, quote character, escape character, whether a header row exists, and the data types of each column. By default it inspects the first 20,480 rows. For most well-formed files, that's enough. For messy real-world data, it sometimes isn't.
 
@@ -30,9 +30,9 @@ One handy trick: `sniff_csv()` returns the detected parameters as a result set. 
 
 Parquet is a columnar binary format, and DuckDB handles it natively through a built-in extension. Reading it is straightforward:
 
-```sql
+
 SELECT * FROM read_parquet('transactions.parquet');
-```
+
 
 Because Parquet files carry their own schema metadata, there's no sniffing step. DuckDB reads the file footer to get column names, types, and row group statistics, then uses that information to plan the query.
 
@@ -48,10 +48,10 @@ Community benchmarks on roughly 20 GB of ZSTD-compressed financial Parquet data 
 
 DuckDB can read directories of Parquet files organized in the Hive partition layout, where directory names encode column values:
 
-```sql
+
 SELECT * FROM read_parquet('s3://bucket/data/year=*/month=*/data.parquet')
 WHERE year = 2025 AND month = 3;
-```
+
 
 The engine recognizes `year` and `month` as partition columns derived from the directory structure and prunes files at the planning stage. It never opens Parquet files from partitions that don't match your filter.
 
@@ -73,9 +73,9 @@ This usually comes down to where you are in the data lifecycle. CSV works well f
 
 DuckDB makes the transition easy. You can convert a CSV to Parquet in a single statement:
 
-```sql
+
 COPY (SELECT * FROM read_csv('input.csv')) TO 'output.parquet' (FORMAT PARQUET, CODEC 'ZSTD');
-```
+
 
 For validation workflows (checking null counts, verifying type constraints, running range checks) DuckDB can replace pandas-based pipelines while using a fraction of the memory, since it processes data in streaming batches rather than loading entire files into RAM.
 

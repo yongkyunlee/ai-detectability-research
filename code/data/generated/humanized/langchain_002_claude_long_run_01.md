@@ -12,12 +12,12 @@ Retrievers are broader. In the framework's own words, "a retriever does not need
 
 The bridge between these two layers is `as_retriever()` on `VectorStore`. Call it and you get back a `VectorStoreRetriever` that wraps your store and delegates search calls to it. Two parameters control behavior: `search_type` and `search_kwargs`.
 
-```python
+
 retriever = vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={"k": 6, "fetch_k": 50, "lambda_mult": 0.25}
 )
-```
+
 
 This lets you swap the underlying store without touching downstream chain logic. Your LCEL pipeline just sees a Runnable that accepts a string and returns documents.
 
@@ -37,7 +37,7 @@ Similarity with score threshold (`search_type="similarity_score_threshold"`) add
 
 Building custom retrievers for cases where vector similarity alone falls short is pretty straightforward. Subclass `BaseRetriever` and implement `_get_relevant_documents`:
 
-```python
+
 class HybridRetriever(BaseRetriever):
     vector_store: VectorStore
     keyword_index: Any
@@ -47,7 +47,7 @@ class HybridRetriever(BaseRetriever):
         vector_results = self.vector_store.similarity_search(query, k=self.k)
         keyword_results = self.keyword_index.search(query, limit=self.k)
         return self._merge_and_deduplicate(vector_results, keyword_results)
-```
+
 
 This pattern comes up a lot in production systems combining dense retrieval (embeddings) with sparse retrieval (BM25 or TF-IDF). The vector path captures semantic similarity, so "automobile" matches "car." The keyword path catches exact terms that embeddings sometimes miss, especially domain-specific jargon, product codes, or proper nouns.
 

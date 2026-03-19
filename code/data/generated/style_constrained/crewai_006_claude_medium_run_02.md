@@ -14,9 +14,9 @@ CrewAI v1.11.0 ships a single `Memory` class that replaced the earlier patchwork
 
 The scoring formula is explicit:
 
-```
+
 composite = semantic_weight * similarity + recency_weight * decay + importance_weight * importance
-```
+
 
 Defaults are 0.5 / 0.3 / 0.2 for semantic, recency, and importance respectively, with a 30-day recency half-life. These are tunable. A sprint retrospective might want `recency_weight=0.5` and `recency_half_life_days=7` so yesterday's decisions outrank last month's. An architecture knowledge base might flip to `importance_weight=0.4` and a 180-day half-life so foundational decisions don't fade.
 

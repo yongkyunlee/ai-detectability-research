@@ -12,7 +12,7 @@ CrewAI ships with over 40 built-in tools in the `crewai-tools` package. You inst
 
 Assigning tools to an agent is dead simple. You pass a list to the `tools` parameter:
 
-```python
+
 from crewai import Agent
 from crewai_tools import SerperDevTool, FileReadTool
 
@@ -22,7 +22,7 @@ researcher = Agent(
     backstory="An expert analyst with a keen eye for market trends.",
     tools=[SerperDevTool(), FileReadTool()],
 )
-```
+
 
 That's it. The agent now knows it can search the web and read files, and it'll decide when to use each based on the task description and its own reasoning loop.
 
@@ -32,7 +32,7 @@ There are two paths to creating a custom tool. The first is subclassing `BaseToo
 
 The decorator approach looks like this:
 
-```python
+
 from crewai.tools import tool
 
 @tool("Currency Converter")
@@ -40,7 +40,7 @@ def convert_currency(amount: float, from_currency: str, to_currency: str) -> str
     """Convert an amount from one currency to another using current exchange rates."""
     # your conversion logic
     return f"{amount} {from_currency} = {converted} {to_currency}"
-```
+
 
 The docstring becomes the tool description. The function signature becomes the args schema. CrewAI infers it automatically using Pydantic's `create_model`. If the function lacks a docstring, the framework raises a ValueError. And if it lacks type annotations, you get another error. These aren't optional.
 
@@ -74,7 +74,7 @@ After hooks can modify the result string or leave it unchanged by returning `Non
 
 Registration happens three ways. Global hooks apply to all crews and agents:
 
-```python
+
 from crewai.hooks import register_before_tool_call_hook
 
 def audit_log(context):
@@ -82,7 +82,7 @@ def audit_log(context):
     return None
 
 register_before_tool_call_hook(audit_log)
-```
+
 
 Decorator-based registration uses `@before_tool_call` and `@after_tool_call`. And crew-scoped hooks use `@before_tool_call_crew` and `@after_tool_call_crew` on methods within a `@CrewBase` class, so they only apply to that specific crew.
 
@@ -92,12 +92,12 @@ The practical use cases are safety guardrails (blocking destructive tools), huma
 
 The Model Context Protocol gives CrewAI agents access to external tool servers over a standardized protocol. CrewAI supports three transports: stdio for local processes, Server-Sent Events for streaming, and Streamable HTTP for remote servers. The simplest approach is the DSL integration using the `mcps` field directly on an agent:
 
-```python
+
 agent = Agent(
     role="Research Analyst",
     mcps=["https://mcp.exa.ai/mcp?api_key=your_key", "snowflake"]
 )
-```
+
 
 Tools from MCP servers are automatically discovered and made available. For more control, use `MCPServerStdio`, `MCPServerHTTP`, or `MCPServerSSE` with explicit configuration. Tool filtering is supported through `create_static_tool_filter` for allow/block lists and dynamic filter functions that can make context-aware decisions.
 

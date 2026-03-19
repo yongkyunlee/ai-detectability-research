@@ -12,13 +12,13 @@ The `|` operator creates a `RunnableSequence`. So when you write `prompt | model
 
 Here's the simplest possible example from the source:
 
-```python
+
 from langchain_core.runnables import RunnableLambda
 
 sequence = RunnableLambda(lambda x: x + 1) | RunnableLambda(lambda x: x * 2)
 sequence.invoke(1)  # 4
 sequence.batch([1, 2, 3])  # [4, 6, 8]
-```
+
 
 We get batch and async support without writing any additional code. The `RunnableSequence` calls `batch` on each component sequentially, and each component's batch implementation uses a thread pool by default for IO-bound work. This matters more than you'd think once you start hitting external APIs at scale.
 
@@ -28,13 +28,13 @@ LCEL really only has two core building blocks. `RunnableSequence` handles serial
 
 `RunnableParallel` accepts a dict of named runnables and runs them all concurrently with the same input. You can construct one explicitly or just drop a dict literal into a sequence - LangChain coerces it automatically:
 
-```python
+
 sequence = RunnableLambda(lambda x: x + 1) | {
     "mul_2": RunnableLambda(lambda x: x * 2),
     "mul_5": RunnableLambda(lambda x: x * 5),
 }
 sequence.invoke(1)  # {'mul_2': 4, 'mul_5': 10}
-```
+
 
 That automatic coercion is one of those small design decisions that makes real pipelines cleaner. You don't need to import and instantiate `RunnableParallel` every time you want to fan out. A plain dict works. And the concurrency is real - both branches run simultaneously, which is exactly what you want when you're making parallel LLM calls.
 
@@ -54,7 +54,7 @@ But here's where you need to pay attention. `RunnableLambda` doesn't support `tr
 
 If you need custom streaming logic, use `RunnableGenerator` instead. It takes a function with signature `Iterator[A] -> Iterator[B]`, letting you process and emit chunks incrementally:
 
-```python
+
 from langchain_core.runnables import RunnableGenerator
 
 def gen(input: Iterator[Any]) -> Iterator[str]:
@@ -63,7 +63,7 @@ def gen(input: Iterator[Any]) -> Iterator[str]:
 
 runnable = RunnableGenerator(gen)
 list(runnable.stream(None))  # ["Have", " a", " nice", " day"]
-```
+
 
 `RunnableLambda` is simpler to use but `RunnableGenerator` gives you true streaming capabilities. That's a trade-off worth understanding before you design your chain, because retrofitting streaming later means rewriting your intermediate steps.
 
@@ -83,7 +83,7 @@ Every `Runnable` comes with a set of standard modifier methods that compose clea
 
 `RunnableBranch` provides conditional logic. You give it a list of `(condition, runnable)` pairs and a default, and it evaluates conditions in order, running the first matching branch:
 
-```python
+
 from langchain_core.runnables import RunnableBranch
 
 branch = RunnableBranch(
@@ -92,7 +92,7 @@ branch = RunnableBranch(
     lambda x: "goodbye",
 )
 branch.invoke("hello")  # "HELLO"
-```
+
 
 This covers simple if/else routing within a chain. For anything more complex - cycles, human-in-the-loop, stateful agents - you'll want LangGraph, which sits on top of LCEL but adds a proper graph execution model.
 
@@ -100,7 +100,7 @@ This covers simple if/else routing within a chain. For anything more complex - c
 
 There's a `@chain` decorator that turns a plain function into a `Runnable`. It sets the name for tracing and ensures any runnables called inside the function are tracked as dependencies:
 
-```python
+
 from langchain_core.runnables import chain
 
 @chain
@@ -110,7 +110,7 @@ def my_func(fields):
     formatted = prompt.invoke(**fields)
     for chunk in model.stream(formatted):
         yield chunk
-```
+
 
 This is handy when you need custom logic that doesn't fit neatly into the pipe syntax but still want to participate in the tracing ecosystem.
 

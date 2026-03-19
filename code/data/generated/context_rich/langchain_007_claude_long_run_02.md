@@ -12,9 +12,9 @@ This uniformity is what makes composition possible. When every component speaks 
 
 The most visible piece of LCEL syntax is the pipe operator. Python's `|` operator is overloaded on Runnables to create a `RunnableSequence`, where the output of the left operand feeds directly into the input of the right operand:
 
-```python
+
 chain = prompt_template | chat_model | output_parser
-```
+
 
 Under the hood, `__or__` calls `coerce_to_runnable` on whatever you hand it, which means you can pipe in plain functions, dictionaries, or anything that can be converted to a Runnable. The resulting `RunnableSequence` is itself a Runnable, so it inherits the full protocol. Call `chain.invoke({"topic": "recursion"})` and you get a synchronous execution. Call `chain.astream({"topic": "recursion"})` and you get token-by-token streaming, provided the underlying components support it.
 
@@ -24,24 +24,24 @@ A subtlety worth understanding: streaming propagation depends on whether each co
 
 The second core composition primitive is `RunnableParallel`, which takes the same input and fans it out to multiple Runnables concurrently, collecting their outputs into a dictionary. You can construct it explicitly or, more idiomatically, use a dictionary literal inside a pipe chain:
 
-```python
+
 chain = prompt | {
     "summary": summary_model | summary_parser,
     "sentiment": sentiment_model | sentiment_parser,
 }
-```
+
 
 That dictionary is automatically coerced into a `RunnableParallel`. Both branches receive the same prompt output and execute concurrently. The result is a dictionary with keys `"summary"` and `"sentiment"`, each containing the output of its respective branch.
 
 This is particularly useful for RAG pipelines where you need to fetch context from a retriever while simultaneously passing the user's question through unchanged. The combination of `RunnableParallel` and `RunnablePassthrough` makes that pattern clean:
 
-```python
+
 setup = RunnableParallel(
     context=retriever,
     question=RunnablePassthrough(),
 )
 chain = setup | prompt | model | parser
-```
+
 
 `RunnablePassthrough` does exactly what its name suggests: it forwards the input unchanged. Its `assign` class method lets you augment the input dictionary with additional computed keys without losing the original data, which is handy when you want to inject retrieved context alongside the original query.
 
@@ -49,31 +49,31 @@ chain = setup | prompt | model | parser
 
 Real pipelines rarely follow a straight line. LCEL provides `RunnableBranch` for conditional routing: you supply a list of `(condition, runnable)` pairs and a default, and at runtime the first condition that evaluates to True determines which branch executes. It is essentially a functional if/elif/else chain expressed as data:
 
-```python
+
 branch = RunnableBranch(
     (lambda x: "code" in x["topic"], code_chain),
     (lambda x: "math" in x["topic"], math_chain),
     general_chain,  # default
 )
-```
+
 
 For resilience, every Runnable has a `with_fallbacks` method that wraps it in a `RunnableWithFallbacks`. If the primary Runnable throws, the system tries each fallback in order until one succeeds. This is the idiomatic way to handle multi-provider failover:
 
-```python
+
 resilient_model = primary_model.with_fallbacks([backup_model])
-```
+
 
 You can attach fallbacks at any level: on a single model call, on an entire chain, or on a sub-chain within a larger pipeline. The exceptions to catch are configurable, and you can pass the caught exception into the fallback as part of the input if the fallback logic needs it.
 
 Similarly, `with_retry` wraps a Runnable in a `RunnableRetry` that uses exponential backoff with jitter, powered by the tenacity library. For transient network errors or rate limits, this is often all you need:
 
-```python
+
 reliable_call = model.with_retry(
     stop_after_attempt=3,
     wait_exponential_jitter=True,
     retry_if_exception_type=(TimeoutError, RateLimitError),
 )
-```
+
 
 ## Runtime Configuration
 

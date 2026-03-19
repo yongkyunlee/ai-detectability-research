@@ -12,7 +12,7 @@ Two interfaces sit at the foundation of any LangChain RAG pipeline: `VectorStore
 
 Both abstractions implement LangChain's `Runnable` interface, so they compose naturally using the expression language. A typical chain pipes a retriever's output into a prompt template, then into an LLM:
 
-```python
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_chroma import Chroma
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -24,7 +24,7 @@ prompt = ChatPromptTemplate.from_template(
     "Answer the question based on the context:\n{context}\n\nQuestion: {question}"
 )
 chain = {"context": retriever, "question": lambda x: x} | prompt | ChatOpenAI()
-```
+
 
 ## Choosing a Search Strategy
 

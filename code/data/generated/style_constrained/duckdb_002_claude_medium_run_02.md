@@ -6,9 +6,9 @@ Most data pipelines start with the same boring step: getting flat files into som
 
 Reading a CSV in DuckDB requires exactly one line of SQL:
 
-```sql
+
 SELECT * FROM 'myfile.csv';
-```
+
 
 That's it. DuckDB's sniffer inspects the first 2,048 rows by default. It auto-detects the delimiter, quote character, escape character, newline type, whether a header row exists, and the data types for every column. The type detection walks a specificity ladder-starting at `SQLNULL` at the top and falling through `BOOLEAN`, `TIME`, `DATE`, `TIMESTAMP`, `TIMESTAMP_TZ`, `BIGINT`, `DOUBLE`, and finally `VARCHAR` as the catch-all. The system tries the most specific type first and relaxes until something fits.
 
@@ -22,9 +22,9 @@ DuckDB also supports `ignore_errors = true` and `store_rejects = true`, which le
 
 Parquet reads follow the same pattern:
 
-```sql
+
 SELECT * FROM 'myfile.parquet';
-```
+
 
 But the internals are different in important ways. Parquet files carry their schema, so there's no sniffing step. They also carry row-group-level statistics-min/max values per column-which DuckDB uses for predicate pushdown. If your `WHERE` clause eliminates an entire row group based on its statistics, DuckDB skips reading it entirely. This is where Parquet earns its keep on analytical workloads.
 
@@ -36,10 +36,10 @@ And the writer side has good options. Snappy is the default compression codec, b
 
 DuckDB reads hive-partitioned datasets out of the box:
 
-```sql
+
 SELECT * FROM read_parquet('s3://bucket/year=*/month=*/*.parquet',
   hive_partitioning = true);
-```
+
 
 You can specify partition column types with `hive_types` to avoid incorrect inference. Version 1.5.0 introduced file-level Dynamic Partition Pruning for local files, which lets DuckDB skip entire files based on partition key filters without reading any file metadata. That's a meaningful improvement for local datasets with thousands of partitions.
 

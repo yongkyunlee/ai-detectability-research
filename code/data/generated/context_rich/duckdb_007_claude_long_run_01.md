@@ -8,13 +8,13 @@ This post walks through the window function landscape in DuckDB — what's avail
 
 Every window function follows the same structural template. You invoke a function and attach an `OVER` clause that defines the computational context:
 
-```sql
+
 function_name(arguments) OVER (
     PARTITION BY grouping_columns
     ORDER BY sorting_columns
     frame_specification
 )
-```
+
 
 The `PARTITION BY` clause splits the dataset into independent groups — think of it as defining boundaries within which the function operates. `ORDER BY` determines the sequence of rows inside each partition. The frame specification narrows things further by defining exactly which rows around the current row participate in the calculation.
 
@@ -31,14 +31,14 @@ DuckDB provides the full set of SQL ranking functions, each with subtly differen
 
 A typical top-N query looks like this:
 
-```sql
+
 SELECT product_name, category, revenue,
        ROW_NUMBER() OVER (
            PARTITION BY category
            ORDER BY revenue DESC
        ) AS rank_in_category
 FROM product_sales
-```
+
 
 This assigns a revenue rank within each category. To actually filter to the top 3 per category, you'd traditionally wrap this in a subquery. DuckDB has a better way, which we'll get to shortly.
 
@@ -53,11 +53,11 @@ Sometimes you need to compare a row with its neighbors or extract specific posit
 
 These are invaluable for computing row-over-row changes. Calculating daily price movement, for instance, becomes straightforward:
 
-```sql
+
 SELECT trading_date, close_price,
        close_price - LAG(close_price) OVER (ORDER BY trading_date) AS daily_change
 FROM stock_prices
-```
+
 
 DuckDB also offers a `FILL()` function for forward-filling missing values across a partition — a feature that anyone working with time series data will appreciate, since it eliminates the need for self-joins or correlated subqueries to carry forward the last known value.
 
@@ -67,18 +67,18 @@ The frame specification is where window functions gain real flexibility, and als
 
 **ROWS** defines boundaries by physical row count. "Give me the average of the current row plus the two preceding rows" translates directly:
 
-```sql
+
 AVG(value) OVER (ORDER BY ts ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
-```
+
 
 **RANGE** defines boundaries by logical value distance. This is essential for time-based windows where rows may not be evenly spaced. A 30-day moving average that handles irregular timestamps:
 
-```sql
+
 AVG(price) OVER (
     ORDER BY trade_date
     RANGE BETWEEN INTERVAL 30 DAY PRECEDING AND CURRENT ROW
 ) AS moving_avg_30d
-```
+
 
 **GROUPS** operates on peer groups — sets of rows that share the same `ORDER BY` value. It's less commonly used but valuable when you want to include all ties naturally.
 
@@ -90,32 +90,32 @@ The default frame when you specify `ORDER BY` is `RANGE BETWEEN UNBOUNDED PRECED
 
 Perhaps the most impactful DuckDB-specific feature for analytical queries is the `QUALIFY` clause. In standard SQL, filtering based on a window function result requires nesting:
 
-```sql
+
 SELECT * FROM (
     SELECT *, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_time DESC) AS rn
     FROM events
 ) sub
 WHERE rn = 1
-```
+
 
 DuckDB lets you collapse this into a single query:
 
-```sql
+
 SELECT *
 FROM events
 QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_time DESC) = 1
-```
+
 
 `QUALIFY` executes after window functions are computed, analogous to how `HAVING` filters after `GROUP BY`. The reduction in boilerplate is significant, and the intent reads more clearly. You can combine multiple window conditions, reference aggregate windows, and build surprisingly expressive filters without subquery nesting.
 
 Common patterns include selecting the top N per group, filtering partitions by their size, and applying threshold conditions to running totals:
 
-```sql
+
 -- Keep only categories with at least 10 products
 SELECT *
 FROM products
 QUALIFY COUNT(*) OVER (PARTITION BY category_id) >= 10
-```
+
 
 ## Performance Under the Hood
 
@@ -143,7 +143,7 @@ There are also edge cases around partition-by clauses without any ordering that 
 
 A realistic analytical query might combine several window techniques. Imagine building a customer retention analysis that identifies each customer's first purchase, computes their running spend, and flags their most recent transaction:
 
-```sql
+
 SELECT
     customer_id,
     order_date,
@@ -160,7 +160,7 @@ WINDOW w AS (PARTITION BY customer_id ORDER BY order_date)
 QUALIFY ROW_NUMBER() OVER (
     PARTITION BY customer_id ORDER BY order_date DESC
 ) <= 5
-```
+
 
 This single query computes first purchase dates, cumulative spending trajectories, inter-purchase intervals, and limits output to each customer's five most recent orders — no subqueries, no CTEs, no temporary tables.
 

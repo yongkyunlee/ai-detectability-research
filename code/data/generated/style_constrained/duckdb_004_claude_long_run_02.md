@@ -12,10 +12,10 @@ There are several well-documented cases where pushdown silently fails. Expressio
 
 Scalar macros create a similar blind spot. If you define a macro that returns a list of partition values and use it in a `WHERE` clause, DuckDB won't push that filter into the file scan. One user reported their query scanning all 309 million rows in 409 seconds. The workaround was to materialize the macro result into a session variable first:
 
-```sql
+
 SET VARIABLE hives = get_hives();
 SELECT * FROM my_data WHERE [year, month] IN getvariable('hives');
-```
+
 
 That dropped the scan from all files to 12 out of 28, bringing runtime to 4.33 seconds. Same data. Same logic. Completely different execution path. This is the kind of thing `EXPLAIN` will reveal immediately, so make it a habit.
 
@@ -37,9 +37,9 @@ And there's a memory problem too. When the `QUALIFY` threshold is large-say `rn 
 
 You can disable this optimization explicitly:
 
-```sql
+
 SET disabled_optimizers = 'top_n_window_elimination';
-```
+
 
 That's a blunt instrument but an effective one. The trade-off is simple: the rewrite is faster for local, moderately sized data with low cardinality groups, but it's worse for remote storage or when the top-N value is large relative to actual group sizes.
 
@@ -51,9 +51,9 @@ Cold starts are the other killer. Local DuckDB showed about 5–8% overhead on c
 
 Version 1.5.0 introduced a regression in how S3 file discovery works for hive-partitioned data. The new hierarchical glob expansion caused DuckDB to discover all files in a partition tree before pruning, rather than pruning during discovery. A `CREATE VIEW` statement that took about 1 second in v1.4.4 ballooned to 3.5 minutes in v1.5.0. The workaround is straightforward:
 
-```sql
+
 SET s3_allow_recursive_globbing = false;
-```
+
 
 This restores the old behavior. A permanent fix is expected in v1.5.1. But the broader point is worth internalizing: optimizations designed for local file access can backfire badly over the network. Dynamic partition pruning through joins reads Parquet footers from every partition file to check row-group statistics, even when the hive directory path alone could have excluded the file. One comparison showed join-derived dynamic pruning reading 6,717 GETs and 1.3 GiB over 407 seconds, while a static `WHERE` literal with the same filter value used 546 GETs, 109 MiB, and finished in 27 seconds. That's 15x faster. If you can express your partition filter as a literal rather than deriving it from a join, do it.
 
@@ -61,12 +61,12 @@ This restores the old behavior. A permanent fix is expected in v1.5.1. But the b
 
 DuckDB doesn't have a working `VACUUM FULL`. Running `VACUUM`, `VACUUM ANALYZE`, or `CHECKPOINT` won't reclaim disk space after deletes or table drops. `VACUUM FULL` raises a `Not implemented Error`. One user observed a database file at 1.26 GB with 26% dead space-1,354 free blocks out of 5,169 total. The only recourse is to copy the database to a fresh file:
 
-```python
+
 with duckdb.connect(":memory:") as conn:
     conn.execute(f"ATTACH '{source_path}' AS source (READ_ONLY)")
     conn.execute(f"ATTACH '{compact_path}' AS target")
     conn.execute("COPY FROM DATABASE source TO target")
-```
+
 
 This reduced the file from 1.26 GB to 256 MB-an 80% reduction-in under 5 seconds. But it requires a maintenance window, enough free disk for a full copy, and manual file management afterward. Databases with heavy write churn accumulate bloat that you have to deal with operationally. It's been an open issue since 2019.
 

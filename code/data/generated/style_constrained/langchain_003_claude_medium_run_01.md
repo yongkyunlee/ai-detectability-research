@@ -12,7 +12,7 @@ The `@tool` decorator is the quickest way to make a Python function available to
 
 The old entry point was `initialize_agent`. It's been deprecated since version 0.1.0 and is slated for removal in 1.0. The replacement is `create_agent`, which lives in `langchain.agents.factory` and builds a compiled LangGraph state graph under the hood. The signature tells you what changed:
 
-```python
+
 from langchain.agents import create_agent
 
 agent = create_agent(
@@ -21,7 +21,7 @@ agent = create_agent(
     system_prompt="You are a helpful assistant.",
     middleware=[ModelRetryMiddleware(), ToolCallLimitMiddleware()],
 )
-```
+
 
 Where `initialize_agent` took an `AgentType` enum and an `AgentExecutor`, `create_agent` takes a model (string or instance), tools, and - critically - a middleware list. The old `AgentExecutor` handled everything in one monolithic class. The new design decomposes cross-cutting concerns into composable middleware.
 

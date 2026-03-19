@@ -42,9 +42,9 @@ DuckDB has an optimization called top-N window elimination. When you write a `QU
 
 The `arg_min_max_n` function pre-allocates all N slots up front. If you ask for the top 50 per group but most groups only have 3 rows, you're allocating 50 slots per group for almost entirely empty storage. On a query with 400,000 rows and a 1GB memory limit, this tripled memory usage and caused an OOM (issue #21431). The workaround is surgical:
 
-```sql
+
 SET disabled_optimizers = 'top_n_window_elimination';
-```
+
 
 DuckDB maintainer Mark Raasveldt confirmed the root cause and noted that the proper fix is to change the heap allocation strategy so it doesn't pre-allocate all slots. The optimization is simpler to disable than to fix, but disabling it means your window queries fall back to the full computation path.
 

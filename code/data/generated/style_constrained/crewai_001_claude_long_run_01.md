@@ -14,21 +14,21 @@ That distinction matters. A Crew with a sequential process is simpler to reason 
 
 CrewAI requires Python >=3.10 and <3.14. Check yours:
 
-```bash
+
 python3 --version
-```
+
 
 The framework uses `uv` as its dependency manager and package handler. If you don't have it, install it first:
 
-```bash
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+
 
 Then install the CrewAI CLI itself:
 
-```bash
+
 uv tool install crewai
-```
+
 
 After installation, verify with `uv tool list` - you should see something like `crewai v0.102.0`. If you hit a PATH warning, run `uv tool update-shell` to fix it.
 
@@ -38,14 +38,14 @@ One thing the quickstart doesn't emphasize enough: CrewAI 0.175.0 requires `open
 
 CrewAI ships a CLI that generates project scaffolding. This is the recommended path, and having used it, I agree - the YAML-based configuration approach is cleaner than wiring everything up in raw Python.
 
-```bash
+
 crewai create crew latest-ai-development
 cd latest_ai_development
-```
+
 
 This produces:
 
-```
+
 latest_ai_development/
 ├── .gitignore
 ├── knowledge/
@@ -63,7 +63,7 @@ latest_ai_development/
         └── config/
             ├── agents.yaml
             └── tasks.yaml
-```
+
 
 Six files matter here. `agents.yaml` defines your agents. `tasks.yaml` defines your tasks. `crew.py` is where you wire them together in Python. `main.py` is the entry point. `.env` holds your API keys. And `knowledge/` is a directory for any domain-specific knowledge sources you want agents to reference.
 
@@ -73,7 +73,7 @@ Agents in CrewAI are defined by three required fields: `role`, `goal`, and `back
 
 Here's what the generated `agents.yaml` looks like after editing:
 
-```yaml
+
 researcher:
   role: >
     {topic} Senior Data Researcher
@@ -93,13 +93,13 @@ reporting_analyst:
     You're a meticulous analyst with a keen eye for detail. You're known for
     your ability to turn complex data into clear and concise reports, making
     it easy for others to understand and act on the information you provide.
-```
+
 
 The `{topic}` variables are template placeholders. They get filled in at runtime when you call `kickoff(inputs={'topic': 'AI Agents'})`. This interpolation works across both agents and tasks YAML files, which keeps your configurations reusable.
 
 Tasks follow a similar pattern:
 
-```yaml
+
 research_task:
   description: >
     Conduct a thorough research about {topic}
@@ -115,10 +115,10 @@ reporting_task:
     Make sure the report is detailed and contains any and all relevant information.
   expected_output: >
     A fully fledge reports with the mains topics, each with a full section of information.
-    Formatted as markdown without '```'
+    Formatted as markdown without ''
   agent: reporting_analyst
   output_file: report.md
-```
+
 
 One critical detail: the names in your YAML files must match the method names in your Python code. If your YAML defines `researcher`, your `crew.py` needs a method called `researcher` decorated with `@agent`. CrewAI uses this naming convention to automatically link configurations to code. Get it wrong and your task won't find its agent.
 
@@ -126,7 +126,7 @@ One critical detail: the names in your YAML files must match the method names in
 
 The `crew.py` file ties YAML configuration to executable Python. The `@CrewBase` decorator on the class handles automatic collection of agents and tasks, which means you don't manually build lists.
 
-```python
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
@@ -171,33 +171,33 @@ class LatestAiDevelopmentCrew():
             process=Process.sequential,
             verbose=True,
         )
-```
+
 
 The `@agent` and `@task` decorators register methods automatically. When you reference `self.agents` and `self.tasks` in the `@crew` method, CrewAI has already collected everything for you.
 
 And `main.py` is straightforward:
 
-```python
+
 from latest_ai_development.crew import LatestAiDevelopmentCrew
 
 def run():
     inputs = {'topic': 'AI Agents'}
     LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)
-```
+
 
 ## Running Your Crew
 
 Before running, install dependencies:
 
-```bash
+
 crewai install
-```
+
 
 Set your API keys in `.env`. You'll need at minimum an LLM provider key. If your agents use `SerperDevTool` for web searches, add `SERPER_API_KEY` too. Then:
 
-```bash
+
 crewai run
-```
+
 
 With `Process.sequential`, tasks execute in the order they're defined. The output of one task feeds as context into the next. So the researcher runs first, produces its bullet points, and the reporting analyst receives that output to expand into a full report. The final result lands both in the console and in `output/report.md`.
 

@@ -14,14 +14,14 @@ Tools are the agent's interface to external capabilities. LangChain offers sever
 
 The simplest approach is the `@tool` decorator. Annotate a Python function with type hints and a docstring, and LangChain will automatically infer an input schema, which gets passed to the model so it knows what arguments to provide:
 
-```python
+
 from langchain_core.tools import tool
 
 @tool
 def search_web(query: str) -> str:
     """Search the web for information about a topic."""
     return perform_search(query)
-```
+
 
 The decorator supports several options. Setting `return_direct=True` tells the agent to return the tool's output immediately without another model call, useful when the tool's result is the final answer. The `response_format` parameter can be set to `"content_and_artifact"` when a tool produces both a textual summary and a structured data object. And `parse_docstring=True` extracts per-parameter descriptions from Google-style docstrings, producing richer schemas for the model.
 
@@ -37,7 +37,7 @@ LangChain's agent API has undergone a significant evolution. The original `initi
 
 The framework deprecated `initialize_agent` in favor of a graph-based approach. The current recommended pattern uses `create_agent`, which builds a LangGraph state graph under the hood. This function accepts a model (either as a string like `"openai:gpt-4"` or a direct model instance), a list of tools, and an optional system prompt:
 
-```python
+
 from langchain.agents import create_agent
 
 agent = create_agent(
@@ -49,7 +49,7 @@ agent = create_agent(
 result = agent.invoke({
     "messages": [{"role": "user", "content": "What is the population of Tokyo?"}]
 })
-```
+
 
 Underneath, `create_agent` constructs a state graph with model and tool nodes connected by conditional edges. When the model produces tool calls, the graph routes to the tool node. When no tool calls remain, it routes to the exit. This graph-based representation makes the control flow explicit and inspectable, a major improvement for debugging and understanding what an agent is doing.
 

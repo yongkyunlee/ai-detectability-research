@@ -8,20 +8,20 @@ I want to walk through what the client actually looks like in practice, where it
 
 The entry point is `duckdb.connect()`. Call it with no arguments and you get an in-memory database. Pass it a filename and you get persistence on disk.
 
-```python
+
 import duckdb
 
 conn = duckdb.connect()  # in-memory
 conn = duckdb.connect("my_analysis.duckdb")  # persistent
-```
+
 
 From there, it's standard SQL execution. The API follows PEP 249 loosely - you can create a cursor with `conn.cursor()` if you want, but it's fully redundant. The connection object itself handles everything.
 
-```python
+
 conn.execute("CREATE TABLE test_table (i INTEGER, j STRING)")
 conn.execute("INSERT INTO test_table VALUES (?, ?)", [2, 'two'])
 conn.executemany("INSERT INTO test_table VALUES (?, ?)", [[3, 'three'], [4, 'four']])
-```
+
 
 Parameterized queries work as you'd expect. So does `executemany()` for bulk inserts. Nothing surprising here - and that's the point.
 
@@ -29,12 +29,12 @@ Parameterized queries work as you'd expect. So does `executemany()` for bulk ins
 
 This is where DuckDB starts to feel different from SQLite or Postgres client libraries. You don't just get rows back. You get multiple output formats depending on what you need downstream.
 
-```python
+
 result = conn.execute("SELECT * FROM test_table")
 result.fetchall()      # list of tuples
 result.fetchdf()       # pandas DataFrame
 result.fetchnumpy()    # dict of masked numpy arrays
-```
+
 
 The `fetchdf()` call is the one most people reach for. It hands you a pandas DataFrame directly, with no intermediate conversion step on your side. And `fetchnumpy()` is cleaner than `fetchdf()` when you're dealing with NULLs, since numpy masked arrays handle missing values more gracefully than pandas in certain numerical contexts.
 
@@ -42,13 +42,13 @@ The `fetchdf()` call is the one most people reach for. It hands you a pandas Dat
 
 Here's the feature that hooks people. You can point DuckDB at an existing pandas DataFrame and query it with SQL - no loading, no import, no ETL step.
 
-```python
+
 import pandas as pd
 
 test_df = pd.DataFrame({"i": [1, 2, 3, 4], "j": ["one", "two", "three", "four"]})
 conn.register("test_df", test_df)
 print(conn.execute("SELECT j FROM test_df WHERE i > 1").fetchdf())
-```
+
 
 We've all been there: you have a DataFrame, you need a grouped aggregation with a window function, and the pandas syntax is getting gnarly. SQL is just better for that kind of work. DuckDB lets you stay in SQL without leaving your Python process or copying data to an external database.
 
@@ -58,10 +58,10 @@ And it's fast. A community benchmark on 20 GB of Parquet data showed DuckDB on l
 
 Beyond raw SQL, DuckDB offers a relational API that lets you build queries programmatically. Think of it as a lazy query builder.
 
-```python
+
 rel = conn.from_df(test_df)
 rel.filter('i > 1').project('i + 1, j').order('j').limit(2)
-```
+
 
 Each call returns a new relation object. Nothing executes until you call `.execute()`, `.fetchdf()`, or `.df()`. You can chain operations, inspect column names and types, and compose queries without concatenating SQL strings.
 
@@ -71,10 +71,10 @@ There's also `duckdb.from_csv_auto()` for reading CSV files directly into a rela
 
 DuckDB reads Parquet, CSV, and JSON files natively. No extra libraries required.
 
-```sql
+
 SELECT * FROM 'myfile.csv';
 SELECT * FROM 'myfile.parquet';
-```
+
 
 You can do this from the Python client just as easily with `conn.execute()`. The CSV parser auto-detects types, and glob patterns work for reading multiple files at once. If those files don't share the same schema, `union_by_name` handles the alignment. This is the kind of ergonomic touch that makes DuckDB pleasant for ad-hoc data work.
 

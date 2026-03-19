@@ -6,15 +6,15 @@ CrewAI is an opinionated framework for multi-agent orchestration. It gives you s
 
 CrewAI requires Python >=3.10 and <3.14. Check yours with `python3 --version`. The framework also leans heavily on `uv`, Astral's Rust-based package manager, for dependency management and project execution. If you've been using pip or poetry, this is a shift. On macOS or Linux, install uv with:
 
-```bash
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+
 
 Windows users get a PowerShell one-liner instead. Once uv is available, install the CrewAI CLI itself:
 
-```bash
+
 uv tool install crewai
-```
+
 
 Run `uv tool list` to confirm. You should see something like `crewai v0.102.0` (or newer) in the output. If you get a PATH warning after installation, run `uv tool update-shell` to fix it. That catches most people on a fresh setup.
 
@@ -22,15 +22,15 @@ Run `uv tool list` to confirm. You should see something like `crewai v0.102.0` (
 
 CrewAI ships a `create` command that generates an entire project skeleton. Run this:
 
-```bash
+
 crewai create crew latest-ai-development
-```
+
 
 The CLI will prompt you to pick an LLM provider. It supports OpenAI, Anthropic, Google Gemini, Groq, and SambaNova out of the box. Select "other" if you want access to the full LiteLLM provider list. After you choose a provider and model, it'll ask for your API key.
 
 What you get is a directory structure that looks like this:
 
-```
+
 latest_ai_development/
 ├── .env
 ├── pyproject.toml
@@ -44,7 +44,7 @@ latest_ai_development/
         │   └── tasks.yaml
         └── tools/
             └── custom_tool.py
-```
+
 
 Two YAML files. Two Python files. That's the core. Everything else is plumbing.
 
@@ -54,7 +54,7 @@ CrewAI's mental model revolves around three primitives. Agents are autonomous un
 
 The recommended approach is YAML configuration. Open `config/agents.yaml` and you'll find a template. Here's what a researcher agent looks like:
 
-```yaml
+
 researcher:
   role: >
     {topic} Senior Data Researcher
@@ -63,7 +63,7 @@ researcher:
   backstory: >
     You're a seasoned researcher with a knack for uncovering the latest
     developments in {topic}.
-```
+
 
 The `{topic}` variable gets interpolated at runtime when you call `kickoff(inputs={'topic': 'AI Agents'})` from your main entry point. Tasks follow the same pattern in `tasks.yaml`, referencing agents by name.
 
@@ -73,7 +73,7 @@ One thing the docs stress but is easy to miss: the keys in your YAML files must 
 
 The `crew.py` file uses a decorator-based pattern. You annotate your class with `@CrewBase`, then define methods for each agent, task, and the crew itself:
 
-```python
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
@@ -101,7 +101,7 @@ class LatestAiDevelopmentCrew():
             process=Process.sequential,
             verbose=True,
         )
-```
+
 
 The `@agent` and `@task` decorators automatically collect your agents and tasks into lists. You don't manually wire them together. The crew's `process` parameter controls execution order. `Process.sequential` runs tasks one after another, with each task's output feeding into the next as context. `Process.hierarchical` introduces a manager agent that delegates tasks based on agent capabilities, but it requires a `manager_llm` or `manager_agent` to be set on the crew.
 
@@ -111,17 +111,17 @@ Sequential is simpler and predictable. Hierarchical gives you dynamic delegation
 
 Before the first run, lock and install dependencies:
 
-```bash
+
 crewai install
-```
+
 
 Then add any extra packages you need with `uv add <package-name>`. Set your API keys in the `.env` file. For the quickstart example, you'll need both your LLM provider key and a Serper API key if you're using the search tool.
 
 Now run:
 
-```bash
+
 crewai run
-```
+
 
 As of version 0.103.0, `crewai run` handles both standard crews and flows. It reads `pyproject.toml` to detect what you're running. The output appears in your terminal, and if you've configured an `output_file` on your final task, you'll get a markdown report written to disk.
 

@@ -16,35 +16,35 @@ The upshot? Your dependency tree only includes what you actually use. If you onl
 
 The simplest starting point is to install the core framework alongside the provider you plan to use. For this walkthrough, we'll go with OpenAI:
 
-```bash
+
 pip install langchain langchain-openai
-```
+
 
 If you prefer `uv` (the fast Python package manager that LangChain's own development team uses internally):
 
-```bash
+
 uv add langchain langchain-openai
-```
+
 
 You'll need Python 3.10 or later. The main package depends on `langchain-core`, `pydantic` (v2), and `langgraph`, all of which get pulled in automatically.
 
 Make sure your OpenAI API key is available as an environment variable:
 
-```bash
+
 export OPENAI_API_KEY="sk-..."
-```
+
 
 ## Your First Model Call
 
 The fastest way to talk to a model is through `init_chat_model`, a factory function that resolves the right provider integration based on the model name you pass in:
 
-```python
+
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model("openai:gpt-4o")
 response = model.invoke("Explain what a hash table is in two sentences.")
 print(response.content)
-```
+
 
 That `"openai:gpt-4o"` string uses a `provider:model` format. You can also just pass `"gpt-4o"` without a prefix and LangChain will infer the provider from the `gpt-` prefix. Being explicit is better though, especially as the number of supported providers grows.
 
@@ -56,7 +56,7 @@ A single model call is useful, but LangChain's real value shows up when you comp
 
 Here's a minimal chain that takes a topic, fills in a prompt template, sends it to the model, and extracts a plain string from the result:
 
-```python
+
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -73,7 +73,7 @@ chain = prompt | model | parser
 
 result = chain.invoke({"topic": "recursion"})
 print(result)
-```
+
 
 Three components, piped together. `ChatPromptTemplate` takes a dictionary with a `topic` key and produces formatted messages. The model takes those messages and returns an `AIMessage`. Then `StrOutputParser` extracts just the text content as a plain string.
 
@@ -83,10 +83,10 @@ What makes this more than syntactic sugar is that the resulting `chain` object i
 
 You can consume model output as it arrives with one small change:
 
-```python
+
 for chunk in chain.stream({"topic": "recursion"}):
     print(chunk, end="", flush=True)
-```
+
 
 Each chunk is a string fragment the model has generated so far. This matters for user-facing applications where waiting several seconds for a complete response feels sluggish.
 
@@ -94,14 +94,14 @@ Each chunk is a string fragment the model has generated so far. This matters for
 
 One advantage of the `init_chat_model` abstraction is that switching providers requires changing exactly one string. Want to use Anthropic's Claude instead of GPT-4o? Install the package and swap the identifier:
 
-```bash
-pip install langchain-anthropic
-```
 
-```python
+pip install langchain-anthropic
+
+
+
 model = init_chat_model("anthropic:claude-sonnet-4-5-20250929")
 chain = prompt | model | parser
-```
+
 
 Everything else stays the same. The prompt template, the output parser, the streaming behavior; none of it cares which model sits in the middle. From what I can tell, this interoperability is the strongest practical reason to pick LangChain over calling provider SDKs directly. When you want to benchmark three different models against the same prompt, you change a string instead of rewriting your integration layer.
 

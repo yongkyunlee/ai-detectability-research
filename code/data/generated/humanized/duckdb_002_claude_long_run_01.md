@@ -8,21 +8,21 @@ This post covers the practical details of getting CSV and Parquet data into Duck
 
 The entry point is the `read_csv` function. Point it at a file, get a table back:
 
-```sql
+
 SELECT * FROM read_csv('sales_2024.csv');
-```
+
 
 It can also read from remote locations (HTTP URLs, S3 buckets, other cloud storage) using the same function. For S3 access you need the `httpfs` extension loaded and your credentials configured.
 
-```sql
+
 SELECT * FROM read_csv('s3://my-bucket/data/sales_2024.csv');
-```
+
 
 Glob patterns work for multi-file reads. If your data is split across monthly exports, you can pull them all in at once:
 
-```sql
+
 SELECT * FROM read_csv('exports/sales_*.csv');
-```
+
 
 ### The CSV Sniffer
 
@@ -32,18 +32,18 @@ By default, it inspects 20,480 rows. The `sample_size` parameter controls this. 
 
 You'll usually see a cryptic column-count error:
 
-```
+
 Invalid Input Error: CSV Error on Line: 25013
 Expected Number of Columns: 8 Found: 9
-```
+
 
 The fix is simple. Either increase the sample size or explicitly specify the quote character:
 
-```sql
+
 SELECT * FROM read_csv('data.csv', sample_size=-1);
 -- or
 SELECT * FROM read_csv('data.csv', quote='"');
-```
+
 
 Setting `sample_size` to -1 scans the entire file for dialect detection. Slower, but it eliminates the guessing.
 
@@ -71,16 +71,16 @@ Parquet is where DuckDB really shines. The columnar format aligns naturally with
 
 Basic usage mirrors the CSV reader:
 
-```sql
+
 SELECT * FROM read_parquet('analytics.parquet');
-```
+
 
 Multiple files work with glob patterns or explicit lists:
 
-```sql
+
 SELECT * FROM read_parquet('data/year=*/month=*/*.parquet');
 SELECT * FROM read_parquet(['q1.parquet', 'q2.parquet', 'q3.parquet']);
-```
+
 
 ### Column Pruning and Predicate Pushdown
 
@@ -94,7 +94,7 @@ Unlike CSV, Parquet stores data in a columnar layout with rich metadata. DuckDB 
 
 Production data lakes often organize Parquet files into directory hierarchies that encode partition values in the path:
 
-```
+
 data/
   year=2023/
     month=01/
@@ -103,21 +103,21 @@ data/
       part-00000.parquet
   year=2024/
     ...
-```
+
 
 DuckDB recognizes this convention with the `hive_partitioning` parameter:
 
-```sql
+
 SELECT * FROM read_parquet('data/**/*.parquet', hive_partitioning=true);
-```
+
 
 With it enabled, the directory structure shows up as additional columns (`year`, `month` in this example), and filters on those columns can prune entire directories from the scan.
 
 There's a catch in version 1.5.0. The engine switched to a hierarchical glob expansion strategy for S3 paths, which discovers all files before applying partition filters. Previous versions only traversed matching directories. For datasets with thousands of partitions on S3, this regression can dramatically increase API requests and slow down query planning. The workaround:
 
-```sql
+
 SET s3_allow_recursive_globbing = false;
-```
+
 
 This restores the older behavior of pruning directories during traversal rather than after.
 
@@ -125,9 +125,9 @@ This restores the older behavior of pruning directories during traversal rather 
 
 Real datasets evolve. New columns get added. Old ones get dropped. Types change. When reading multiple Parquet files that don't share an identical schema, `union_by_name` reconciles the differences:
 
-```sql
+
 SELECT * FROM read_parquet('data/*.parquet', union_by_name=true);
-```
+
 
 Columns are matched by name rather than position, and missing ones get filled with NULLs. You can combine this with `hive_partitioning` for flexibility when your data spans schema migrations.
 
@@ -141,19 +141,19 @@ Reading Parquet from S3 introduces latency patterns that differ from local reads
 
 For wide schemas, the default prefetching behavior can generate a large number of individual HTTP GET requests, one per column chunk per row group. With 90+ columns, a single query can trigger thousands of S3 requests. If that becomes a bottleneck, disable prefetching:
 
-```sql
+
 SELECT * FROM read_parquet('s3://bucket/wide_table.parquet', disable_parquet_prefetching=true);
-```
+
 
 There's a related performance trap in version 1.5.0 involving the `QUALIFY ROW_NUMBER() OVER (...) = 1` pattern, commonly used for deduplication. An optimizer change can cause this to scan the data twice, sending S3 request counts through the roof. Wrapping the base query in a `MATERIALIZED` CTE avoids the double scan:
 
-```sql
+
 WITH base AS MATERIALIZED (
     SELECT * FROM read_parquet('s3://bucket/data/*.parquet')
 )
 SELECT * FROM base
 QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1;
-```
+
 
 ### Parquet Type Considerations
 
@@ -171,9 +171,9 @@ If you control the data format, Parquet is almost always the better choice for a
 
 CSV still has its place. It's human-readable, universally supported, and trivial to produce from any system. For data exchange with non-technical stakeholders, one-off imports, or files under a few megabytes, it works just fine. Converting between the two is easy:
 
-```sql
+
 COPY (SELECT * FROM read_csv('input.csv')) TO 'output.parquet' (FORMAT PARQUET, COMPRESSION ZSTD);
-```
+
 
 That single statement reads a CSV, infers its schema, and writes a compressed Parquet file. Often the first thing I do when I get a new dataset.
 

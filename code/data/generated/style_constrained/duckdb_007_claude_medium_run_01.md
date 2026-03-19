@@ -16,19 +16,19 @@ If you're still wrapping window functions in subqueries just to filter on their 
 
 Instead of this:
 
-```sql
+
 SELECT * FROM (
   SELECT *, ROW_NUMBER() OVER (PARTITION BY student ORDER BY mark DESC) AS rn
   FROM exam
 ) WHERE rn = 1
-```
+
 
 You write:
 
-```sql
+
 SELECT * FROM exam
 QUALIFY ROW_NUMBER() OVER (PARTITION BY student ORDER BY mark DESC) = 1
-```
+
 
 Same result, less noise. And you can combine `QUALIFY` with named windows - `WINDOW w AS (ORDER BY mark)` - then reference `w` in both the select list and the qualify clause. This keeps complex analytical queries readable when you're stacking multiple window functions on the same frame.
 

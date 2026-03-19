@@ -28,40 +28,40 @@ There is also LangGraph, which handles agent orchestration under the hood. You d
 
 LangChain requires Python 3.10 or higher. Setting up a virtual environment first is strongly recommended:
 
-```bash
+
 python -m venv langchain-env
 source langchain-env/bin/activate
-```
+
 
 Install the core package:
 
-```bash
+
 pip install langchain
-```
+
 
 If you prefer `uv`, which is the tool the LangChain team themselves use for development:
 
-```bash
+
 uv add langchain
-```
+
 
 This pulls in `langchain-core` and `langgraph` as dependencies automatically. However, you still need to install the integration package for whichever model provider you plan to use. For OpenAI:
 
-```bash
+
 pip install langchain-openai
-```
+
 
 For Anthropic:
 
-```bash
+
 pip install langchain-anthropic
-```
+
 
 You can also install provider packages as extras of the main package, which is slightly more convenient:
 
-```bash
+
 pip install "langchain[openai]"
-```
+
 
 The available extras include `anthropic`, `openai`, `google-genai`, `ollama`, `groq`, `mistralai`, `deepseek`, and several others.
 
@@ -71,20 +71,20 @@ Before running any code that calls a model API, make sure you have the appropria
 
 The simplest entry point into LangChain is `init_chat_model`, a factory function that creates a chat model instance from any supported provider through a single, unified interface.
 
-```python
+
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model("openai:gpt-4o")
 response = model.invoke("Explain what a hash table is in two sentences.")
 print(response.content)
-```
+
 
 The `model` argument uses a `provider:model_name` format. LangChain can also infer the provider from the model name itself. If the name starts with `gpt-` or `o3`, it assumes OpenAI. If it starts with `claude`, it maps to Anthropic. Names beginning with `gemini` route to Google. This inference is convenient for quick experimentation, but specifying the provider explicitly avoids ambiguity:
 
-```python
+
 claude = init_chat_model("anthropic:claude-sonnet-4-5-20250929", temperature=0)
 response = claude.invoke("What is the capital of Japan?")
-```
+
 
 The `invoke` method accepts a plain string, a list of message objects, or a prompt value. For anything beyond a simple question, you will typically work with message objects to control the conversation structure.
 
@@ -92,7 +92,7 @@ The `invoke` method accepts a plain string, a list of message objects, or a prom
 
 LangChain represents conversations as lists of typed message objects. The three most common types are `SystemMessage` (sets the model's behavior), `HumanMessage` (user input), and `AIMessage` (model output).
 
-```python
+
 from langchain_core.messages import HumanMessage, SystemMessage
 
 model = init_chat_model("openai:gpt-4o", temperature=0.7)
@@ -104,7 +104,7 @@ messages = [
 
 response = model.invoke(messages)
 print(response.content)
-```
+
 
 This pattern gives you precise control over the prompt structure. The system message establishes context and constraints, while human messages carry the actual queries. When you build multi-turn conversations, you append each response as an `AIMessage` and each follow-up as a `HumanMessage`, maintaining the full dialogue history.
 
@@ -112,12 +112,12 @@ This pattern gives you precise control over the prompt structure. The system mes
 
 For interactive applications where you want to display output as it is generated, LangChain supports streaming out of the box:
 
-```python
+
 model = init_chat_model("anthropic:claude-sonnet-4-5-20250929")
 
 for chunk in model.stream("Write a haiku about debugging code."):
     print(chunk.content, end="", flush=True)
-```
+
 
 Each chunk contains a partial response. The `stream` method returns an iterator, so you process tokens as they arrive rather than waiting for the complete output. There is also an async variant, `astream`, for use in asynchronous applications.
 
@@ -127,7 +127,7 @@ Where LangChain really differentiates itself from raw API calls is in agent cons
 
 Here is a minimal agent that has access to a single tool:
 
-```python
+
 from langchain.agents import create_agent
 
 def check_weather(location: str) -> str:
@@ -146,7 +146,7 @@ result = agent.invoke(
 
 for message in result["messages"]:
     print(f"{message.type}: {message.content}")
-```
+
 
 The `create_agent` function takes a model (as a string identifier or an instantiated model object), a list of tools, and an optional system prompt. Tools can be plain Python functions, and LangChain automatically inspects the function signature and docstring to generate the tool schema that gets sent to the model.
 
@@ -156,18 +156,18 @@ Under the hood, the agent runs a loop: it calls the model, checks if the respons
 
 One of LangChain's strongest practical benefits is provider interoperability. Suppose you have been prototyping with OpenAI but want to test how Anthropic handles the same task. With `init_chat_model`, the change is a single string:
 
-```python
+
 # Switch from OpenAI to Anthropic — no other code changes needed
 agent = create_agent(
     model="anthropic:claude-sonnet-4-5-20250929",
     tools=[check_weather],
     system_prompt="You are a helpful assistant that can check the weather.",
 )
-```
+
 
 You can even create configurable models that defer provider selection to runtime:
 
-```python
+
 configurable_model = init_chat_model(temperature=0)
 
 # Use OpenAI for this call
@@ -175,7 +175,7 @@ configurable_model.invoke("Hello", config={"configurable": {"model": "gpt-4o"}})
 
 # Use Anthropic for this call
 configurable_model.invoke("Hello", config={"configurable": {"model": "claude-sonnet-4-5-20250929"}})
-```
+
 
 This is particularly useful for A/B testing different models or letting users choose their preferred provider.
 

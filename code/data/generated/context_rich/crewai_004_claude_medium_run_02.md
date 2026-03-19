@@ -6,7 +6,7 @@ Tools are what separate a chatbot from an agent. In CrewAI, a tool is any discre
 
 CrewAI offers two paths for equipping agents with tools. The first is subclassing `BaseTool`, which gives you full control over the input schema and execution logic. You define a Pydantic model for your arguments, set the tool's name and description, and implement the `_run` method:
 
-```python
+
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -21,11 +21,11 @@ class StockPriceTool(BaseTool):
     def _run(self, ticker: str) -> str:
         price = get_price_from_api(ticker)
         return f"{ticker}: ${price}"
-```
+
 
 The second approach uses the `@tool` decorator, which infers the argument schema directly from your function's type annotations and docstring. This is faster for simple tools where a full class feels heavy:
 
-```python
+
 from crewai.tools import tool
 
 @tool("currency_convert")
@@ -33,7 +33,7 @@ def currency_convert(amount: float, from_code: str, to_code: str) -> str:
     """Convert an amount between two currencies."""
     result = call_exchange_api(amount, from_code, to_code)
     return f"{amount} {from_code} = {result} {to_code}"
-```
+
 
 Both approaches produce objects that plug into an agent's `tools` list. The decorator path is convenient, but the class path is better when you need custom initialization, private state, or fine-grained caching control.
 

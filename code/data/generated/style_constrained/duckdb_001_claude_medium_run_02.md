@@ -8,17 +8,17 @@ So why should you care about the Python client specifically? Because `pip instal
 
 One command gets you going:
 
-```
+
 pip install duckdb
-```
+
 
 Then open a connection:
 
-```python
+
 import duckdb
 
 conn = duckdb.connect()
-```
+
 
 That's an in-memory database. If you want persistence, pass a filename: `duckdb.connect("my_analysis.db")`. The file-based approach gives you durability between sessions, but in-memory is where most people start. And for quick one-off queries, you don't even need an explicit connection - DuckDB provides module-level functions like `duckdb.sql()` that use a default in-memory connection behind the scenes.
 
@@ -28,17 +28,17 @@ The Python client follows PEP 249 loosely. You can call `conn.cursor()` to get a
 
 Running queries looks exactly like you'd expect:
 
-```python
+
 conn.execute("CREATE TABLE test_table (i INTEGER, j STRING)")
 conn.execute("INSERT INTO test_table VALUES (1, 'one')")
 conn.execute("INSERT INTO test_table VALUES (?, ?)", [2, 'two'])
-```
+
 
 Parameterized queries use `?` placeholders. For batch inserts, `executemany()` accepts a list of parameter lists:
 
-```python
+
 conn.executemany("INSERT INTO test_table VALUES (?, ?)", [[3, 'three'], [4, 'four']])
-```
+
 
 Fetching results gives you options. `fetchall()` returns plain tuples. `fetchdf()` hands you a pandas DataFrame. `fetchnumpy()` gives masked NumPy arrays, which handle NULLs more cleanly than pandas does for numeric columns.
 
@@ -46,12 +46,12 @@ Fetching results gives you options. `fetchall()` returns plain tuples. `fetchdf(
 
 This is the feature that hooks people. DuckDB can see your local Python variables and query them directly as if they were tables:
 
-```python
+
 import pandas as pd
 
 test_df = pd.DataFrame({"i": [1, 2, 3, 4], "j": ["one", "two", "three", "four"]})
 result = conn.execute("SELECT j FROM test_df WHERE i > 1").fetchdf()
-```
+
 
 No intermediate steps. No exporting to CSV, no creating temporary tables. DuckDB reaches into your local namespace and treats the DataFrame as a scannable relation. You can also explicitly register a DataFrame as a named view with `conn.register("my_view", df)`, which is useful when you want a stable name to reference across multiple queries.
 
@@ -61,10 +61,10 @@ One gotcha to know: when you use `INSERT INTO table SELECT * FROM dataframe`, co
 
 Beyond raw SQL, DuckDB offers a programmatic query builder called the Relation API. Relations are lazily evaluated chains of relational operators. You build up a pipeline, and nothing executes until you call `.execute()`, `.df()`, or `.fetchall()`.
 
-```python
+
 rel = conn.from_df(test_df)
 result = rel.filter('i > 1').project('i + 1, j').order('j').limit(2).df()
-```
+
 
 Each method returns a new relation, so chaining is natural. You can also create relations from CSV files with `duckdb.from_csv_auto(path)` or from existing tables with `conn.table("table_name")`. Relations expose metadata too: `.columns` gives column names, `.types` gives their types, `.alias` gives the relation's name.
 

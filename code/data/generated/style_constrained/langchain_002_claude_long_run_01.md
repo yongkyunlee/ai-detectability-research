@@ -30,7 +30,7 @@ Qdrant deserves a mention for its filtering capabilities, though watch out for i
 
 Regardless of which store you choose, the pattern for loading documents into it looks roughly the same. You split your documents, choose an embedding model, and call `from_documents`:
 
-```python
+
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
@@ -43,7 +43,7 @@ texts = text_splitter.split_documents(retrieved_documents)
 
 embeddings = OpenAIEmbeddings(max_retries=1000)
 docsearch = Chroma.from_documents(texts, embeddings)
-```
+
 
 That `max_retries=1000` on the embeddings isn't paranoia - it's practical. Embedding API rate limits will bite you on large ingestion jobs, and you'd rather retry than lose your place in a multi-hour pipeline.
 
@@ -53,9 +53,9 @@ A vector store holds your data. A retriever decides what comes back when someone
 
 The simplest retriever is `.as_retriever()` called on any vector store. It returns the top-k most similar documents by embedding distance. You control k through `search_kwargs`:
 
-```python
+
 doc_retriever = docsearch.as_retriever(search_kwargs={"k": 5})
-```
+
 
 This works fine for straightforward queries. But real user questions are messy. They're ambiguous, compound, and sometimes contradict themselves. That's where multi-query retrieval comes in. The idea is to break a user's question into multiple sub-queries - essentially generating keyword variants - and retrieving against each one separately before merging the results. Coverage improves dramatically because you're no longer dependent on a single embedding similarity score.
 
@@ -65,7 +65,7 @@ Contextual compression is another retriever strategy worth knowing about. It run
 
 And if you're building an agent that needs retrieval as one of several tools, `create_retriever_tool` from `langchain_core.tools` wraps a retriever into something an agent can call:
 
-```python
+
 from langchain_core.tools import create_retriever_tool
 
 retriever_tool = create_retriever_tool(
@@ -73,7 +73,7 @@ retriever_tool = create_retriever_tool(
     name="sql_get_similar_examples",
     description=tool_description
 )
-```
+
 
 This bridges the gap between RAG and agentic workflows, letting the model decide when to retrieve rather than always retrieving.
 
@@ -81,7 +81,7 @@ This bridges the gap between RAG and agentic workflows, letting the model decide
 
 Adding conversation history to a RAG pipeline introduces real complexity. LangChain's `ConversationBufferMemory` is the most common choice, and integrating it with a retrieval chain requires careful configuration:
 
-```python
+
 from langchain.memory import ConversationBufferMemory
 
 memory = ConversationBufferMemory(
@@ -89,7 +89,7 @@ memory = ConversationBufferMemory(
     return_messages=True,
     output_key='answer'
 )
-```
+
 
 That `output_key='answer'` is critical. If you're using `ConversationalRetrievalChain` with `return_source_documents=True`, the chain produces multiple output keys. Without specifying which one the memory should track, you'll get an error. This particular incompatibility has tripped up enough developers to generate multiple GitHub issues.
 

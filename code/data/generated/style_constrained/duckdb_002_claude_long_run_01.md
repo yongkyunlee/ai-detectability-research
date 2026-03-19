@@ -6,10 +6,10 @@ DuckDB makes file imports look trivial. One line of SQL, and you're querying a C
 
 Reading a file requires almost nothing:
 
-```sql
+
 SELECT * FROM 'myfile.csv';
 SELECT * FROM 'myfile.parquet';
-```
+
 
 That's it. DuckDB auto-detects the format, infers the schema, and starts scanning. You can also use the explicit function forms - `read_csv()` and `read_parquet()` - which give you access to the full configuration surface. And you can glob across hundreds of files with a wildcard pattern like `SELECT * FROM 'data/*.parquet'` without writing a single line of orchestration code.
 
@@ -35,13 +35,13 @@ Reading Parquet files is zero-configuration by default. DuckDB reads the file fo
 
 Writing Parquet has more knobs. The default compression is Snappy, which prioritizes speed over compression ratio. ZSTD generally offers a better balance for storage-bound workloads. You can set `row_group_size` to control how many rows land in each row group - smaller groups improve predicate pushdown granularity but increase metadata overhead. The internal benchmarks test three configurations: 5,000 rows (small), 200,000 rows (medium), and 1,000,000 rows (large) per row group. A typical production write looks something like:
 
-```sql
+
 COPY (SELECT * FROM source_table) TO 'output.parquet' (
     FORMAT 'parquet',
     COMPRESSION 'ZSTD',
     ROW_GROUP_SIZE 100000
 );
-```
+
 
 For hive-partitioned output, you can add `PARTITION_BY (year, month)` and `OVERWRITE_OR_IGNORE`. But be careful with deeply nested partition hierarchies - an issue documented in #21370 shows that three levels of partitioning can produce an unexpected number of output files unless you add an explicit `ORDER BY` on the partition columns.
 

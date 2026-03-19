@@ -16,9 +16,9 @@ Importantly, the `Runnable` base class provides sensible defaults. If a componen
 
 The signature feature of LCEL is the `|` operator, which chains two runnables into a `RunnableSequence`. The output of each step feeds directly into the input of the next:
 
-```python
+
 chain = prompt_template | chat_model | output_parser
-```
+
 
 Under the hood, this creates a `RunnableSequence` object that stores the steps and orchestrates their execution. When you call `chain.invoke(input)`, it threads the data through each step sequentially. When you call `chain.stream(input)`, it chains `transform` calls so that tokens flow through the pipeline as they arrive, rather than waiting for each step to fully complete before starting the next.
 
@@ -28,13 +28,13 @@ The pipe operator also accepts plain Python functions and dictionaries, not just
 
 Not every pipeline is a straight line. `RunnableParallel` accepts a dictionary mapping keys to runnables, sends the same input to all of them concurrently, and collects the results into a single dictionary:
 
-```python
+
 analysis = RunnableParallel(
     sentiment=sentiment_classifier,
     summary=summarizer,
     keywords=keyword_extractor,
 )
-```
+
 
 This maps naturally onto common patterns like enrichment pipelines, where you need several independent pieces of information derived from the same input. Synchronous execution uses a thread pool; async execution uses `asyncio.gather`. Because the result is just a dict, it composes cleanly as an intermediate step in a larger sequence.
 
@@ -42,22 +42,22 @@ This maps naturally onto common patterns like enrichment pipelines, where you ne
 
 LCEL provides several small but essential building blocks. `RunnablePassthrough` acts as an identity function, returning its input unchanged. It becomes particularly useful through its `assign` class method, which merges passthrough data with additional computed fields:
 
-```python
+
 enriched = RunnablePassthrough.assign(
     word_count=lambda x: len(x["text"].split()),
     language=language_detector,
 )
-```
+
 
 `RunnableBranch` implements conditional routing by evaluating predicates in order and dispatching to the first matching handler:
 
-```python
+
 router = RunnableBranch(
     (lambda x: x["type"] == "question", qa_chain),
     (lambda x: x["type"] == "command", action_chain),
     default_chain,
 )
-```
+
 
 `RunnableLambda` wraps arbitrary Python callables—synchronous functions, async functions, generators, and async generators—into the `Runnable` protocol. This is how custom logic gets injected into chains without building a full subclass. If the function accepts a `RunnableConfig` parameter, the framework automatically threads configuration through to it.
 
@@ -65,13 +65,13 @@ router = RunnableBranch(
 
 Production systems need retries and fallbacks, and LCEL provides both as composable decorators. Calling `.with_retry()` on a runnable wraps it in `RunnableRetry`, which adds exponential backoff. Calling `.with_fallbacks()` wraps it in `RunnableWithFallbacks`, which tries alternative runnables if the primary one raises an exception. Because both return new `Runnable` instances, they can be chained:
 
-```python
+
 resilient_model = (
     primary_model
     .with_retry(stop_after_attempt=3)
     .with_fallbacks([backup_model])
 )
-```
+
 
 However, these wrappers interact with batching in subtle ways. When `RunnableRetry` operates in batch mode, it needs to track which items succeeded and which failed across retry rounds, then reassemble outputs in the correct order. Bugs in this area have surfaced where failed items get replaced by stale results from other positions, corrupting the batch output. The complexity here is inherent to the problem: composing retry semantics with position-tracked batch execution is genuinely difficult.
 

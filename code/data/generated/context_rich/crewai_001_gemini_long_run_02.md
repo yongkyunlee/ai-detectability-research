@@ -52,21 +52,21 @@ CrewAI strongly recommends utilizing `uv`, an exceptionally fast Python package 
 
 If `uv` is not already present on your machine, you can install it using a simple shell command. On macOS or Linux, execute:
 
-```bash
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+
 
 For Windows users, PowerShell provides a similar installation vector:
 
-```powershell
+
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+
 
 Once `uv` is successfully installed and available in your environment, you can proceed to install the CrewAI command-line interface. This CLI is the primary vehicle for generating project scaffolding and managing execution.
 
-```bash
+
 uv tool install crewai
-```
+
 
 Depending on your system configuration, `uv` might issue a warning regarding your system's PATH variable. If this occurs, executing `uv tool update-shell` will automatically resolve the discrepancy. To confirm that the installation was successful, run `uv tool list`, which should display the `crewai` package alongside its version number.
 
@@ -76,9 +76,9 @@ With the CLI installed, you are ready to initiate your first project. CrewAI hea
 
 To generate a new project, utilize the `create crew` command followed by your desired project name:
 
-```bash
+
 crewai create crew industry_research_team
-```
+
 
 This command constructs a standardized directory hierarchy tailored for multi-agent development. Within the generated `src/industry_research_team/` directory, you will find several critical components. The `config/` folder contains `agents.yaml` and `tasks.yaml`, the beating heart of your crew's behavior. The `crew.py` file serves as the orchestration layer, utilizing Python decorators to bind the YAML configurations to executable agent and task objects. Finally, `main.py` provides the entry point for executing the pipeline and injecting runtime variables.
 
@@ -92,7 +92,7 @@ To illustrate the capabilities of CrewAI, we will construct a practical example:
 
 The first step is characterizing our workforce within the `src/industry_research_team/config/agents.yaml` file. We define the properties of each agent, heavily utilizing variable interpolation (e.g., `{topic}`) to allow dynamic inputs at runtime.
 
-```yaml
+
 researcher:
   role: >
     {topic} Senior Data Researcher
@@ -112,7 +112,7 @@ reporting_analyst:
     You are a meticulous technical analyst with a keen eye for detail and narrative flow.
     You excel at transforming complex, fragmented data points into clear, cohesive, and 
     comprehensive reports. Your work empowers decision-makers to rapidly understand complex subjects.
-```
+
 
 Notice the specificity in the backstories. By telling the LLM exactly *who* it is and *how* it should approach its work, we significantly reduce the likelihood of generic, unhelpful responses.
 
@@ -120,7 +120,7 @@ Notice the specificity in the backstories. By telling the LLM exactly *who* it i
 
 Next, we establish the assignments in the `src/industry_research_team/config/tasks.yaml` file. Each task is explicitly assigned to one of the agents we just defined.
 
-```yaml
+
 research_task:
   description: >
     Conduct a thorough and exhaustive research campaign regarding {topic}.
@@ -141,7 +141,7 @@ reporting_task:
     under each section. The final output MUST be formatted as standard markdown.
   agent: reporting_analyst
   output_file: output/comprehensive_report.md
-```
+
 
 The `output_file` parameter in the reporting task is a powerful feature; it instructs the framework to automatically persist the final string returned by the reporting analyst to the local file system.
 
@@ -149,7 +149,7 @@ The `output_file` parameter in the reporting task is a powerful feature; it inst
 
 With the configuration established, we move to the Python execution layer in `crew.py`. This file utilizes CrewAI's decorator system to dynamically load the YAML configurations and instantiate the objects. Furthermore, we will equip our researcher with the `SerperDevTool`, allowing it to perform live web searches.
 
-```python
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
@@ -194,7 +194,7 @@ class IndustryResearchTeamCrew():
             process=Process.sequential,
             verbose=True,
         )
-```
+
 
 The strict naming convention is vital here. The method names in the Python class (`researcher`, `reporting_analyst`, `research_task`, `reporting_task`) must exactly match the keys defined in the respective YAML files. This symmetry allows the `@CrewBase` mechanics to map the configuration to the execution logic seamlessly.
 
@@ -204,21 +204,21 @@ Before executing the pipeline, ensure that your environment variables are correc
 
 Dependency management within the scaffolded project is handled by `uv`. First, lock and install the base dependencies:
 
-```bash
+
 crewai install
-```
+
 
 Since we integrated the `crewai_tools` package for web search capabilities, ensure it is added to your environment:
 
-```bash
+
 uv add crewai-tools
-```
+
 
 Finally, initialize the workflow by executing the run command. You can modify the `main.py` file to pass a specific topic, such as "Quantum Computing Advancements," to the kickoff sequence.
 
-```bash
+
 crewai run
-```
+
 
 As the script executes, the verbose logging will output the internal thought processes of the agents in the terminal. You will see the researcher formulating search queries, parsing the results, and summarizing the data. Once the research is complete, the reporting analyst will take the context, structure the document, and ultimately write the finalized markdown to the specified output directory.
 

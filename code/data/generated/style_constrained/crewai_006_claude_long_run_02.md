@@ -6,13 +6,13 @@ CrewAI's memory system has gone through a significant redesign. The old approach
 
 The surface area is small. You call `memory.remember()` to store something, `memory.recall()` to retrieve it, and `memory.forget()` to drop a scope. Behind the scenes, the system runs an LLM on every save to decide where in a hierarchical scope tree to place the record, how important it is, and what categories it belongs to.
 
-```python
+
 from crewai import Memory
 
 memory = Memory()
 memory.remember("We decided to use PostgreSQL for the user database.")
 matches = memory.recall("What database did we choose?")
-```
+
 
 That's it for basic usage. But the defaults hide a lot of machinery. The default LLM is `gpt-4o-mini`. The default storage backend is LanceDB, writing to `./.crewai/memory`. The default embedding provider is OpenAI's `text-embedding-3-small`. Every one of these is configurable, and you'll probably need to change at least one of them.
 
@@ -36,9 +36,9 @@ I think this is a reasonable default for prototyping. But I wouldn't rely on it 
 
 Recall results aren't ranked by raw vector similarity alone. CrewAI uses a weighted composite score:
 
-```
+
 composite = semantic_weight * similarity + recency_weight * decay + importance_weight * importance
-```
+
 
 The defaults are 0.5 for semantic, 0.3 for recency, and 0.2 for importance, with a recency half-life of 30 days. You can tune these per use case. A sprint retrospective might want `recency_weight=0.5` and `recency_half_life_days=7`. An architecture knowledge base might favor `importance_weight=0.4` and a half-life of 180 days. The scoring formula is transparent and each `MemoryMatch` includes a `match_reasons` list explaining why it ranked where it did.
 

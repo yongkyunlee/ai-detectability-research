@@ -32,7 +32,7 @@ While the built-in tools cover many common use cases, enterprise applications of
 
 For complex tools that require strict type validation, dependency injection, or extensive configuration, subclassing `BaseTool` is the recommended approach. This method leverages Pydantic models to define strict input schemas, ensuring the LLM understands exactly what arguments are required.
 
-```python
+
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 from typing import Type
@@ -52,7 +52,7 @@ class CustomerDataTool(BaseTool):
     def _run(self, customer_id: str) -> str:
         # Complex API logic, database queries, or internal business logic here
         return f"Retrieved data for {customer_id}: [Order History, Ticket Status]"
-```
+
 
 Providing an explicit `args_schema` and a highly descriptive `description` is critical. The agent relies entirely on the `description` to decide *when* to use the tool, and the `args_schema` to know *how* to use it.
 
@@ -60,7 +60,7 @@ Providing an explicit `args_schema` and a highly descriptive `description` is cr
 
 For simpler, single-function operations, the `@tool` decorator provides a lightweight and rapid development path. The docstring of the decorated function automatically serves as the tool's description.
 
-```python
+
 from crewai.tools import tool
 
 @tool("Currency Converter")
@@ -70,7 +70,7 @@ def currency_converter(amount: float, from_currency: str, to_currency: str) -> s
     exchange_rate = 1.10 # Assume a fetched rate
     converted = amount * exchange_rate
     return f"{amount} {from_currency} is equal to {converted} {to_currency}"
-```
+
 
 ## Supercharging Performance: Asynchronous Execution and Caching
 
@@ -82,7 +82,7 @@ CrewAI natively supports asynchronous tools, allowing non-blocking operations th
 
 Developers can implement async tools either by using `async def` with the `@tool` decorator or by implementing the `async def _run()` method within a `BaseTool` subclass.
 
-```python
+
 from crewai.tools import BaseTool
 import asyncio
 import httpx
@@ -96,7 +96,7 @@ class AsyncAPIQueryTool(BaseTool):
         async with httpx.AsyncClient() as client:
             response = await client.get(endpoint)
             return response.text
-```
+
 
 The CrewAI framework automatically handles the execution context, abstracting away the complexity of managing event loops. Whether the agent is running in a standard sequential process or a parallel execution flow, the framework intelligently routes the async calls.
 
@@ -108,7 +108,7 @@ However, CrewAI takes this a step further by allowing developers to define custo
 
 For example, if a tool checks real-time stock prices, you might only want to cache the result if the market is closed, or based on specific threshold conditions:
 
-```python
+
 from crewai.tools import tool
 
 @tool("Stock Price Checker")
@@ -123,7 +123,7 @@ def custom_cache_policy(args, result):
     return float(result) > 100.0
 
 check_stock_price.cache_function = custom_cache_policy
-```
+
 
 This flexibility ensures that caching optimizes performance without serving stale or inappropriate data in highly dynamic environments.
 
@@ -139,12 +139,12 @@ CrewAI, however, takes a different approach. Instead of relying purely on the na
 
 In CrewAI, the framework injects a strict formatting prompt into the system prompt. It lists the available tools and instructs the LLM to respond in a specific format:
 
-```text
+
 Thought: I need to think about what to do
 Action: [Tool Name]
 Action Input: {"arg1": "value"}
 Observation: [The result of the action]
-```
+
 
 The CrewAI parser reads the LLM's output, intercepts the `Action` and `Action Input`, physically executes the python tool code, and then injects the result back into the context as the `Observation`.
 

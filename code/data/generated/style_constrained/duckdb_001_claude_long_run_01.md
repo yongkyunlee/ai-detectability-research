@@ -10,7 +10,7 @@ Installation is trivial. Run `pip install duckdb` and you're done. No compiler t
 
 Connecting is equally simple. Call `duckdb.connect()` and you get an in-memory database that lives for the duration of your process. If you want persistence, pass a filename instead:
 
-```python
+
 import duckdb
 
 # In-memory, ephemeral
@@ -18,18 +18,18 @@ conn = duckdb.connect()
 
 # Persistent, written to disk
 conn = duckdb.connect("my_analytics.duckdb")
-```
+
 
 That's it. No connection strings, no port numbers, no authentication dance. The database file is a single portable artifact you can move between machines. Version 1.5.0, released on March 9, 2026, is the latest stable release and the one I'd recommend starting with.
 
 You can also pass configuration through the `config` dictionary at connection time for things like thread count and memory limits:
 
-```python
+
 conn = duckdb.connect("analytics.duckdb", config={
     "threads": 8,
     "memory_limit": "16GB"
 })
-```
+
 
 One thing to know: not every option works through the config dictionary yet. The `compress` option for in-memory databases, introduced in v1.4.0, currently only works through the `ATTACH` SQL command rather than `duckdb.connect()`. The DuckDB team has acknowledged this as a limitation they plan to address. So if you want in-memory compression, you'll need the two-step pattern: connect first, then run `ATTACH ':memory:' AS cdb (COMPRESS)` followed by `USE cdb`.
 
@@ -37,20 +37,20 @@ One thing to know: not every option works through the config dictionary yet. The
 
 The API follows a straightforward execute-then-fetch pattern. You write SQL, execute it, and pull results in whatever format you need.
 
-```python
+
 conn.execute("CREATE TABLE events (id INTEGER, name VARCHAR, ts TIMESTAMP)")
 conn.execute("INSERT INTO events VALUES (1, 'signup', '2026-01-15 10:30:00')")
 conn.execute("INSERT INTO events VALUES (?, ?, ?)", [2, 'purchase', '2026-01-15 11:00:00'])
-```
+
 
 Parameterized queries use `?` placeholders. For batch inserts, `executemany()` accepts a list of parameter lists:
 
-```python
+
 conn.executemany("INSERT INTO events VALUES (?, ?, ?)", [
     [3, 'login', '2026-01-15 12:00:00'],
     [4, 'logout', '2026-01-15 13:00:00']
 ])
-```
+
 
 Results come back in several shapes. You pick the one that fits your downstream code. `.fetchall()` returns a list of tuples. `.fetchone()` grabs a single row. `.fetchdf()` hands you a pandas DataFrame. And `.fetchnumpy()` gives you masked numpy arrays, which handle NULLs more cleanly than pandas does in some cases. I tend to reach for `.fetchdf()` when exploring data interactively and `.fetchall()` when I need raw values in application code.
 
@@ -58,22 +58,22 @@ Results come back in several shapes. You pick the one that fits your downstream 
 
 This is the part that shifts how you think about DuckDB. The Python client can query pandas DataFrames directly, without any explicit registration step. Just reference the variable name in your SQL:
 
-```python
+
 import pandas as pd
 
 df = pd.DataFrame({"user_id": [1, 2, 3], "spend": [50.0, 120.5, 30.0]})
 result = conn.execute("SELECT * FROM df WHERE spend > 40").fetchdf()
-```
+
 
 DuckDB reaches into your local Python scope and treats the DataFrame as a virtual table. This feels like magic the first time you see it. And it's fast - DuckDB's vectorized execution engine processes data in batches optimized for CPU caches, which often outperforms pandas' row-at-a-time operations for analytical queries.
 
 You can also go the explicit route with `conn.register()` if you prefer named views:
 
-```python
+
 conn.register("spending_data", df)
 result = conn.execute("SELECT avg(spend) FROM spending_data").fetchdf()
 conn.unregister("spending_data")
-```
+
 
 But there's a gotcha with bulk inserts from DataFrames that bit at least one early user hard enough to file a GitHub issue about it. If you create a table with one column order and then `INSERT INTO ... SELECT * FROM` a DataFrame with a different column order, DuckDB will silently map columns by position, not by name. The fix is straightforward - use `CREATE TABLE ... AS SELECT * FROM df` instead, which preserves column names from the DataFrame. Or if the table already exists, spell out the column names explicitly in both the INSERT and SELECT clauses.
 
@@ -81,10 +81,10 @@ But there's a gotcha with bulk inserts from DataFrames that bit at least one ear
 
 DuckDB doesn't need you to load data into a table first. You can query CSV, Parquet, and JSON files directly with SQL:
 
-```python
+
 result = conn.execute("SELECT * FROM read_csv_auto('transactions.csv')").fetchdf()
 result = conn.execute("SELECT * FROM read_parquet('events/*.parquet')").fetchdf()
-```
+
 
 That glob pattern support is genuinely useful. You can point DuckDB at a directory of hundreds of Parquet files and query them as if they were a single table. And if those files don't share an identical schema, the `union_by_name` option reconciles them by column name rather than position.
 
@@ -94,11 +94,11 @@ The CSV parser deserves a mention too. It auto-detects types, handles quoting, a
 
 Beyond raw SQL, DuckDB offers a "relation API" that gives you a programmatic, lazy query builder. Think of it as a middle ground between writing SQL strings and using a full ORM.
 
-```python
+
 rel = conn.from_df(df)
 result = rel.filter("spend > 40").project("user_id, spend").order("spend").limit(10)
 print(result.fetchdf())
-```
+
 
 Relations are lazily evaluated - nothing executes until you call `.execute()`, `.fetchdf()`, or `.df()`. You can chain `.filter()`, `.project()`, `.aggregate()`, `.join()`, `.distinct()`, `.order()`, and `.limit()` in whatever combination makes sense. It's a nice API for building queries programmatically when the SQL string would get unwieldy with dynamic conditions.
 

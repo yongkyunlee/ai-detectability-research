@@ -14,15 +14,15 @@ So keep that trade-off in mind. LangChain is simpler to start with than writing 
 
 The install itself is straightforward. You have two options:
 
-```bash
+
 pip install langchain
-```
+
 
 Or, if you're using `uv` (which the LangChain team themselves use internally):
 
-```bash
+
 uv add langchain
-```
+
 
 That gets you the core framework. You'll also need an integration package for your model provider. Want OpenAI? Add `langchain-openai`. Anthropic? `langchain-anthropic`. Ollama for local models? `langchain-ollama`. The `pyproject.toml` lists optional dependency groups for each - `pip install langchain[openai]` works too.
 
@@ -32,12 +32,12 @@ I'd recommend installing only the provider you need. Don't reach for `langchain-
 
 The quickstart in the official README is honest and minimal. Here's the core of it:
 
-```python
+
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model("openai:gpt-5.4")
 result = model.invoke("Hello, world!")
-```
+
 
 Three lines. That's a real working call. The `init_chat_model` function takes a provider-prefixed model string, handles the right client instantiation under the hood, and returns a model object with a standard interface. You can swap `"openai:gpt-5.4"` for an Anthropic or Ollama model string and the rest of the code stays the same. This is the interoperability promise made concrete.
 
@@ -53,10 +53,10 @@ This matters because a lot of tutorials and Stack Overflow answers still show th
 
 The framework's memory abstractions have rough edges. A well-known example: `ConversationalRetrievalChain` doesn't play nicely with `ConversationBufferMemory` when you enable `return_source_documents=True`. The memory object expects a single output key, but returning source documents gives it two - `answer` and `source_documents` - and it throws a `ValueError`. The workaround is to explicitly set `output_key='answer'` on the memory object:
 
-```python
+
 memory = ConversationBufferMemory(
     memory_key='chat_history', return_messages=True, output_key='answer')
-```
+
 
 That issue (GitHub #2303) has been open since April 2023 and was still receiving comments into 2026. It's a small thing, but it's representative. LangChain moves fast, and the seams between components don't always line up cleanly.
 

@@ -12,15 +12,15 @@ You'll need Python 3.10 or newer (up through 3.13). CrewAI leans on UV, the fast
 
 The core installation is a single command:
 
-```bash
+
 uv pip install crewai
-```
+
 
 If you want the extra agent tools (web search, file reading, directory traversal, and more), install the tools bundle:
 
-```bash
+
 uv pip install 'crewai[tools]'
-```
+
 
 One dependency that occasionally trips people up is `tiktoken`, which requires a Rust compiler to build from source. If the install fails at that step, try `uv pip install tiktoken --prefer-binary` to pull a prebuilt wheel instead.
 
@@ -28,13 +28,13 @@ One dependency that occasionally trips people up is `tiktoken`, which requires a
 
 CrewAI ships with a CLI that generates a well-organized project skeleton. Run:
 
-```bash
+
 crewai create crew latest-ai-development
-```
+
 
 This produces a directory structure that separates configuration from logic:
 
-```
+
 latest-ai-development/
 ├── pyproject.toml
 ├── .env
@@ -47,7 +47,7 @@ latest-ai-development/
         └── config/
             ├── agents.yaml
             └── tasks.yaml
-```
+
 
 The YAML files are where you define your agents and tasks declaratively. Python files wire everything together. This separation matters because it keeps prompt engineering and role definitions out of your application logic, which becomes increasingly valuable as a project grows.
 
@@ -57,7 +57,7 @@ Agents in CrewAI are autonomous units with three core attributes: a role, a goal
 
 Open `config/agents.yaml` and define two agents:
 
-```yaml
+
 researcher:
   role: >
     {topic} Senior Data Researcher
@@ -77,7 +77,7 @@ reporting_analyst:
     You're a meticulous analyst with a keen eye for detail. You're known for
     your ability to turn complex data into clear and concise reports, making
     it easy for others to understand and act on the information you provide.
-```
+
 
 Those `{topic}` placeholders get filled in at runtime when you kick off the crew, which makes the same definitions reusable across different subjects.
 
@@ -85,7 +85,7 @@ Those `{topic}` placeholders get filled in at runtime when you kick off the crew
 
 Tasks represent the actual work each agent will perform. In `config/tasks.yaml`:
 
-```yaml
+
 research_task:
   description: >
     Conduct a thorough research about {topic}.
@@ -105,7 +105,7 @@ reporting_task:
     of information. Formatted as markdown.
   agent: reporting_analyst
   output_file: report.md
-```
+
 
 Two things to note here. The `agent` field links each task to whoever's responsible for it. And the `output_file` on the reporting task tells CrewAI to write the final result to disk automatically. In a sequential process, output from the research task feeds directly into the reporting task as context, so no explicit wiring is needed.
 
@@ -113,7 +113,7 @@ Two things to note here. The `agent` field links each task to whoever's responsi
 
 In `crew.py`, you create a class decorated with `@CrewBase` that maps the YAML definitions to Python objects:
 
-```python
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
@@ -154,7 +154,7 @@ class LatestAiDevelopmentCrew():
             process=Process.sequential,
             verbose=True,
         )
-```
+
 
 The `@agent` and `@task` decorators automatically collect instances into `self.agents` and `self.tasks`, so you don't need to manually assemble lists. Method names must match the keys in your YAML files: `researcher` in the code maps to `researcher` in `agents.yaml`.
 
@@ -162,16 +162,16 @@ The `@agent` and `@task` decorators automatically collect instances into `self.a
 
 Before running, add your API keys to the `.env` file:
 
-```
+
 OPENAI_API_KEY=sk-...
 SERPER_API_KEY=your_serper_key_here
-```
+
 
 Then from the project root:
 
-```bash
+
 crewai run
-```
+
 
 You'll see verbose output as the researcher agent queries the web, synthesizes findings, and passes its results to the reporting analyst. The final markdown report lands in `report.md`.
 

@@ -22,7 +22,7 @@ CrewAI offers two distinct patterns for custom tool creation, each serving diffe
 ### The Lightweight Approach: The `@tool` Decorator
 For simple, single-purpose functions, CrewAI provides a `@tool` decorator. This approach is highly ergonomic, allowing developers to wrap a standard Python function and immediately expose it to an agent. 
 
-```python
+
 from crewai import tool
 
 @tool("User Lookup")
@@ -30,7 +30,7 @@ def lookup_user(email: str) -> str:
     """Fetches user details from the internal CRM based on email."""
     # Logic here
     return result
-```
+
 
 While convenient, the decorator pattern can become brittle as tool complexity grows. It lacks native mechanisms for strict schema validation, robust environment variable management, and lazy dependency loading.
 

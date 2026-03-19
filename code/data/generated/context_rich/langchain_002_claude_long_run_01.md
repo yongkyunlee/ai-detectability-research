@@ -12,12 +12,12 @@ A **retriever**, on the other hand, is a broader abstraction. In the framework's
 
 The bridge between these two layers is the `as_retriever()` method on `VectorStore`. Calling it returns a `VectorStoreRetriever` that wraps your store and delegates search calls to it. You configure the retriever's behavior entirely through two parameters: `search_type` and `search_kwargs`.
 
-```python
+
 retriever = vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={"k": 6, "fetch_k": 50, "lambda_mult": 0.25}
 )
-```
+
 
 This pattern lets you swap the underlying store without touching any downstream chain logic. Your LCEL pipeline sees a Runnable that accepts a string and returns documents — nothing more.
 
@@ -37,7 +37,7 @@ MMR is particularly valuable when your documents share structural patterns — t
 
 The framework makes it straightforward to build custom retrievers for cases where vector similarity alone is insufficient. You subclass `BaseRetriever` and implement `_get_relevant_documents`:
 
-```python
+
 class HybridRetriever(BaseRetriever):
     vector_store: VectorStore
     keyword_index: Any
@@ -47,7 +47,7 @@ class HybridRetriever(BaseRetriever):
         vector_results = self.vector_store.similarity_search(query, k=self.k)
         keyword_results = self.keyword_index.search(query, limit=self.k)
         return self._merge_and_deduplicate(vector_results, keyword_results)
-```
+
 
 This pattern shows up frequently in production systems that combine dense retrieval (embeddings) with sparse retrieval (BM25 or TF-IDF). The vector path captures semantic similarity — "automobile" matches "car" — while the keyword path catches exact terms that embeddings sometimes miss, especially for domain-specific jargon, product codes, or proper nouns.
 

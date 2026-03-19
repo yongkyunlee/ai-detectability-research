@@ -16,9 +16,9 @@ The `|` operator is implemented through Python's `__or__` and `__ror__` dunder m
 
 What makes the syntax feel lightweight is automatic coercion. The internal `coerce_to_runnable` function intercepts the right-hand operand before composition: if it is already a `Runnable`, it passes through unchanged; a plain callable becomes a `RunnableLambda`; a generator function becomes a `RunnableGenerator`; a dictionary literal becomes a `RunnableParallel`. This means you can mix typed components with raw Python functions without boilerplate:
 
-```python
+
 chain = prompt | model | (lambda msg: msg.content.upper())
-```
+
 
 The lambda is silently wrapped in a `RunnableLambda`, gaining the standard runnable interface. The trade-off is that `RunnableLambda` does not support streaming — it buffers its entire input before executing. If streaming matters throughout the pipeline, you need `RunnableGenerator`, which accepts a generator function that maps an input iterator to an output iterator.
 
@@ -26,13 +26,13 @@ The lambda is silently wrapped in a `RunnableLambda`, gaining the standard runna
 
 Sequential composition handles linear pipelines. For fan-out patterns, `RunnableParallel` (also aliased as `RunnableMap`) runs multiple runnables concurrently against the same input and collects results into a dictionary. You can construct it explicitly or lean on the coercion system by dropping a dictionary into a pipe chain:
 
-```python
+
 chain = preprocess | {
     "summary": summarize_chain,
     "entities": entity_extractor,
     "sentiment": sentiment_scorer,
 }
-```
+
 
 Each branch receives the same preprocessed input and runs independently. The output is a dictionary with keys matching the branch names. This pattern is especially useful when an application needs several model calls that do not depend on each other — running them in parallel cuts latency roughly to the duration of the slowest branch.
 

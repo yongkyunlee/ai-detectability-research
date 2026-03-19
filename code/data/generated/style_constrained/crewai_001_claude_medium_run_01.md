@@ -14,15 +14,15 @@ The YAML-based configuration is simpler than wiring everything up in pure Python
 
 CrewAI requires Python >=3.10 and <3.14. It uses `uv` as its dependency manager, which is a deliberate choice - `uv` is fast and handles virtual environments without ceremony. If you don't have it installed:
 
-```
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+
 
 Then install the CrewAI CLI itself:
 
-```
+
 uv tool install crewai
-```
+
 
 You can verify the installation with `uv tool list`. You should see something like `crewai v0.102.0` in the output. If you get a PATH warning after install, run `uv tool update-shell` to fix it.
 
@@ -32,10 +32,10 @@ One dependency worth noting: CrewAI 0.175.0 requires `openai >= 1.13.3`. Even if
 
 The CLI generates a project skeleton for you:
 
-```
+
 crewai create crew latest-ai-development
 cd latest_ai_development
-```
+
 
 This produces a clean directory layout with `src/latest_ai_development/config/agents.yaml`, `tasks.yaml`, a `crew.py` orchestration file, a `main.py` entry point, and a `.env` for your API keys. There's also a `knowledge/` directory for RAG-style knowledge bases, though you won't need it right away.
 
@@ -45,7 +45,7 @@ The naming convention matters here. Agent names in `agents.yaml` must match the 
 
 In `agents.yaml`, you define each agent's personality and purpose. Variables like `{topic}` get interpolated at runtime from inputs you pass to the crew:
 
-```yaml
+
 researcher:
   role: >
     {topic} Senior Data Researcher
@@ -54,18 +54,18 @@ researcher:
   backstory: >
     You're a seasoned researcher with a knack for uncovering the latest
     developments in {topic}.
-```
+
 
 Tasks go in `tasks.yaml`. Each task specifies a description, an expected output format, and the agent responsible:
 
-```yaml
+
 research_task:
   description: >
     Conduct a thorough research about {topic}
   expected_output: >
     A list with 10 bullet points of the most relevant information about {topic}
   agent: researcher
-```
+
 
 In `crew.py`, the `@CrewBase` decorator connects everything. You define methods decorated with `@agent` and `@task` that return configured `Agent` and `Task` objects. The `@crew` method assembles them into a `Crew` with a chosen process - `Process.sequential` runs tasks in order, with each task's output feeding into the next as context.
 
@@ -75,17 +75,17 @@ So the wiring is: YAML defines what, Python defines how, and the decorator syste
 
 Before your first run, lock and install dependencies:
 
-```
+
 crewai install
-```
+
 
 Then set your environment variables in `.env`. You'll need an API key for your LLM provider and, if you're using the search tool from the quickstart example, a Serper API key as well. The default model configuration uses OpenAI's GPT-4, but you can swap to any provider by setting the `MODEL` environment variable or specifying `llm` directly in your agent YAML.
 
 To kick it off:
 
-```
+
 crewai run
-```
+
 
 The crew executes each task sequentially, and you'll see verbose output in the console if you've set `verbose=True`. The final output lands both in stdout and in any `output_file` you specified on your last task.
 

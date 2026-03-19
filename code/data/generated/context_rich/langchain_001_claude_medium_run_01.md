@@ -12,19 +12,19 @@ What LangChain is not is magic. Community discussions surface a recurring theme:
 
 LangChain is distributed as a family of Python packages. The main one is simply `langchain`, and you can install it with pip or uv:
 
-```bash
+
 pip install langchain
-```
+
 
 This pulls in `langchain-core`, which contains the base abstractions every other package depends on: Runnables, prompt templates, output parsers, and the callback system. You will not import from `langchain-core` directly in most cases — it exists so that provider integrations can target a stable interface.
 
 To talk to an actual model you need a provider package. The project maintains first-party integrations for OpenAI, Anthropic, Ollama, DeepSeek, xAI, and several others. Install whichever matches your use case:
 
-```bash
+
 pip install langchain-openai        # for GPT models
 pip install langchain-anthropic     # for Claude models
 pip install langchain-ollama        # for local models via Ollama
-```
+
 
 Each provider package is independently versioned. That design is deliberate — it lets the Anthropic integration ship a fix without waiting on a full LangChain release cycle, and it keeps your dependency tree narrow. If you only need OpenAI, you are not pulling in the Google Vertex SDK.
 
@@ -42,7 +42,7 @@ Each provider package is independently versioned. That design is deliberate — 
 
 Here is a minimal chain that takes a topic, asks a model to explain it, and returns plain text:
 
-```python
+
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -62,33 +62,33 @@ chain = prompt | model | StrOutputParser()
 # Run it
 result = chain.invoke({"topic": "how TCP handles packet loss"})
 print(result)
-```
+
 
 The pipe operator constructs a `RunnableSequence` under the hood. When you call `invoke`, the input dictionary flows through the prompt template (which fills in `{topic}`), then to the model (which returns an `AIMessage`), then through the output parser (which pulls out the string content). Each step's output becomes the next step's input.
 
 Because every piece is a Runnable, you get streaming for free:
 
-```python
+
 for chunk in chain.stream({"topic": "how TCP handles packet loss"}):
     print(chunk, end="", flush=True)
-```
+
 
 You also get async support without rewriting anything:
 
-```python
+
 result = await chain.ainvoke({"topic": "how TCP handles packet loss"})
-```
+
 
 ## Swapping Models Without Changing Logic
 
 One of the concrete benefits of the abstraction layer is provider portability. Suppose you want to compare responses across models:
 
-```python
+
 anthropic_model = init_chat_model("anthropic:claude-sonnet-4-5-20250929", temperature=0.7)
 chain_anthropic = prompt | anthropic_model | StrOutputParser()
 
 result_anthropic = chain_anthropic.invoke({"topic": "how TCP handles packet loss"})
-```
+
 
 The prompt template and output parser are unchanged. Only the model object differs. For more dynamic scenarios, `init_chat_model` supports configurable fields so you can select the provider at runtime through a configuration dictionary rather than hardcoding it.
 

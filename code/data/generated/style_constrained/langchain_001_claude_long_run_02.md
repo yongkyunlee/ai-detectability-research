@@ -12,15 +12,15 @@ That said, there's a real trade-off. LangChain is simpler for getting started an
 
 The core package installs in one line:
 
-```bash
+
 pip install langchain
-```
+
 
 Or, if you're using `uv` (which LangChain's own monorepo uses internally):
 
-```bash
+
 uv add langchain
-```
+
 
 That gets you version 1.2.12 as of this writing - the base framework with `init_chat_model`, the foundational abstractions, and the `langchain-core` dependency. But here's the thing most tutorials skip: the base `langchain` package doesn't ship any provider integrations. You need to install those separately.
 
@@ -28,9 +28,9 @@ Want to use OpenAI models? Install `langchain-openai`. Anthropic? `langchain-ant
 
 A typical setup for someone who wants OpenAI and Anthropic support looks like this:
 
-```bash
+
 pip install langchain langchain-openai langchain-anthropic
-```
+
 
 Three packages. Clean dependency tree. No surprises.
 
@@ -38,22 +38,22 @@ Three packages. Clean dependency tree. No surprises.
 
 Once installed, the fastest path to a working call uses `init_chat_model`. This is the unified entry point that LangChain provides across all supported providers:
 
-```python
+
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model("openai:gpt-4o", temperature=0)
 result = model.invoke("Explain Python's GIL in two sentences.")
 print(result.content)
-```
+
 
 The `provider:model` syntax is doing real work here. That colon tells `init_chat_model` to route to the OpenAI integration and pass `gpt-4o` as the model name. You don't have to use this format - LangChain can also infer the provider from model name prefixes. A model name starting with `gpt-` or `o3` routes to OpenAI. Names starting with `claude` go to Anthropic. Names starting with `gemini` hit Google's Vertex AI. The inference covers about a dozen providers, but I'd recommend the explicit `provider:model` format. It's clearer and doesn't break when a provider releases a model with an unexpected prefix.
 
 Switching providers is exactly as boring as it should be:
 
-```python
+
 claude = init_chat_model("anthropic:claude-sonnet-4-5-20250929", temperature=0)
 response = claude.invoke("Explain Python's GIL in two sentences.")
-```
+
 
 Same interface. Same `.invoke()` call. Different model. That's the core promise working as advertised.
 
@@ -65,9 +65,9 @@ The `libs/` directory contains `core/` (the `langchain-core` package with base a
 
 This layered architecture matters in practice. The core layer defines interfaces like `BaseChatModel` and `Runnable`. The implementation layer provides utilities like `init_chat_model`. And the integration layer wires up specific providers. If you see an `ImportError` mentioning a missing class, it's usually because you're importing from the wrong layer. A good example from the issue tracker: `create_retriever_tool` moved from `langchain_community.agent_toolkits` to `langchain_core.tools`, and the old import path stopped working. If you hit that, the fix is straightforward:
 
-```python
+
 from langchain_core.tools import create_retriever_tool
-```
+
 
 These import reshuffles happen. Keep an eye on deprecation warnings in your terminal output.
 
@@ -75,7 +75,7 @@ These import reshuffles happen. Keep an eye on deprecation warnings in your term
 
 One of the more practical features is the configurable model pattern. Instead of hardcoding a provider, you can create a model that accepts provider and model name at runtime:
 
-```python
+
 from langchain.chat_models import init_chat_model
 
 configurable_model = init_chat_model(temperature=0)
@@ -91,7 +91,7 @@ response = configurable_model.invoke(
     "Summarize this document",
     config={"configurable": {"model": "claude-sonnet-4-5-20250929"}}
 )
-```
+
 
 When you don't pass a model to `init_chat_model`, it defaults to making both `model` and `model_provider` configurable at runtime. This is genuinely useful for A/B testing different models or letting users pick their preferred provider. Be careful with the `configurable_fields="any"` option, though. The LangChain documentation explicitly warns that this exposes fields like `api_key` and `base_url` to runtime configuration, which could redirect model requests to a different service if you're accepting untrusted input. Enumerate your configurable fields explicitly when accepting user-provided configs.
 
@@ -103,7 +103,7 @@ We had an issue tracked on GitHub (issue #29277, opened January 2025) specifical
 
 Another common stumbling block involves memory. If you're using `ConversationBufferMemory` with a chain that returns source documents, you'll hit a `ValueError: One output key expected` error. The chain returns both `answer` and `source_documents` as keys, and the memory object doesn't know which one to store. The fix is to specify the output key explicitly:
 
-```python
+
 from langchain.memory import ConversationBufferMemory
 
 memory = ConversationBufferMemory(
@@ -111,7 +111,7 @@ memory = ConversationBufferMemory(
     return_messages=True,
     output_key='answer'
 )
-```
+
 
 This was reported back in 2023 and still catches people. It's a reasonable API design - the memory shouldn't guess - but it's the kind of thing that wastes an afternoon if you don't know about it.
 

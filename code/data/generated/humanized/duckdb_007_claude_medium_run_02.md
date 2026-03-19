@@ -10,13 +10,13 @@ DuckDB supports the standard set you'd expect: `ROW_NUMBER()`, `RANK()`, `DENSE_
 
 One semantic detail trips up newcomers: `LAG()` and `LEAD()` don't respect window frame specifications. If you write:
 
-```sql
+
 SELECT ts,
        lag(ts) OVER w AS ts_lag,
        array_agg(ts) OVER w AS window_values
 FROM events
 WINDOW w AS (ORDER BY ts RANGE BETWEEN INTERVAL 15 MINUTES PRECEDING AND CURRENT ROW);
-```
+
 
 The `array_agg` correctly restricts its input to rows within 15 minutes, but `lag` ignores the range entirely and just returns the previous row in partition order. This matches the SQL standard (navigation functions operate on partition ordering, not on the frame), but it diverges from what most analysts intuitively expect. The docs don't make this obvious. If you need frame-aware lookups, you can specify an explicit secondary ordering within the function call itself, or work around it using `FIRST_VALUE` with the appropriate frame.
 
@@ -24,21 +24,21 @@ The `array_agg` correctly restricts its input to rows within 15 minutes, but `la
 
 DuckDB supports `QUALIFY`, borrowed from Teradata's SQL dialect, which lets you filter rows based on window function results without nesting subqueries. Instead of writing:
 
-```sql
+
 SELECT * FROM (
     SELECT *, ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date DESC) AS rn
     FROM orders
 ) sub
 WHERE rn = 1;
-```
+
 
 You can write:
 
-```sql
+
 SELECT *
 FROM orders
 QUALIFY ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date DESC) = 1;
-```
+
 
 Cleaner. For simple deduplication, it reads almost like plain English. But there's a subtlety in evaluation order that catches people off guard.
 

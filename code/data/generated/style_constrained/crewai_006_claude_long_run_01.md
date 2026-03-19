@@ -8,13 +8,13 @@ CrewAI replaced its older collection of separate memory types-short-term, long-t
 
 The simplest usage is dead simple:
 
-```python
+
 from crewai import Memory
 
 memory = Memory()
 memory.remember("We decided to use PostgreSQL for the user database.")
 matches = memory.recall("What database did we choose?")
-```
+
 
 Behind that two-liner, though, there's a surprisingly deep pipeline. On save, an LLM (gpt-4o-mini by default) analyzes the content to infer a scope path, categories, and an importance score between 0 and 1. On recall, results come back ranked by a composite formula that blends semantic similarity, recency decay, and importance. The weights default to 0.5 semantic, 0.3 recency, and 0.2 importance, with a recency half-life of 30 days.
 
@@ -28,12 +28,12 @@ You don't have to design the scope tree upfront. If you call `remember()` withou
 
 Slices are the multi-scope complement. A `MemorySlice` lets you recall across several disjoint branches simultaneously-useful when an agent needs both its private findings and shared company knowledge. The most common pattern is a read-only slice:
 
-```python
+
 agent_view = memory.slice(
     scopes=["/agent/researcher", "/company/knowledge"],
     read_only=True,
 )
-```
+
 
 This gives the agent visibility into shared docs without letting it pollute the shared space with its own intermediate thoughts. That `read_only=True` flag is load-bearing in multi-agent setups.
 

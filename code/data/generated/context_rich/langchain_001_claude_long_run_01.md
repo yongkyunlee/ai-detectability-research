@@ -20,33 +20,33 @@ The practical upshot: install `langchain` for the framework itself, then install
 
 The installation itself is straightforward. Using pip:
 
-```bash
+
 pip install langchain
-```
+
 
 If you prefer a modern package manager like uv:
 
-```bash
+
 uv add langchain
-```
+
 
 Next, install a provider package. For OpenAI models:
 
-```bash
+
 pip install langchain-openai
-```
+
 
 For Anthropic's Claude:
 
-```bash
+
 pip install langchain-anthropic
-```
+
 
 For running models locally through Ollama:
 
-```bash
+
 pip install langchain-ollama
-```
+
 
 You will also need to set up authentication for your chosen provider. Most cloud-hosted models expect an API key passed through an environment variable. For OpenAI, that means setting `OPENAI_API_KEY`; for Anthropic, `ANTHROPIC_API_KEY`. Local inference through Ollama does not require an API key but assumes you have the Ollama server running and the model pulled locally.
 
@@ -68,19 +68,19 @@ Let us build a minimal working example. The chain will take a topic from the use
 
 LangChain provides a convenient `init_chat_model` function that handles provider-specific instantiation for you:
 
-```python
+
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model("openai:gpt-4o")
-```
+
 
 The string format is `provider:model_name`. You can swap providers by changing this single argument---`"anthropic:claude-sonnet-4-20250514"`, `"ollama:llama3"`, and so on. If you prefer explicit control, you can import directly from the partner package:
 
-```python
+
 from langchain_openai import ChatOpenAI
 
 model = ChatOpenAI(model="gpt-4o")
-```
+
 
 Both approaches produce a Runnable that accepts messages and returns an AI response.
 
@@ -88,14 +88,14 @@ Both approaches produce a Runnable that accepts messages and returns an AI respo
 
 Hard-coding prompts as raw strings works for quick experiments but falls apart once you need to reuse them with different inputs. `ChatPromptTemplate` lets you define a template with placeholder variables:
 
-```python
+
 from langchain_core.prompts import ChatPromptTemplate
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a knowledgeable technical writer who explains concepts clearly and concisely."),
     ("user", "Explain {topic} in a few paragraphs.")
 ])
-```
+
 
 The `from_messages` class method accepts a list of tuples where each tuple is a role-content pair. The `{topic}` placeholder will be filled in at invocation time. You can include as many variables as your template needs.
 
@@ -103,11 +103,11 @@ The `from_messages` class method accepts a list of tuples where each tuple is a 
 
 When a chat model responds, it returns an `AIMessage` object that wraps the text content along with metadata like token usage. If all you need is the text itself, `StrOutputParser` strips away the wrapper:
 
-```python
+
 from langchain_core.output_parsers import StrOutputParser
 
 parser = StrOutputParser()
-```
+
 
 For more structured outputs, LangChain offers `JsonOutputParser`, `PydanticOutputParser`, and `XMLOutputParser`, among others. But `StrOutputParser` is the right starting point.
 
@@ -115,9 +115,9 @@ For more structured outputs, LangChain offers `JsonOutputParser`, `PydanticOutpu
 
 Now connect the three components with the pipe operator:
 
-```python
+
 chain = prompt | model | parser
-```
+
 
 That single line creates a complete pipeline. Under the hood, LangChain constructs a `RunnableSequence` that will:
 
@@ -127,19 +127,19 @@ That single line creates a complete pipeline. Under the hood, LangChain construc
 
 ### Step 5: Run It
 
-```python
+
 result = chain.invoke({"topic": "how TCP handles packet loss"})
 print(result)
-```
+
 
 The `invoke` method accepts a dictionary whose keys match the placeholder variables in your prompt. The return value is a plain string because of the `StrOutputParser` at the end.
 
 If you want to see the response token by token as the model generates it:
 
-```python
+
 for chunk in chain.stream({"topic": "how TCP handles packet loss"}):
     print(chunk, end="", flush=True)
-```
+
 
 Streaming works out of the box because every Runnable in the sequence supports it. There is nothing extra to configure.
 
@@ -147,7 +147,7 @@ Streaming works out of the box because every Runnable in the sequence supports i
 
 Here is the complete script:
 
-```python
+
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -165,7 +165,7 @@ chain = prompt | model | parser
 
 result = chain.invoke({"topic": "how TCP handles packet loss"})
 print(result)
-```
+
 
 Twelve lines of meaningful code, and you have a reusable, streamable, async-capable chain. Changing the model, the prompt, or the output format is a matter of swapping one component without touching the rest.
 
@@ -177,14 +177,14 @@ Once the first chain is working, the natural next steps branch in a few directio
 
 **Using tools.** Language models become far more capable when they can call external functions---search the web, query a database, run calculations. LangChain's `@tool` decorator lets you expose Python functions to the model. The decorator is flexible: your function can accept any combination of argument types and return whatever type makes sense. The one requirement is that the function must have a docstring, since LangChain uses it to tell the model what the tool does.
 
-```python
+
 from langchain_core.tools import tool
 
 @tool
 def multiply(a: int, b: int) -> int:
     """Multiply two integers and return the product."""
     return a * b
-```
+
 
 **Building agents.** An agent is a system where the model decides which tools to call and in what order. The current recommended approach is to use `create_react_agent` from LangGraph, which provides a structured loop for reasoning and acting. Older tutorials may reference `initialize_agent`, but that pattern has been deprecated in favor of the LangGraph-based approach, which gives you more control over the agent's behavior and better reliability in production.
 

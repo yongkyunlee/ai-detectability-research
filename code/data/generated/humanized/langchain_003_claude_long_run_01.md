@@ -14,14 +14,14 @@ An agent's connection to external capabilities comes through tools, and LangChai
 
 The simplest is the `@tool` decorator. Slap it on a Python function with type hints and a docstring, and LangChain infers an input schema that gets passed to the model so it knows what arguments to provide:
 
-```python
+
 from langchain_core.tools import tool
 
 @tool
 def search_web(query: str) -> str:
     """Search the web for information about a topic."""
     return perform_search(query)
-```
+
 
 A few options make the decorator more useful than it first appears. Setting `return_direct=True` tells the agent to return the tool's output immediately without another model call, which is handy when the output itself is the final answer. You can set `response_format` to `"content_and_artifact"` when a tool produces both a text summary and a structured data object, and `parse_docstring=True` pulls per-parameter descriptions from Google-style docstrings, giving the model richer schemas to work with.
 
@@ -37,7 +37,7 @@ LangChain's agent API has gone through a pretty big evolution. For years, `initi
 
 That function is now deprecated in favor of a graph-based approach. `create_agent` builds a LangGraph state graph under the hood, accepting a model (either as a string like `"openai:gpt-4"` or a direct instance), a list of tools, and an optional system prompt:
 
-```python
+
 from langchain.agents import create_agent
 
 agent = create_agent(
@@ -49,7 +49,7 @@ agent = create_agent(
 result = agent.invoke({
     "messages": [{"role": "user", "content": "What is the population of Tokyo?"}]
 })
-```
+
 
 Underneath, it builds a state graph with model and tool nodes connected by conditional edges. When the model produces tool calls, the graph routes to the tool node; when none remain, it exits. Making the control flow into an actual inspectable graph is a big win for debugging, and honestly it's one of the better architectural decisions the team has made.
 

@@ -22,13 +22,13 @@ The `search_kwargs` dictionary provides fine-grained control. You can set `k` to
 
 A typical setup might look like this:
 
-```python
+
 retriever = vectorstore.as_retriever(
     search_type="mmr",
     search_kwargs={"k": 6, "fetch_k": 50, "lambda_mult": 0.25}
 )
 docs = retriever.invoke("How does authentication work?")
-```
+
 
 This fetches 50 candidate documents by similarity, then selects 6 that balance relevance with diversity. The low `lambda_mult` value pushes toward greater diversity, which is useful when your corpus contains many near-duplicate passages.
 
@@ -48,7 +48,7 @@ Sometimes none of the built-in search strategies match your needs. LangChain mak
 
 For example, a retriever that uses a TF-IDF vectorizer from scikit-learn looks like this:
 
-```python
+
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.documents import Document
 from sklearn.metrics.pairwise import cosine_similarity
@@ -66,7 +66,7 @@ class TFIDFRetriever(BaseRetriever):
         query_vec = self.vectorizer.transform([query])
         results = cosine_similarity(self.tfidf_array, query_vec).reshape((-1,))
         return [self.docs[i] for i in results.argsort()[-self.k:][::-1]]
-```
+
 
 Because this retriever implements the `Runnable` interface, it plugs directly into any LangChain chain or agent that expects a retriever. You get callback support, tracing via LangSmith, batching, and async execution for free.
 

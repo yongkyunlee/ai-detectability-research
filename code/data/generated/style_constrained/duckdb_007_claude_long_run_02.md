@@ -12,7 +12,7 @@ Frame specifications are flexible. You get ROWS BETWEEN, RANGE BETWEEN, and GROU
 
 Here's what that looks like in practice:
 
-```sql
+
 SELECT
     l_extendedprice,
     l_partkey,
@@ -21,7 +21,7 @@ SELECT
     SUM(l_extendedprice) OVER (PARTITION BY l_partkey ORDER BY l_orderkey DESC) AS reverse_total
 FROM lineitem
 ORDER BY l_partkey, l_orderkey;
-```
+
 
 DuckDB's window fusion optimization kicks in here. When multiple window functions share compatible PARTITION BY clauses but differ in ORDER BY, the engine can sort the data once and derive multiple window results from that single pass. The `test_window_fusion.test` in DuckDB's test suite verifies exactly this pattern - combining partitioned and unpartitioned windows over the same data with different orderings, confirming that the engine fuses prefix-compatible sorts rather than re-sorting for each function.
 
@@ -37,12 +37,12 @@ There's a subtlety here though. FIRST_VALUE with IGNORE NULLS over a running fra
 
 DuckDB supports the QUALIFY clause, which filters rows after window functions are evaluated. This is a huge ergonomic win. Without it, you'd need a subquery or CTE just to filter on a window function's output.
 
-```sql
+
 SELECT *
 FROM metrics m
 WHERE m.k = t.k
 QUALIFY ROW_NUMBER() OVER (PARTITION BY m.k ORDER BY m.tm DESC) <= 3;
-```
+
 
 That's equivalent to wrapping the whole thing in a CTE, computing `rn`, and filtering `WHERE rn <= 3`. But it's one query. Less nesting, less noise. The DuckDB benchmark suite uses this pattern extensively - the `topn_window_elimination.benchmark` file tests exactly this with a 10-million-row metrics table and a 100-key tags table.
 
@@ -58,7 +58,7 @@ But it has caused real problems for remote storage. One well-documented case (is
 
 The workaround is to either disable the optimizer entirely with `SET disabled_optimizers = 'top_n_window_elimination'` or wrap your scan in a `MATERIALIZED` CTE to force a single-pass plan:
 
-```sql
+
 WITH scanned AS MATERIALIZED (
     SELECT * FROM read_parquet('s3://bucket/data/*/*/data.parquet')
     WHERE partition_filter_conditions
@@ -66,7 +66,7 @@ WITH scanned AS MATERIALIZED (
 SELECT *
 FROM scanned
 QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts DESC) = 1;
-```
+
 
 There's a second problem with this optimizer. When `QUALIFY rn <= N` uses a large N but the actual number of groups per partition is small, the rewrite to `arg_min_max_n(..., N)` pre-allocates N slots per group upfront. Issue #21431 demonstrated that with `QUALIFY rn <= 50` on data where the actual max rank per group was 3, memory usage tripled and exceeded the configured 1GB limit. The fix being discussed involves having the internal `BinaryAggregateHeap` allocate slots lazily instead of pre-allocating.
 

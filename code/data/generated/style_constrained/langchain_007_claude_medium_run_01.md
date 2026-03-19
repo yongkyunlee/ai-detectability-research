@@ -14,7 +14,7 @@ LCEL's most recognizable syntax is the `|` operator. When you write `runnable_a 
 
 The two core composition primitives are `RunnableSequence` and `RunnableParallel`. Sequences chain steps end-to-end. Parallels fan out, running multiple runnables concurrently on the same input and collecting their outputs into a dict. You can construct a `RunnableParallel` explicitly or, more commonly, just drop a dict literal into a sequence:
 
-```python
+
 from langchain_core.runnables import RunnableLambda
 
 sequence = RunnableLambda(lambda x: x + 1) | {
@@ -22,7 +22,7 @@ sequence = RunnableLambda(lambda x: x + 1) | {
     "mul_5": RunnableLambda(lambda x: x * 5),
 }
 sequence.invoke(1)  # {'mul_2': 4, 'mul_5': 10}
-```
+
 
 That dict gets coerced to a `RunnableParallel` internally. It's concise. And it preserves all the usual guarantees --- the parallel branches will run concurrently in both sync (via threads) and async (via `asyncio`) modes.
 

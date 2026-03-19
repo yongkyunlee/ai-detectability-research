@@ -10,11 +10,11 @@ If you've ever written a self-join to get the previous row's value, or grouped a
 
 A quick example of the `QUALIFY` pattern that's become extremely common in deduplication workflows:
 
-```sql
+
 SELECT *
 FROM events
 QUALIFY row_number() OVER (PARTITION BY user_id ORDER BY event_time DESC) = 1;
-```
+
 
 One line replaces what would otherwise be a CTE plus a `WHERE rn = 1` filter. It's clean. We use it everywhere.
 
@@ -30,13 +30,13 @@ For local SSDs, two scans is cheap. For S3, where every request carries TLS over
 
 The workaround involves two settings:
 
-```sql
+
 SET disabled_optimizers = 'top_n_window_elimination';
-```
+
 
 Or, if you don't want to disable the optimizer globally, force a single scan with a `MATERIALIZED` CTE:
 
-```sql
+
 SET s3_allow_recursive_globbing = false;
 
 WITH scanned AS MATERIALIZED (
@@ -46,7 +46,7 @@ WITH scanned AS MATERIALIZED (
 SELECT *
 FROM scanned
 QUALIFY row_number() OVER (PARTITION BY id ORDER BY max_date DESC) = 1;
-```
+
 
 The optimizer implementation in `src/optimizer/topn_window_elimination.cpp` triggers its rewrite based purely on the logical pattern - `ROW_NUMBER` with a filter - without considering whether the underlying scan targets remote storage or a wide schema. This is the kind of optimization that's simpler to implement as a universal rewrite, but accounting for storage characteristics would give you a plan that doesn't regress by 50x on remote reads.
 
@@ -62,7 +62,7 @@ Here's something that trips up even people who've written SQL for years. `LAG()`
 
 Consider this query:
 
-```sql
+
 SELECT ts,
        lag(ts) OVER w AS ts_lag,
        array_agg(ts) OVER w AS window_values
@@ -70,7 +70,7 @@ FROM unnest(['2026-01-01T12:00:00Z', '2026-01-01T12:30:00Z',
              '2026-01-01T13:00:00Z']) t(ts)
 WINDOW w AS (ORDER BY ts::timestamp
              RANGE BETWEEN INTERVAL 15 MINUTES PRECEDING AND CURRENT ROW);
-```
+
 
 The `array_agg` correctly returns only rows within the 15-minute range. But `lag` ignores the frame entirely and returns the globally previous row. If your rows are 30 minutes apart, `lag` still gives you the prior row even though it falls outside the window frame.
 
@@ -80,7 +80,7 @@ The workaround is `lag(ts ORDER BY ts)`, which applies a secondary ordering. Thi
 
 Version 1.5.0 introduced a subtle binder bug with `row_number()`. When you combine a multi-column `PARTITION BY` with an `ORDER BY` on a non-VARCHAR column and then filter on the row number output, DuckDB incorrectly binds the selected column's type from the `ORDER BY` column's type instead of its actual declared type.
 
-```sql
+
 CREATE TABLE t (a VARCHAR, ts TIMESTAMP, k VARCHAR);
 
 WITH deduped AS (
@@ -89,7 +89,7 @@ WITH deduped AS (
     FROM t
 )
 SELECT k FROM deduped WHERE rn = 1;
-```
+
 
 This throws: `INTERNAL Error: Failed to bind column reference "k" [N.1]: inequal types (VARCHAR != TIMESTAMP)`. All four conditions must be present - `row_number()` specifically (not `rank()`), multi-column `PARTITION BY`, non-VARCHAR `ORDER BY`, and a filter on the window output. Remove any one condition and the error disappears.
 
@@ -99,13 +99,13 @@ Also in v1.5.0, window aggregate functions with `PARTITION BY` fail on non-Parqu
 
 A community-discovered workaround is dead simple: add `ORDER BY NULL` to the window spec.
 
-```sql
+
 -- Fails in 1.5.0
 SELECT id, MIN(lastupdatedtime) OVER (PARTITION BY id) FROM base_data;
 
 -- Works
 SELECT id, MIN(lastupdatedtime) OVER (PARTITION BY id ORDER BY NULL) FROM base_data;
-```
+
 
 The underlying issue is that the optimizer tries to copy the logical operator tree for the rewrite, but scan functions for CSV and pandas sources don't implement serialization. Adding `ORDER BY NULL` changes the plan path enough to avoid the serialization step.
 

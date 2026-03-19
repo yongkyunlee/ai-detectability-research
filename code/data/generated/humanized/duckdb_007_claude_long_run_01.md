@@ -6,13 +6,13 @@ Aggregations only get you so far. The moment you need running totals, rankings w
 
 Every window function follows the same pattern. You call a function and tack on an `OVER` clause that sets up the computational context:
 
-```sql
+
 function_name(arguments) OVER (
     PARTITION BY grouping_columns
     ORDER BY sorting_columns
     frame_specification
 )
-```
+
 
 `PARTITION BY` splits your dataset into independent groups, sort of like defining boundaries for where the function does its work. `ORDER BY` determines row sequence inside each partition. The frame specification narrows things even further, pinpointing which rows around the current one actually participate in the calculation.
 
@@ -24,14 +24,14 @@ DuckDB gives you the full set of SQL ranking functions, and the differences betw
 
 A typical top-N query:
 
-```sql
+
 SELECT product_name, category, revenue,
        ROW_NUMBER() OVER (
            PARTITION BY category
            ORDER BY revenue DESC
        ) AS rank_in_category
 FROM product_sales
-```
+
 
 This assigns a revenue rank within each category. Filtering down to the top 3 per category would traditionally mean wrapping it in a subquery. DuckDB has a cleaner approach, which I'll get to shortly.
 
@@ -41,11 +41,11 @@ Sometimes you need to compare a row with its neighbors or grab values from speci
 
 These are great for row-over-row changes. Daily price movement, for instance:
 
-```sql
+
 SELECT trading_date, close_price,
        close_price - LAG(close_price) OVER (ORDER BY trading_date) AS daily_change
 FROM stock_prices
-```
+
 
 DuckDB also has a `FILL()` function for forward-filling missing values across a partition. Anyone working with time series will appreciate this one, since it kills the need for self-joins or correlated subqueries just to carry forward the last known value.
 
@@ -55,18 +55,18 @@ The frame specification is where window functions get really flexible. It's also
 
 **ROWS** defines boundaries by physical row count. "Give me the average of the current row plus the two preceding rows" translates directly:
 
-```sql
+
 AVG(value) OVER (ORDER BY ts ROWS BETWEEN 2 PRECEDING AND CURRENT ROW)
-```
+
 
 **RANGE** defines boundaries by logical value distance. This matters a lot for time-based windows where rows aren't evenly spaced. Here's a 30-day moving average that handles irregular timestamps:
 
-```sql
+
 AVG(price) OVER (
     ORDER BY trade_date
     RANGE BETWEEN INTERVAL 30 DAY PRECEDING AND CURRENT ROW
 ) AS moving_avg_30d
-```
+
 
 **GROUPS** operates on peer groups (sets of rows sharing the same `ORDER BY` value). I don't see it used as often, but it's valuable when you want to include all ties naturally.
 
@@ -78,32 +78,32 @@ One thing the docs don't make super obvious: the default frame when you specify 
 
 Honestly, this might be my favorite DuckDB feature for analytical work. In standard SQL, filtering on a window function result means nesting:
 
-```sql
+
 SELECT * FROM (
     SELECT *, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_time DESC) AS rn
     FROM events
 ) sub
 WHERE rn = 1
-```
+
 
 DuckDB collapses this into a single query:
 
-```sql
+
 SELECT *
 FROM events
 QUALIFY ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY event_time DESC) = 1
-```
+
 
 `QUALIFY` runs after window functions are computed, similar to how `HAVING` filters after `GROUP BY`. The boilerplate reduction is real, and the intent reads so much more clearly. You can combine multiple window conditions, reference aggregate windows, and build expressive filters without any subquery nesting.
 
 Some common patterns: selecting the top N per group, filtering partitions by size, applying thresholds to running totals.
 
-```sql
+
 -- Keep only categories with at least 10 products
 SELECT *
 FROM products
 QUALIFY COUNT(*) OVER (PARTITION BY category_id) >= 10
-```
+
 
 ## Performance Under the Hood
 
@@ -131,7 +131,7 @@ There are also edge cases around partition-by clauses without any ordering that 
 
 Here's a more realistic example. Say you're building a customer retention analysis: identify each customer's first purchase, compute their running spend, flag their most recent transactions.
 
-```sql
+
 SELECT
     customer_id,
     order_date,
@@ -148,7 +148,7 @@ WINDOW w AS (PARTITION BY customer_id ORDER BY order_date)
 QUALIFY ROW_NUMBER() OVER (
     PARTITION BY customer_id ORDER BY order_date DESC
 ) <= 5
-```
+
 
 One query. First purchase dates, cumulative spending, inter-purchase intervals, and output limited to each customer's five most recent orders. No subqueries, no CTEs, no temp tables.
 

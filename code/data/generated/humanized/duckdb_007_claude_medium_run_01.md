@@ -8,7 +8,7 @@ Three components define a window. PARTITION BY splits data into independent grou
 
 Here's an example computing a seven-day rolling average of daily sales:
 
-```sql
+
 SELECT
     date,
     revenue,
@@ -17,7 +17,7 @@ SELECT
         RANGE BETWEEN INTERVAL 7 DAY PRECEDING AND CURRENT ROW
     ) AS rolling_7d_avg
 FROM daily_sales;
-```
+
 
 RANGE mode means the frame includes all rows whose date falls within seven days before the current row's date, regardless of how many physical rows that spans. The distinction between ROWS and RANGE trips people up constantly.
 
@@ -25,11 +25,11 @@ RANGE mode means the frame includes all rows whose date falls within seven days 
 
 DuckDB borrows the QUALIFY clause from Teradata's SQL dialect, and honestly it's one of my favorite features. Instead of wrapping a window function in a subquery just to filter on it:
 
-```sql
+
 SELECT *
 FROM orders
 QUALIFY ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date DESC) = 1;
-```
+
 
 That returns the most recent order per customer. Without it, you'd need a CTE or subquery with a WHERE clause on the window result. Syntactic sugar, sure, but the kind that meaningfully reduces nesting in real analytical work.
 

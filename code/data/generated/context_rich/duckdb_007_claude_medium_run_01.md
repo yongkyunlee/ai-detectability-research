@@ -10,7 +10,7 @@ DuckDB supports all three frame modes from the SQL standard: ROWS (physical row 
 
 Here is a straightforward example that computes a seven-day rolling average of daily sales:
 
-```sql
+
 SELECT
     date,
     revenue,
@@ -19,7 +19,7 @@ SELECT
         RANGE BETWEEN INTERVAL 7 DAY PRECEDING AND CURRENT ROW
     ) AS rolling_7d_avg
 FROM daily_sales;
-```
+
 
 The RANGE mode here means the frame includes all rows whose date falls within seven days before the current row's date, regardless of how many physical rows that spans. That distinction between ROWS and RANGE trips people up regularly.
 
@@ -27,11 +27,11 @@ The RANGE mode here means the frame includes all rows whose date falls within se
 
 One of DuckDB's conveniences is the QUALIFY clause, borrowed from Teradata's SQL dialect. Instead of wrapping your window function in a subquery just to filter on it, you can write:
 
-```sql
+
 SELECT *
 FROM orders
 QUALIFY ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date DESC) = 1;
-```
+
 
 This returns the most recent order per customer. Without QUALIFY, you would need a CTE or subquery with a WHERE clause on the window result. It is syntactic sugar, but the kind that meaningfully reduces query nesting in analytical work.
 

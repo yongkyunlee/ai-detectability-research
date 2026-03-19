@@ -8,15 +8,15 @@ This guide covers installing CrewAI, creating your first project, and understand
 
 First, check your Python version. CrewAI needs Python 3.10 or higher, but below 3.14.
 
-```bash
+
 python3 --version
-```
+
 
 If you're outside that range, grab a compatible version from the official Python downloads page. You'll also need `uv`, a fast dependency management tool from Astral that CrewAI adopted as its standard package handler. If you don't have it, one command on macOS or Linux gets you there:
 
-```bash
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+
 
 Windows users can install it through PowerShell instead. Once `uv` is on your PATH, you're good.
 
@@ -24,9 +24,9 @@ Windows users can install it through PowerShell instead. Once `uv` is on your PA
 
 CrewAI ships as a CLI tool that manages project creation, dependency locking, and execution. Install it globally:
 
-```bash
+
 uv tool install crewai
-```
+
 
 Verify by running `uv tool list`; you should see `crewai` with its version number in the output. If the shell can't find the command, run `uv tool update-shell` to refresh your PATH.
 
@@ -36,14 +36,14 @@ One thing to know upfront: CrewAI also requires `openai >= 1.13.3` as a runtime 
 
 The CLI generates a project skeleton with sensible defaults. Here we'll build a small crew that researches a topic and produces a summary report:
 
-```bash
+
 crewai create crew latest-ai-development
 cd latest_ai_development
-```
+
 
 This creates a directory structure separating configuration from logic:
 
-```
+
 latest_ai_development/
 ├── .env
 ├── pyproject.toml
@@ -56,7 +56,7 @@ latest_ai_development/
 │       │   └── tasks.yaml
 │       └── tools/
 │           └── custom_tool.py
-```
+
 
 The design choice here is interesting. Agent definitions and task specs live in YAML, while orchestration logic stays in Python. So you can tweak an agent's personality, goals, or task descriptions without touching code, and vice versa. I think it's a nice separation, though from what I can tell the tradeoff is that you need to keep the naming in sync between YAML and Python (more on that in a second).
 
@@ -64,7 +64,7 @@ The design choice here is interesting. Agent definitions and task specs live in 
 
 Open `config/agents.yaml` and define two agents: a researcher and a reporting analyst. Each gets a role, a goal describing what it should optimize for, and a backstory that shapes how it approaches problems.
 
-```yaml
+
 researcher:
   role: "{topic} Senior Data Researcher"
   goal: "Uncover cutting-edge developments in {topic}"
@@ -80,13 +80,13 @@ reporting_analyst:
     You're a meticulous analyst with a keen eye for detail.
     You turn complex data into clear, concise reports that
     others can easily understand and act on.
-```
+
 
 The `{topic}` placeholders get filled at runtime, which is a handy pattern for making crews reusable across different subjects.
 
 Tasks go in `config/tasks.yaml`. Each task specifies what should happen, what the output should look like, and which agent handles it:
 
-```yaml
+
 research_task:
   description: "Conduct thorough research about {topic}"
   expected_output: "A list with 10 bullet points of the most relevant information"
@@ -97,7 +97,7 @@ reporting_task:
   expected_output: "A complete report formatted as markdown"
   agent: reporting_analyst
   output_file: report.md
-```
+
 
 Here's the thing the docs don't make obvious: the names in your YAML files must match the method names in your Python code exactly. CrewAI uses this naming convention to automatically link configuration with implementation. Get it wrong and you'll get confusing errors.
 
@@ -105,7 +105,7 @@ Here's the thing the docs don't make obvious: the names in your YAML files must 
 
 The `crew.py` file connects your YAML definitions to actual agent and task objects. The `@CrewBase` decorator handles the plumbing:
 
-```python
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
@@ -135,7 +135,7 @@ class LatestAiDevelopmentCrew():
             process=Process.sequential,
             verbose=True,
         )
-```
+
 
 `Process.sequential` means tasks run in order: the researcher finishes before the analyst begins. There's also a hierarchical process where a manager agent delegates work on the fly, which works better for workflows where task ordering depends on intermediate results.
 
@@ -143,10 +143,10 @@ class LatestAiDevelopmentCrew():
 
 Set your API keys in the `.env` file. At minimum you'll need an OpenAI key (or whatever provider you prefer). Then install dependencies and launch:
 
-```bash
+
 crewai install
 crewai run
-```
+
 
 With `verbose=True`, you'll see each agent's reasoning process in real time: what it's thinking, which tools it's calling, and what output it produces. The final report gets written to `report.md` in your project root.
 

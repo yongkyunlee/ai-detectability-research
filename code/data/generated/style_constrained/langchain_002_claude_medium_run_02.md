@@ -22,13 +22,13 @@ The tradeoff here is clear: plain similarity search is simpler and faster, but M
 
 The bridge between these two layers is `VectorStoreRetriever`, and the typical way to get one is through the `as_retriever()` method on any vector store instance. Here's what actually happens when you call it:
 
-```python
+
 retriever = vector_store.as_retriever(
     search_type="mmr",
     search_kwargs={"k": 6, "fetch_k": 50, "lambda_mult": 0.25}
 )
 docs = retriever.invoke("How do I configure authentication?")
-```
+
 
 That `invoke()` call runs through LangChain's callback machinery - setting up tracing, tagging, and metadata - before dispatching to `_get_relevant_documents`, which delegates to the appropriate search method on the underlying vector store. The retriever also reports LangSmith tracing parameters automatically, including the vector store provider name and embedding provider, so your observability pipeline can track which backend handled each query.
 

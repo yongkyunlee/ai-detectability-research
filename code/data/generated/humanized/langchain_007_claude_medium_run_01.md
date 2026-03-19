@@ -12,7 +12,7 @@ That consistency is the actual design insight here. Instead of having separate a
 
 The most visible feature of LCEL is the `|` operator, which chains Runnables into a `RunnableSequence`. One step's output feeds directly into the next:
 
-```python
+
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
@@ -24,7 +24,7 @@ chain = (
 )
 
 result = chain.invoke({"text": "Long document content here..."})
-```
+
 
 Under the hood, `RunnableSequence` handles execution, threading callbacks and configuration through each step. Streaming propagates end-to-end: if every component supports a `transform` method that maps streaming input to streaming output, the full chain can stream tokens to the caller as they arrive. When a component lacks streaming support (say, a `RunnableLambda` wrapping a plain function), the framework accumulates that step's input before continuing, so partial streaming still works for everything else in the pipeline.
 
@@ -32,7 +32,7 @@ Under the hood, `RunnableSequence` handles execution, threading callbacks and co
 
 Not every workflow is linear. Sometimes you need to fan the same input out to several branches and merge the results. `RunnableParallel` does this by running a dictionary of Runnables concurrently, returning a dictionary of their outputs:
 
-```python
+
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 
 analysis = RunnableParallel(
@@ -43,7 +43,7 @@ analysis = RunnableParallel(
 
 results = analysis.invoke({"text": article})
 # {"summary": "...", "sentiment": "positive", "keywords": [...]}
-```
+
 
 A nice touch: any dict literal inside a `|` expression gets automatically coerced into a `RunnableParallel`, so you can embed fan-out points inline without extra ceremony. `RunnablePassthrough` complements this by forwarding inputs unchanged, which is useful when one branch needs the raw input while another transforms it.
 
@@ -61,7 +61,7 @@ These modifiers aren't special-cased. They return new Runnables that compose lik
 
 Not everything fits neatly into operator syntax. When you need arbitrary Python logic inside a pipeline, `RunnableLambda` wraps any callable into a Runnable. The `@chain` decorator goes further: it converts a function into a named Runnable, and any Runnables invoked inside that function are automatically traced as dependencies. This bridges LCEL's declarative style with imperative code, so you can drop into regular Python for complex transformations while keeping observability.
 
-```python
+
 from langchain_core.runnables import chain
 
 @chain
@@ -69,7 +69,7 @@ def enrich_query(query: str) -> dict:
     expanded = synonym_expander.invoke(query)
     documents = retriever.invoke(expanded)
     return {"query": query, "context": documents}
-```
+
 
 ## Trade-offs and Practical Considerations
 

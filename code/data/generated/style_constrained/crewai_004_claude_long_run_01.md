@@ -8,7 +8,7 @@ CrewAI tools are Pydantic models. Every tool inherits from `BaseTool`, which liv
 
 You attach tools to agents through the `tools` parameter. That's it. The agent gets access, the LLM sees the tool descriptions in its prompt, and CrewAI's executor handles the invocation loop.
 
-```python
+
 from crewai import Agent
 from crewai_tools import SerperDevTool, FileReadTool
 
@@ -18,7 +18,7 @@ researcher = Agent(
     tools=[SerperDevTool(), FileReadTool()],
     verbose=True
 )
-```
+
 
 You can also override an agent's tools at the task level. So if your researcher normally has web search but a specific task should only read local files, pass `tools=[FileReadTool()]` on the `Task` instead. This is a nice design choice - it keeps agent definitions broad and lets tasks narrow the scope.
 
@@ -28,7 +28,7 @@ CrewAI gives you two approaches. Subclass `BaseTool` when you need full control:
 
 Here's the subclass approach:
 
-```python
+
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -42,18 +42,18 @@ class MyCustomTool(BaseTool):
 
     def _run(self, argument: str) -> str:
         return do_search(argument)
-```
+
 
 And the decorator:
 
-```python
+
 from crewai.tools import tool
 
 @tool("custom_search")
 def custom_search(query: str) -> str:
     """Searches an internal knowledge base for relevant documents."""
     return do_search(query)
-```
+
 
 The decorator is simpler, but the subclass gives you access to things like `result_as_answer` - a flag that tells CrewAI to return the tool's output directly as the agent's final answer, skipping further reasoning. That's useful for tools where the output is already the finished product. Both approaches support `max_usage_count`, which caps how many times a tool can fire during execution. Set `max_usage_count=5` on a web search tool, and after five calls the agent gets back an error string telling it the tool is exhausted. The framework enforces this atomically with `threading.Lock`, so it's safe in concurrent setups.
 

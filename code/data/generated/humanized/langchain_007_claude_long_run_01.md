@@ -16,9 +16,9 @@ The base class also provides sensible defaults, which honestly surprised me the 
 
 Here's where it gets fun. The `|` operator chains two runnables into a `RunnableSequence`:
 
-```python
+
 chain = prompt_template | chat_model | output_parser
-```
+
 
 When you call `chain.invoke(input)`, it threads data through each step sequentially. Call `chain.stream(input)` instead, and it chains `transform` calls so tokens flow through the pipeline as they arrive rather than waiting for each step to fully complete before the next one starts.
 
@@ -30,13 +30,13 @@ Not every pipeline is a straight line.
 
 `RunnableParallel` takes a dictionary mapping keys to runnables, sends the same input to all of them concurrently, and collects results into a single dict:
 
-```python
+
 analysis = RunnableParallel(
     sentiment=sentiment_classifier,
     summary=summarizer,
     keywords=keyword_extractor,
 )
-```
+
 
 This maps well onto enrichment patterns where you need several independent pieces of information from the same input. Sync execution uses a thread pool; async uses `asyncio.gather`. Because the result is just a dict, it composes cleanly as an intermediate step in a larger sequence.
 
@@ -44,22 +44,22 @@ This maps well onto enrichment patterns where you need several independent piece
 
 LCEL ships with several small but useful building blocks. `RunnablePassthrough` acts as an identity function, returning its input unchanged, and it becomes especially handy through its `assign` class method, which merges passthrough data with additional computed fields:
 
-```python
+
 enriched = RunnablePassthrough.assign(
     word_count=lambda x: len(x["text"].split()),
     language=language_detector,
 )
-```
+
 
 For conditional routing, `RunnableBranch` evaluates predicates in order and dispatches to the first matching handler:
 
-```python
+
 router = RunnableBranch(
     (lambda x: x["type"] == "question", qa_chain),
     (lambda x: x["type"] == "command", action_chain),
     default_chain,
 )
-```
+
 
 Then there's `RunnableLambda`, which wraps arbitrary Python callables (sync functions, async functions, generators, async generators) into the `Runnable` protocol. This is how custom logic gets injected into chains without building a full subclass. If your function accepts a `RunnableConfig` parameter, the framework threads configuration through to it automatically.
 
@@ -67,13 +67,13 @@ Then there's `RunnableLambda`, which wraps arbitrary Python callables (sync func
 
 Production systems need retries and fallbacks. LCEL provides both as composable decorators: `.with_retry()` wraps a runnable in `RunnableRetry` with exponential backoff, and `.with_fallbacks()` wraps it in `RunnableWithFallbacks`, which tries alternative runnables if the primary one throws. Both return new `Runnable` instances, so they chain naturally:
 
-```python
+
 resilient_model = (
     primary_model
     .with_retry(stop_after_attempt=3)
     .with_fallbacks([backup_model])
 )
-```
+
 
 There's a catch, though. These wrappers interact with batching in subtle ways. When `RunnableRetry` operates in batch mode, it needs to track which items succeeded and which failed across retry rounds, then reassemble outputs in the correct order. Bugs have surfaced where failed items get replaced by stale results from other positions, corrupting the batch output. I think the complexity here is just inherent to the problem; composing retry semantics with position-tracked batch execution is genuinely hard.
 

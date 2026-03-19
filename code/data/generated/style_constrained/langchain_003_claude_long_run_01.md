@@ -10,7 +10,7 @@ A tool in LangChain is ultimately a subclass of `BaseTool`, which itself extends
 
 The simplest way to create a tool is the `@tool` decorator from `langchain_core.tools`. You write a function with type hints and a docstring, and LangChain infers the schema automatically. Pass `parse_docstring=True` and it'll even pull per-argument descriptions from Google-style docstrings into the JSON schema the model receives.
 
-```python
+
 from langchain_core.tools import tool
 
 @tool(parse_docstring=True)
@@ -22,7 +22,7 @@ def search_docs(query: str, max_results: int = 5) -> str:
         max_results: Maximum number of results to return.
     """
     return run_search(query, max_results)
-```
+
 
 This generates a `StructuredTool` with an `args_schema` derived from the function signature. The decorator is flexible enough to handle async functions, custom names, and a `response_format` of `"content_and_artifact"` for tools that return both a human-readable summary and raw structured data. But the decorator hides complexity. Under the covers, `create_schema_from_function` uses Pydantic's `validate_arguments` to build the model - and the codebase itself contains a comment noting this approach is deprecated and should be rewritten. It works, but it's technical debt the maintainers are aware of.
 

@@ -18,33 +18,33 @@ The practical upshot: install `langchain` for the framework, then add whichever 
 
 Installation is the easy part. Using pip:
 
-```bash
+
 pip install langchain
-```
+
 
 Or if you prefer a modern package manager like uv:
 
-```bash
+
 uv add langchain
-```
+
 
 Next, grab a provider package. For OpenAI models:
 
-```bash
+
 pip install langchain-openai
-```
+
 
 For Anthropic's Claude:
 
-```bash
+
 pip install langchain-anthropic
-```
+
 
 For running models locally through Ollama:
 
-```bash
+
 pip install langchain-ollama
-```
+
 
 You'll also need authentication for your chosen provider. Most cloud-hosted models expect an API key through an environment variable: `OPENAI_API_KEY` for OpenAI, `ANTHROPIC_API_KEY` for Anthropic. Local inference through Ollama doesn't need an API key, but you'll need the Ollama server running and your model pulled locally.
 
@@ -66,19 +66,19 @@ Let's build a minimal working example. The chain takes a topic from the user, as
 
 LangChain provides `init_chat_model` to handle provider-specific setup:
 
-```python
+
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model("openai:gpt-4o")
-```
+
 
 The string format is `provider:model_name`. Swapping providers means changing that single argument (`"anthropic:claude-sonnet-4-20250514"`, `"ollama:llama3"`, and so on). If you want more explicit control, import directly from the partner package:
 
-```python
+
 from langchain_openai import ChatOpenAI
 
 model = ChatOpenAI(model="gpt-4o")
-```
+
 
 Both approaches produce a Runnable that accepts messages and returns an AI response.
 
@@ -86,14 +86,14 @@ Both approaches produce a Runnable that accepts messages and returns an AI respo
 
 Hard-coding prompts as raw strings works for quick experiments but falls apart once you need to reuse them with different inputs. `ChatPromptTemplate` lets you define a template with placeholder variables:
 
-```python
+
 from langchain_core.prompts import ChatPromptTemplate
 
 prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a knowledgeable technical writer who explains concepts clearly and concisely."),
     ("user", "Explain {topic} in a few paragraphs.")
 ])
-```
+
 
 The `from_messages` class method takes a list of tuples, each a role-content pair. The `{topic}` placeholder gets filled in when you invoke the chain, and you can include as many variables as your template needs.
 
@@ -101,11 +101,11 @@ The `from_messages` class method takes a list of tuples, each a role-content pai
 
 When a chat model responds, it returns an `AIMessage` object wrapping the text along with metadata like token usage. If all you want is the text, `StrOutputParser` strips away the wrapper:
 
-```python
+
 from langchain_core.output_parsers import StrOutputParser
 
 parser = StrOutputParser()
-```
+
 
 For more structured outputs, there's `JsonOutputParser`, `PydanticOutputParser`, and `XMLOutputParser`, among others. But `StrOutputParser` is the right starting point.
 
@@ -113,27 +113,27 @@ For more structured outputs, there's `JsonOutputParser`, `PydanticOutputParser`,
 
 Connect the three components with the pipe operator:
 
-```python
+
 chain = prompt | model | parser
-```
+
 
 That single line creates a complete pipeline. Under the hood, LangChain builds a `RunnableSequence` that feeds input variables into the prompt template to produce formatted messages, sends them to the chat model, then extracts the plain text via the parser.
 
 ### Step 5: Run It
 
-```python
+
 result = chain.invoke({"topic": "how TCP handles packet loss"})
 print(result)
-```
+
 
 `invoke` accepts a dictionary whose keys match the placeholder variables in your prompt. Because of the `StrOutputParser` at the end, you get a plain string back.
 
 Want to see tokens arrive as the model generates them?
 
-```python
+
 for chunk in chain.stream({"topic": "how TCP handles packet loss"}):
     print(chunk, end="", flush=True)
-```
+
 
 Streaming works out of the box since every Runnable in the sequence supports it. Nothing extra to configure.
 
@@ -141,7 +141,7 @@ Streaming works out of the box since every Runnable in the sequence supports it.
 
 Here's the complete script:
 
-```python
+
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -159,7 +159,7 @@ chain = prompt | model | parser
 
 result = chain.invoke({"topic": "how TCP handles packet loss"})
 print(result)
-```
+
 
 Twelve lines of meaningful code. You've got a reusable, streamable, async-capable chain. Swapping the model, prompt, or output format means changing one component without touching the rest.
 
@@ -171,14 +171,14 @@ A single prompt-response cycle has no memory of prior exchanges. LangChain addre
 
 Language models get a lot more useful when they can call external functions to search the web, query a database, or run calculations. LangChain's `@tool` decorator lets you expose Python functions to the model. It's flexible about argument types and return values, though the docs don't make this super obvious. One requirement: your function needs a docstring. That's how the framework tells the model what the tool does.
 
-```python
+
 from langchain_core.tools import tool
 
 @tool
 def multiply(a: int, b: int) -> int:
     """Multiply two integers and return the product."""
     return a * b
-```
+
 
 If you want the model deciding which tools to call and in what order, that's an agent. The current recommended approach is `create_react_agent` from LangGraph, which provides a structured reasoning-and-acting loop. Older tutorials reference `initialize_agent`, but that's been deprecated. The LangGraph version gives you more control and better reliability in production.
 

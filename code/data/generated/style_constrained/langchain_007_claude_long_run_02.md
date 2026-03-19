@@ -14,13 +14,13 @@ The signature move of LCEL is the `|` operator. It overloads Python's bitwise OR
 
 A simple example from the codebase:
 
-```python
+
 from langchain_core.runnables import RunnableLambda
 
 sequence = RunnableLambda(lambda x: x + 1) | RunnableLambda(lambda x: x * 2)
 sequence.invoke(1)  # 4
 sequence.batch([1, 2, 3])  # [4, 6, 8]
-```
+
 
 Two things are happening here that matter. First, any callable gets coerced into a `Runnable` automatically - you can pipe plain functions, dicts, and lambdas directly. Second, the sequence flattens nested sequences. If you pipe two `RunnableSequence` objects together, the constructor merges their steps into one flat list rather than nesting. This keeps the chain structure clean for debugging and tracing.
 
@@ -30,13 +30,13 @@ But streaming through a `RunnableSequence` comes with a caveat that the document
 
 The second core primitive is `RunnableParallel`. It takes a dict mapping string keys to runnables and executes them concurrently on the same input. You can instantiate it explicitly, or - and this is the more common pattern - use a dict literal inside a pipe expression, and LCEL will coerce it automatically.
 
-```python
+
 sequence = RunnableLambda(lambda x: x + 1) | {
     "mul_2": RunnableLambda(lambda x: x * 2),
     "mul_5": RunnableLambda(lambda x: x * 5),
 }
 sequence.invoke(1)  # {'mul_2': 4, 'mul_5': 10}
-```
+
 
 This is where LCEL starts to feel genuinely useful. Parallel execution of independent branches - say, calling two different models on the same prompt, or running a retriever alongside a reformulation step - is a common pattern in LLM applications, and `RunnableParallel` handles the concurrency plumbing for you. We can simultaneously stream output from multiple branches, which matters for building responsive UIs where you want partial results from several sources at once.
 
@@ -56,7 +56,7 @@ LCEL ships several specialized runnables that cover recurring patterns.
 
 For cases where the pipe operator feels too constraining, LCEL offers a `@chain` decorator that converts any function - sync, async, or generator - into a `Runnable`. Under the hood, it just wraps the function in a `RunnableLambda`, but it sets the name of the runnable to the function name, which improves tracing output. Any runnables invoked inside the decorated function get tracked as dependencies.
 
-```python
+
 from langchain_core.runnables import chain
 
 @chain
@@ -66,7 +66,7 @@ def my_func(fields):
     formatted = prompt.invoke(**fields)
     for chunk in model.stream(formatted):
         yield chunk
-```
+
 
 This is a pragmatic escape hatch. Sometimes a pipeline doesn't decompose neatly into a linear or parallel graph, and you just want to write procedural Python while keeping the tracing and streaming benefits.
 

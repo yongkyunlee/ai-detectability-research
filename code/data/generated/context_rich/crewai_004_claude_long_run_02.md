@@ -6,7 +6,7 @@ When an AI agent can only generate text, its usefulness has a hard ceiling. It c
 
 CrewAI offers two primary interfaces for creating tools. The first is subclassing `BaseTool`, which gives you full control over input validation, naming, and behavior. You define a Pydantic model for your arguments, give the tool a name and description, and implement a `_run` method:
 
-```python
+
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -21,18 +21,18 @@ class StockPriceTool(BaseTool):
     def _run(self, ticker: str) -> str:
         # call your pricing API here
         return f"Price for {ticker}: $142.50"
-```
+
 
 The second approach is the `@tool` decorator, which is more concise. It pulls the tool's name from the function name (or a string argument) and its description from the docstring. Type annotations on the function parameters are introspected to build the argument schema automatically:
 
-```python
+
 from crewai.tools import tool
 
 @tool("stock_price_lookup")
 def stock_price_lookup(ticker: str) -> str:
     """Fetches the current price for a given stock ticker."""
     return f"Price for {ticker}: $142.50"
-```
+
 
 Both approaches produce objects that CrewAI internally converts into a `CrewStructuredTool` — a normalized wrapper the executor understands. The conversion step validates that the tool has a name, a description, and a well-formed argument schema. If the decorator approach seems easier for quick prototyping, the class-based approach pays off when you need custom caching logic, usage limits, or async execution.
 
@@ -54,13 +54,13 @@ Every tool in CrewAI participates in a caching layer by default. The `CacheHandl
 
 For most tools, default caching is exactly what you want. But sometimes you need finer control. The `cache_function` attribute on a tool lets you decide per-invocation whether to store the result. It receives the arguments and the result, and returns a boolean:
 
-```python
+
 def should_cache(args, result):
     # Only cache successful lookups
     return "error" not in result.lower()
 
 stock_price_tool.cache_function = should_cache
-```
+
 
 This is particularly useful for tools that hit external APIs with rate limits, or for tools where stale results are dangerous. A stock price lookup might be fine to cache within a single crew run, but a tool that checks system health probably should not be.
 
@@ -72,14 +72,14 @@ CrewAI's MCP implementation uses a factory pattern internally — each tool invo
 
 There is, however, a practical gotcha that has tripped up many users. If you define an agent with MCP servers but do not explicitly pass `tools=[]`, the MCP tools will not load. The initialization logic checks whether `self.tools is not None` before extending the tool list with MCP-discovered tools, and since the default value for `tools` is `None`, the condition fails silently. The fix is straightforward — always pass an empty list:
 
-```python
+
 agent = Agent(
     role="Analyst",
     goal="Analyze data from remote services",
     mcps=[MCPServerHTTP(url="http://localhost:8022/mcp")],
     tools=[],  # required for MCP tools to load
 )
-```
+
 
 This kind of subtle default-value interaction is exactly the sort of thing that burns hours of debugging time, especially because the agent will still run — it just will not have any tools available.
 

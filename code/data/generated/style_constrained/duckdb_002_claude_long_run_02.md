@@ -6,10 +6,10 @@ DuckDB makes file imports absurdly simple. You point it at a file, and it figure
 
 DuckDB's README captures the core idea in two lines of SQL:
 
-```sql
+
 SELECT * FROM 'myfile.csv';
 SELECT * FROM 'myfile.parquet';
-```
+
 
 That's it. No `CREATE EXTERNAL TABLE`, no schema definition, no loader configuration. DuckDB resolves the file format from the extension and runs auto-detection. For quick exploration or ad-hoc analysis, this is hard to beat.
 

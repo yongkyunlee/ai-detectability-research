@@ -12,15 +12,15 @@ Because the engine lives inside your Python process, there is no serialization o
 
 Installation is a single command:
 
-```bash
+
 pip install duckdb
-```
+
 
 There are no native dependencies to compile and no external services to start. The package ships a self-contained binary for each supported platform.
 
 To open a connection:
 
-```python
+
 import duckdb
 
 # Fully in-memory — everything vanishes when the process ends
@@ -28,7 +28,7 @@ conn = duckdb.connect()
 
 # Backed by a file — your tables persist across sessions
 conn = duckdb.connect("analytics.duckdb")
-```
+
 
 The connection object is your gateway to everything. It follows Python's DB-API 2.0 closely enough that existing muscle memory carries over.
 
@@ -36,7 +36,7 @@ The connection object is your gateway to everything. It follows Python's DB-API 
 
 The `execute` method accepts SQL strings and returns a result object you can fetch from in several formats:
 
-```python
+
 conn.execute("CREATE TABLE events (user_id INTEGER, action VARCHAR, ts TIMESTAMP)")
 conn.execute("INSERT INTO events VALUES (1, 'click', '2024-06-01 09:15:00')")
 conn.execute("INSERT INTO events VALUES (?, ?, ?)", [2, 'purchase', '2024-06-01 10:30:00'])
@@ -49,22 +49,22 @@ df = conn.execute("SELECT action, COUNT(*) AS cnt FROM events GROUP BY action").
 
 # Fetch as NumPy masked arrays — cleaner NULL handling
 arrays = conn.execute("SELECT * FROM events").fetchnumpy()
-```
+
 
 For batch inserts, `executemany` accepts a list of parameter lists, which avoids writing a loop around single-row inserts:
 
-```python
+
 conn.executemany("INSERT INTO events VALUES (?, ?, ?)", [
     [3, 'click', '2024-06-01 11:00:00'],
     [4, 'signup', '2024-06-01 11:05:00'],
 ])
-```
+
 
 ## Querying Pandas DataFrames Directly
 
 Perhaps the most immediately useful feature: DuckDB can query Pandas DataFrames as though they are tables, without any explicit import step. It reads the DataFrame's underlying memory buffers directly.
 
-```python
+
 import pandas as pd
 
 orders = pd.DataFrame({
@@ -78,7 +78,7 @@ result = duckdb.sql("""
     GROUP BY customer
     ORDER BY total_spent DESC
 """).fetchdf()
-```
+
 
 DuckDB resolves the name `orders` by looking it up in the calling scope's local variables. This feels almost magical the first time you see it. For cases where you want more explicit control, `conn.register("my_table", df)` binds a DataFrame to a specific name within a connection.
 
@@ -88,7 +88,7 @@ One subtlety worth noting: if you use `INSERT INTO ... SELECT * FROM registered_
 
 DuckDB queries CSV, Parquet, and JSON files in place. You do not need to load them into a table first:
 
-```python
+
 # CSV with automatic type detection
 conn.execute("SELECT * FROM 'sales_2024.csv' WHERE region = 'West'").fetchdf()
 
@@ -97,7 +97,7 @@ conn.execute("SELECT * FROM 'logs/year=2024/month=*/*.parquet'").fetchdf()
 
 # JSON lines
 conn.execute("SELECT * FROM read_json_auto('events.jsonl')").fetchdf()
-```
+
 
 Glob support is especially handy when your data arrives as hundreds of daily export files. A single query unifies them all. For Parquet files, DuckDB pushes predicates and column selections down into the reader, so it only decompresses the data it actually needs. On wide tables with dozens of columns, this can cut I/O by an order of magnitude.
 
@@ -105,7 +105,7 @@ Glob support is especially handy when your data arrives as hundreds of daily exp
 
 Beyond raw SQL, DuckDB offers a chainable API for building queries programmatically. Operations are lazy — nothing executes until you explicitly ask for results:
 
-```python
+
 rel = conn.from_csv_auto("measurements.csv")
 summary = (
     rel
@@ -115,7 +115,7 @@ summary = (
     .limit(10)
 )
 print(summary.fetchdf())
-```
+
 
 This style works well in library code where query structure depends on runtime parameters, and chaining avoids the messy string concatenation that plagues dynamic SQL construction.
 

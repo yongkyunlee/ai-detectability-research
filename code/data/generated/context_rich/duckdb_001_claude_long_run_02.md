@@ -16,18 +16,18 @@ The trade-off is straightforward: DuckDB is not designed for concurrent transact
 
 Getting started takes a single pip command:
 
-```
+
 pip install duckdb
-```
+
 
 That pulls down a self-contained wheel with no external dependencies. No C library to link against, no system packages to install. It works on Linux, macOS, and Windows across Python 3.8 and later.
 
 Verify the installation:
 
-```python
+
 import duckdb
 print(duckdb.__version__)
-```
+
 
 You should see the version string printed without errors. That is the entire setup process.
 
@@ -35,7 +35,7 @@ You should see the version string printed without errors. That is the entire set
 
 The entry point is `duckdb.connect()`. Called without arguments, it creates an in-memory database that lives for the duration of your Python session. Pass a file path to persist data to disk.
 
-```python
+
 import duckdb
 
 # In-memory (temporary)
@@ -43,18 +43,18 @@ conn = duckdb.connect()
 
 # Persistent, backed by a file
 conn = duckdb.connect("my_analysis.duckdb")
-```
+
 
 With a connection in hand, you can execute SQL directly:
 
-```python
+
 conn.execute("CREATE TABLE measurements (sensor_id INTEGER, reading DOUBLE, ts TIMESTAMP)")
 conn.execute("INSERT INTO measurements VALUES (1, 23.5, '2025-06-15 08:00:00')")
 conn.execute("INSERT INTO measurements VALUES (2, 19.8, '2025-06-15 08:01:00')")
 
 result = conn.execute("SELECT sensor_id, AVG(reading) FROM measurements GROUP BY sensor_id")
 print(result.fetchall())
-```
+
 
 DuckDB's Python client follows the PEP 249 (DB-API 2.0) interface, so if you have used `sqlite3` or `psycopg2`, the patterns will feel familiar. You can call `conn.cursor()` to get a cursor object, though it is not strictly necessary—executing directly on the connection works identically.
 
@@ -62,29 +62,29 @@ DuckDB's Python client follows the PEP 249 (DB-API 2.0) interface, so if you hav
 
 To avoid SQL injection and handle dynamic values cleanly, pass parameters as a list with `?` placeholders:
 
-```python
+
 conn.execute(
     "INSERT INTO measurements VALUES (?, ?, ?)",
     [3, 21.2, "2025-06-15 08:02:00"]
 )
-```
+
 
 For bulk operations, `executemany()` accepts a list of parameter tuples:
 
-```python
+
 rows = [
     (4, 18.7, "2025-06-15 08:03:00"),
     (5, 22.1, "2025-06-15 08:04:00"),
     (6, 20.9, "2025-06-15 08:05:00"),
 ]
 conn.executemany("INSERT INTO measurements VALUES (?, ?, ?)", rows)
-```
+
 
 ## Fetching Results
 
 DuckDB gives you several ways to pull results out of a query, each suited to different downstream needs:
 
-```python
+
 result = conn.execute("SELECT * FROM measurements WHERE reading > 20")
 
 # Plain Python lists
@@ -96,7 +96,7 @@ result.fetchdf()
 
 # NumPy arrays (masked, so NULLs are handled properly)
 result.fetchnumpy()
-```
+
 
 The `fetchdf()` method is probably the one you will reach for most often. It hands you a pandas DataFrame that you can immediately plot, reshape, or feed into scikit-learn. The `fetchnumpy()` variant returns masked arrays, which can be useful when you want to avoid the overhead of a full DataFrame for purely numerical work.
 
@@ -104,23 +104,23 @@ The `fetchdf()` method is probably the one you will reach for most often. It han
 
 Here is where DuckDB starts to feel genuinely different from other databases. You can point SQL at raw files—CSV, Parquet, JSON—and query them without any import step:
 
-```python
+
 # Query a CSV file as if it were a table
 result = conn.execute("SELECT * FROM 'sensor_data.csv' WHERE reading > 20")
 print(result.fetchdf())
 
 # Query a Parquet file
 result = conn.execute("SELECT sensor_id, COUNT(*) FROM 'archive.parquet' GROUP BY sensor_id")
-```
+
 
 DuckDB automatically infers the schema from the file: column names from headers, data types from sampled values. For CSVs with unusual delimiters or quoting, you can use `read_csv()` with explicit options, but the automatic detection handles the common cases well.
 
 Glob patterns let you treat a directory of files as a single table:
 
-```python
+
 # Read all CSVs matching the pattern
 result = conn.execute("SELECT * FROM 'logs_2025_*.csv'")
-```
+
 
 If those files have slightly different schemas—say, one has an extra column added midway through the year—the `union_by_name` option aligns columns by name rather than position, filling in NULLs where a column is absent.
 
@@ -128,7 +128,7 @@ If those files have slightly different schemas—say, one has an extra column ad
 
 The pandas integration goes both directions. You already saw `fetchdf()` for pulling results into DataFrames. Going the other way, you can query an existing DataFrame directly in SQL:
 
-```python
+
 import pandas as pd
 
 orders = pd.DataFrame({
@@ -140,7 +140,7 @@ orders = pd.DataFrame({
 # Reference the DataFrame variable name directly in SQL
 result = conn.execute("SELECT region, SUM(amount) as total FROM orders GROUP BY region")
 print(result.fetchdf())
-```
+
 
 DuckDB resolves the variable name `orders` from the local Python scope. No registration, no import—just write the variable name in your query. For cases where you want more control, `conn.register("my_view", df)` explicitly creates a named virtual table backed by the DataFrame.
 
@@ -150,7 +150,7 @@ One thing to watch out for when building tables from DataFrames: if you use `INS
 
 Beyond raw SQL, DuckDB offers a programmatic query builder called the Relation API. Relations are lazily evaluated—nothing executes until you actually request the data:
 
-```python
+
 rel = conn.sql("SELECT * FROM measurements")
 
 # Chain operations
@@ -158,14 +158,14 @@ filtered = rel.filter("reading > 20").project("sensor_id, reading").order("readi
 
 # Execute and fetch
 print(filtered.fetchdf())
-```
+
 
 You can also construct relations from DataFrames or CSV files:
 
-```python
+
 rel = duckdb.from_csv_auto("sensor_data.csv")
 summary = rel.aggregate("sensor_id, AVG(reading) AS avg_reading").order("avg_reading")
-```
+
 
 Relations compose well. You can join two relations, union them, or pass them as subqueries. The lazy evaluation means DuckDB's optimizer sees the entire pipeline before it runs, which can result in better query plans than issuing individual SQL statements.
 

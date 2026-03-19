@@ -14,7 +14,7 @@ CrewAI gives you two paths, and which you pick depends on complexity.
 
 For stateless operations, the `@tool` decorator is fastest. You write a plain function with type-annotated parameters and a descriptive docstring, and the framework infers the argument schema from the signature automatically:
 
-```python
+
 from crewai.tools import tool
 
 @tool("search_documentation")
@@ -22,11 +22,11 @@ def search_documentation(query: str) -> str:
     """Search internal documentation for information relevant to the query."""
     # your retrieval logic here
     return results
-```
+
 
 When you need internal state, configuration, or complex initialization, subclass `BaseTool` instead. You define `_run` (and optionally an async `_arun`) as the execution method and can add any fields your tool requires:
 
-```python
+
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
@@ -42,7 +42,7 @@ class DatabaseQueryTool(BaseTool):
     def _run(self, sql: str) -> str:
         # execute query using self.connection_string
         return formatted_results
-```
+
 
 The class-based approach makes it easy to compose tools with external clients, connection pools, or auth tokens that persist across invocations.
 
@@ -50,14 +50,14 @@ The class-based approach makes it easy to compose tools with external clients, c
 
 Tools get attached to agents through the `tools` parameter at construction time. A researcher might carry a web search and document reader; a writer might have only file system access. This assignment should be deliberate. Giving every agent access to everything is tempting but counterproductive, because a bloated list forces the language model to choose among too many options. That increases the chance it picks wrong or hallucinates something that doesn't exist.
 
-```python
+
 researcher = Agent(
     role="Market Research Analyst",
     goal="Provide current market analysis of the AI industry",
     backstory="An expert analyst with a keen eye for market trends.",
     tools=[search_tool, web_rag_tool],
 )
-```
+
 
 CrewAI validates tools at construction too, accepting both native `BaseTool` instances and LangChain-compatible objects (converting the latter internally). If one is missing a name or description, validation fails right away rather than at runtime. Honestly, that saves a lot of debugging time.
 
@@ -79,13 +79,13 @@ CrewAI has a built-in caching layer for tool results. The cache key combines the
 
 By default, everything gets cached. You can attach a `cache_function` to any tool for finer control, though. This function receives the arguments and result and returns a boolean saying whether to store that particular output. You might skip caching when a search comes back empty, since the absence of data could be temporary; or you might cache only results meeting some quality threshold to keep bad data from polluting future runs.
 
-```python
+
 def cache_func(args, result):
     # Only cache if the result contains substantive data
     return len(result) > 50
 
 my_tool.cache_function = cache_func
-```
+
 
 In practice, this is one of the most effective levers for controlling costs in a multi-agent system. Agents in a crew frequently ask overlapping questions (a researcher and a fact-checker might both search for the same company name), and without caching, each request hits the API independently.
 

@@ -12,9 +12,9 @@ The API is deliberately simple. `memory = Memory()` gives you a working instance
 
 Recall isn't just vector search. Every result is scored by a weighted formula:
 
-```
+
 composite = semantic_weight * similarity + recency_weight * decay + importance_weight * importance
-```
+
 
 The defaults are 0.5/0.3/0.2 for semantic/recency/importance, with a 30-day recency half-life. This means a memory from yesterday scores noticeably higher on recency than one from three weeks ago, even if the embeddings match equally well. You can tune these weights for your use case. A sprint retrospective crew might want `recency_weight=0.5` and `recency_half_life_days=7`, while an architecture knowledge base would favor `importance_weight=0.4` and a 180-day half-life.
 

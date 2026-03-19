@@ -16,29 +16,29 @@ The install process has two steps: get `uv`, then get `crewai`.
 
 On macOS or Linux, install `uv` with:
 
-```shell
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
+
 
 On Windows, use PowerShell:
 
-```shell
+
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
+
 
 Then install the CrewAI CLI itself:
 
-```shell
+
 uv tool install crewai
-```
+
 
 If you get a PATH warning after this, run `uv tool update-shell` to fix it. Verify the install with `uv tool list`, and you should see something like `crewai v0.102.0` in the output.
 
 There's a choice to make here about extras. The base `crewai` package gives you the agent framework, but if you want the bundled tool library (web search, file reading, and so on), you need:
 
-```shell
+
 uv pip install 'crewai[tools]'
-```
+
 
 This pulls in `crewai-tools`, currently at version 1.11.0. The tools extra is simpler to start with, but it adds significant dependencies. If you only need one or two tools, you might prefer to write thin wrappers yourself and keep your dependency tree lean. The YAML-based scaffolding approach (which we'll use below) is simpler, but you trade that simplicity for less visibility into what's happening under the hood. That's a reasonable trade-off for getting started quickly, though production users on the CrewAI subreddit and HN threads consistently report that they eventually want more control over the agent-to-LLM boundary.
 
@@ -46,13 +46,13 @@ This pulls in `crewai-tools`, currently at version 1.11.0. The tools extra is si
 
 CrewAI ships a CLI that generates project boilerplate. Run:
 
-```shell
+
 crewai create crew latest-ai-development
-```
+
 
 This creates a directory with the following structure:
 
-```
+
 latest-ai-development/
 ├── .gitignore
 ├── knowledge/
@@ -70,7 +70,7 @@ latest-ai-development/
         └── config/
             ├── agents.yaml
             └── tasks.yaml
-```
+
 
 Six files matter. `agents.yaml` defines your agents' roles, goals, and backstories. `tasks.yaml` defines what those agents should do. `crew.py` wires agents and tasks together into a Crew object. `main.py` is the entry point. `.env` holds your API keys. And `knowledge/` is an empty directory where you can drop files for the agents to reference.
 
@@ -80,7 +80,7 @@ The YAML configuration approach is what the CrewAI team recommends. It separates
 
 Open `src/latest_ai_development/config/agents.yaml` and define two agents:
 
-```yaml
+
 researcher:
   role: >
     {topic} Senior Data Researcher
@@ -100,13 +100,13 @@ reporting_analyst:
     You're a meticulous analyst with a keen eye for detail. You're known for
     your ability to turn complex data into clear and concise reports, making
     it easy for others to understand and act on the information you provide.
-```
+
 
 The `{topic}` placeholders get interpolated at runtime from the inputs dictionary you pass in `main.py`. This is a nice touch. It means you can reuse the same crew definition across different domains without modifying the YAML.
 
 Now define the tasks in `src/latest_ai_development/config/tasks.yaml`:
 
-```yaml
+
 research_task:
   description: >
     Conduct a thorough research about {topic}
@@ -122,10 +122,10 @@ reporting_task:
     Make sure the report is detailed and contains any and all relevant information.
   expected_output: >
     A fully fledge reports with the mains topics, each with a full section of information.
-    Formatted as markdown without '```'
+    Formatted as markdown without ''
   agent: reporting_analyst
   output_file: report.md
-```
+
 
 Each task specifies its assigned agent by name, a description of the work, and what the output should look like. The `output_file` field on the reporting task tells CrewAI to write the final result to disk. Tasks in a sequential process run in order, and the output of one task automatically becomes context for the next. So the reporting_analyst receives the researcher's findings without you having to wire that up manually.
 
@@ -133,7 +133,7 @@ Each task specifies its assigned agent by name, a description of the work, and w
 
 The `crew.py` file connects your YAML definitions to actual CrewAI objects:
 
-```python
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
@@ -184,7 +184,7 @@ class LatestAiDevelopmentCrew():
             process=Process.sequential,
             verbose=True,
         )
-```
+
 
 The `@CrewBase` decorator handles the heavy lifting. It automatically reads your YAML configs and populates `self.agents_config` and `self.tasks_config`. The `@agent` and `@task` decorators register methods so that `self.agents` and `self.tasks` are populated without explicit list construction.
 
@@ -192,7 +192,7 @@ The researcher agent gets a `SerperDevTool()`, which lets it search the web via 
 
 And `main.py` is dead simple:
 
-```python
+
 import sys
 from latest_ai_development.crew import LatestAiDevelopmentCrew
 
@@ -201,29 +201,29 @@ def run():
         'topic': 'AI Agents'
     }
     LatestAiDevelopmentCrew().crew().kickoff(inputs=inputs)
-```
+
 
 ## Running It
 
 Before you run anything, set up your `.env` file with the necessary API keys. By default, CrewAI agents use OpenAI's models (defaulting to gpt-4 if `OPENAI_MODEL_NAME` isn't set). You'll also need a Serper API key for the web search tool:
 
-```
+
 OPENAI_API_KEY=sk-...
 SERPER_API_KEY=YOUR_KEY_HERE
-```
+
 
 Navigate to the project directory and install dependencies:
 
-```shell
+
 cd latest_ai_development
 crewai install
-```
+
 
 Then run:
 
-```shell
+
 crewai run
-```
+
 
 The crew will execute. With `verbose=True`, you'll see each agent's reasoning, tool calls, and outputs streamed to the terminal. The final report lands in `report.md` at the root of your project.
 

@@ -8,10 +8,10 @@ Getting DuckDB into your Python environment is a one-liner. Run `pip install duc
 
 Once installed, connecting takes two lines:
 
-```python
+
 import duckdb
 conn = duckdb.connect()
-```
+
 
 That gives you an in-memory database. Pass a filename to `duckdb.connect("my_data.db")` if you want persistence. The connection object is your primary interface-you can call `conn.cursor()` to get a PEP 249 cursor, but the DuckDB example code itself describes the cursor as "fully redundant." I'd skip it and work directly with the connection.
 
@@ -19,20 +19,20 @@ That gives you an in-memory database. Pass a filename to `duckdb.connect("my_dat
 
 The SQL API follows a pattern that'll feel natural if you've used `sqlite3`. You call `conn.execute()` with a query string and optionally bind parameters:
 
-```python
+
 conn.execute("CREATE TABLE sensors (id INTEGER, reading DOUBLE, label STRING)")
 conn.execute("INSERT INTO sensors VALUES (?, ?, ?)", [1, 23.5, 'temperature'])
 conn.executemany("INSERT INTO sensors VALUES (?, ?, ?)", [
     [2, 45.1, 'humidity'],
     [3, 99.8, 'pressure']
 ])
-```
+
 
 Parameterized queries work exactly as you'd expect. Where DuckDB really shines is in how many ways it can hand results back to you. Calling `.fetchall()` returns plain Python tuples. But you probably don't want tuples. You want a DataFrame:
 
-```python
+
 df = conn.execute("SELECT * FROM sensors").fetchdf()
-```
+
 
 That's it-one method call, and you've got a pandas DataFrame. There's also `.fetchnumpy()`, which returns masked NumPy arrays instead. The masked arrays handle NULLs more cleanly than pandas' default behavior, so they're worth considering if you're doing numerical work on columns with missing values.
 
@@ -40,19 +40,19 @@ That's it-one method call, and you've got a pandas DataFrame. There's also `.fet
 
 This is the feature that hooked our team. DuckDB can query pandas DataFrames without importing them into a table first:
 
-```python
+
 import pandas as pd
 orders = pd.DataFrame({"product_id": [1, 2, 3], "quantity": [10, 20, 5]})
 conn.register("orders", orders)
 result = conn.execute("SELECT * FROM orders WHERE quantity > 8").fetchdf()
-```
+
 
 You register the DataFrame with a name and then reference it in SQL. And DuckDB's file reading is just as seamless-you can point SQL directly at files on disk:
 
-```sql
+
 SELECT * FROM 'transactions.csv';
 SELECT * FROM 'warehouse.parquet';
-```
+
 
 Glob patterns work too. If you've got a directory of CSVs following a naming convention, `SELECT * FROM 'tsa20*.csv'` reads them all. For files with slightly different schemas, the `union_by_name` option reconciles columns across files. We stopped writing throwaway pandas scripts for ad-hoc data exploration after discovering this.
 
@@ -60,11 +60,11 @@ Glob patterns work too. If you've got a directory of CSVs following a naming con
 
 Beyond raw SQL, DuckDB's Python client offers a Relation API that operates lazily. Nothing executes until you ask for results. You build up a query pipeline by chaining method calls:
 
-```python
+
 rel = conn.from_df(orders)
 result = rel.filter('quantity > 5').project('product_id, quantity').order('quantity').limit(10)
 result.df()  # triggers execution, returns DataFrame
-```
+
 
 Each call-`.filter()`, `.project()`, `.order()`, `.limit()`-returns a new relation. You can also aggregate with `.aggregate("sum(quantity)")`, join relations with `.join(other_rel, 'product_id')`, and even run SQL against a relation using `.query('alias', 'SELECT * FROM alias WHERE ...')`. The shorthand `duckdb.df(my_dataframe)` creates a relation using the default connection, so you don't even need an explicit connection object for quick one-offs.
 
@@ -88,12 +88,12 @@ DuckDB is excellent, but it has real limitations you need to understand before r
 
 The workaround is to periodically compact your database by copying it to a fresh file:
 
-```python
+
 with duckdb.connect(":memory:") as conn:
     conn.execute(f"ATTACH '{source_path}' AS source (READ_ONLY)")
     conn.execute(f"ATTACH '{compact_path}' AS target")
     conn.execute("COPY FROM DATABASE source TO target")
-```
+
 
 This reduced one user's database from 1.26 GB to 256 MB-an 80% reduction-in under 5 seconds.
 
@@ -105,12 +105,12 @@ This reduced one user's database from 1.26 GB to 256 MB-an 80% reduction-in unde
 
 DuckDB exposes a handful of runtime settings worth knowing about:
 
-```sql
+
 SET memory_limit = '16GB';
 SET threads = 8;
 SET temp_directory = '/path/to/tmp.tmp';
 SET preserve_insertion_order = false;
-```
+
 
 Disabling `preserve_insertion_order` can speed up bulk loads because DuckDB doesn't need to maintain row ordering during parallel inserts. If you're working with S3, v1.5.0 switched the default HTTP backend from httplib to curl, which you can also set explicitly with `SET httpfs_client_implementation = 'curl'`.
 

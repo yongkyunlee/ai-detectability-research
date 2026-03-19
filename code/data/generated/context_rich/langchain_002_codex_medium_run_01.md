@@ -1,0 +1,33 @@
+# Building RAG Pipelines with LangChain Retrievers and Vector Stores
+
+Retrieval-augmented generation looks simple in diagrams: split documents, embed them, store vectors, retrieve context, answer the question. LangChain’s codebase shows why real RAG is more layered. It separates vector storage, retrieval policy, query rewriting, filtering, and index maintenance, which lets you evolve one part of the pipeline without replacing the whole system.
+
+The first design choice is not the database. It is how you turn source material into retrievable units. LangChain’s text splitter interface makes chunk size, overlap, separator handling, and even token-based length measurement explicit parameters. `RecursiveCharacterTextSplitter` is still the practical baseline because it keeps backing off through larger to smaller separators until a chunk fits the budget. That is a reasonable default for mixed prose, code, and markdown, especially when you enable metadata like start offsets for traceability.
+
+But the project issues make an important point: chunking is not just a tuning knob, it is part of correctness. One reported bug in `RecursiveJsonSplitter` dropped keys that happened to land on chunk boundaries. Another discussion around semantic chunking argued that naive character windows can damage retrieval quality on dense HTML and scientific text because the boundary lands in the middle of a concept. The practical takeaway is simple: start with recursive splitting, but treat chunk inspection as a validation step, not an implementation detail. If your source is structured or semantically dense, the wrong splitter can silently degrade the entire pipeline.
+
+Once documents are split, LangChain’s `VectorStore` abstraction takes over. The interface is intentionally broad: add texts or documents, delete by ID, retrieve by ID when supported, and search by similarity. It also standardizes sync and async variants. The core wrapper can expose three search modes through `as_retriever()`: plain similarity, maximal marginal relevance for diversity, and similarity with a score threshold.
+
+For local experiments, `InMemoryVectorStore` is the cleanest demonstration of the model. It embeds documents, stores vectors in a dictionary, runs cosine similarity, supports filtering, and can be turned directly into a retriever.
+
+From there, provider-specific integrations let you scale without rewriting the chain. The Chroma package supports a local persistent directory, an HTTP server, or Chroma Cloud. The Qdrant integration adds richer operational controls such as batch upserts, async clients, metadata-aware search, score thresholds, and read consistency settings. Storage backends vary, but the retriever contract remains stable.
+
+That stability matters because a retriever is not the same thing as a vector store. In LangChain, retrievers are runnable components that accept a query and return `Document` objects. A vector store can back a retriever, but retrieval can also involve query rewriting, fusion, metadata translation, or compression.
+
+The simplest path is `vector_store.as_retriever()`. The more interesting path is composing specialized retrievers for the failure mode you actually have.
+
+If recall is the problem, `MultiQueryRetriever` uses an LLM to generate alternate phrasings of the same question, runs retrieval for each one, and unions the unique results. That is useful when a single embedding query misses relevant passages because the wording in the corpus does not line up with the user’s phrasing.
+
+If retrieved chunks are individually relevant but too small to answer from cleanly, `ParentDocumentRetriever` and the lower-level `MultiVectorRetriever` are the right tools. They index smaller child chunks for search quality, but return the larger parent document for answer generation. This directly addresses the central RAG tension: smaller chunks embed better, larger chunks explain better.
+
+If users naturally ask for filtered retrieval in plain English, `SelfQueryRetriever` is the next step. It uses an LLM to produce a structured query and then translates that query into the filter syntax supported by the underlying vector store. The codebase includes translator support for many stores, including Chroma, Qdrant, Pinecone, PGVector, Redis, and others. That means you can move from “find notes about contract renewals after March” to a real filtered search without hand-writing filter logic for every query.
+
+If your top results are too repetitive, `EnsembleRetriever` and MMR help from different angles. MMR increases diversity inside one retriever’s candidate set. Ensemble retrieval combines outputs from multiple retrievers using reciprocal rank fusion.
+
+Precision controls matter just as much as recall controls. LangChain includes document compression components such as `EmbeddingsFilter`, which trims the candidate set by comparing document embeddings against the query before the final prompt is built. Community discussions around RAG ranking make the same point from another angle: vector retrieval is often good at finding a large candidate pool, but ranking the best few passages is the harder problem. A mature pipeline usually needs both stages.
+
+The final layer is index hygiene. LangChain’s indexing API addresses a common RAG failure: stale, duplicated, or partially refreshed content. The API hashes document content and metadata, deduplicates within batches, and works with a `RecordManager` to decide whether documents should be added, refreshed, skipped, or deleted. Cleanup modes such as `incremental`, `full`, and `scoped_full` make the trade-off explicit. The code also warns against relying on SHA-1 for new applications and supports stronger hash functions.
+
+The broader LangChain discussions reinforce the same lesson. Newcomers get overwhelmed when they focus on syntax before embeddings, chunking, and ranking. Teams that do get a prototype working often discover that production problems live outside the happy path: latency drift, retries, provider quirks, and inconsistent response behavior. LangChain does not remove that complexity, but its retriever and vector store abstractions give you a place to put it.
+
+The best way to build a LangChain RAG pipeline is incrementally. Start with recursive splitting, a simple vector store, and `as_retriever()`. When failures appear, upgrade the layer that matches the failure: multi-query for recall, parent documents for context preservation, self-query for structured filtering, compression or reranking for precision, and the indexing API for refresh discipline. The result is not one monolithic chain, but a set of interchangeable retrieval policies around a shared document interface.
